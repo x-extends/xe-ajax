@@ -1,4 +1,4 @@
-# xe-ajax 使用Promise提供便捷函数式调用api
+# xe-ajax 使用Promise提供便捷http调用函数
 
 ## 通过NPM安装最新版本
 
@@ -6,12 +6,20 @@
 npm install xe-ajax --save
 ```
 
-### 按需引入
+### 局部使用
 ``` shell
-import { get, post } from 'xe-ajax/ajax'
+import { get, getJSON, post, postJSON } from 'xe-ajax'
 
-get ('url')
-post ('url', {id: 1})
+get ('url').then().then(response => {
+  response.body
+}).catch(response => {
+  response.body
+})
+getJSON ('url', {id: 1}).then(data => {
+  data
+}).catch(data => {
+  data
+})
 ```
 
 ### 如果是全局安装，通过实例调用this.$ajax函数this默认指向当前vue实例
@@ -22,10 +30,17 @@ import VXEAjax from 'vxe-ajax'
 
 Vue.use(VXEAjax, XEAjax)
 
+// 在Vue实例中使用
+this.$ajax.getJSON ('url', {id: 1}).then(data => {
+  data
+}).catch(data => {
+  data
+})
 ```
 
 ## API :
 ### vxe-ajax 提供的便捷方法：
+* ajax( options )
 * get ( url, params, options )
 * getJSON ( url, params, options )
 * post ( url, body, options )
@@ -42,29 +57,7 @@ Vue.use(VXEAjax, XEAjax)
 * url（字符串），请求地址。可被options属性覆盖。
 * params/body（可选，对象/数组），要发送的数据。可被options属性覆盖。
 * options （可选，对象）参数
-``` shell
-// 返回response对象
-this.get('url').then(response => {
-  // this 指向当前vue实例
-  response.body
-}).catch(response => {
-  // this 指向当前vue实例
-  response.body
-  response.status
-})
-// 直接返回数据
-this.getJSON('url').then(data => {
-  // this 指向当前vue实例
-}).catch(data => {
-  // this 指向当前vue实例
-})
-// url参数和数据同时提交
-this.postJSON('url', {name: 'aaa'}, {params: {id: 1}}).then(data => {
-  // this 指向当前vue实例
-}).catch(data => {
-  // this 指向当前vue实例
-})
-```
+
 ### 调用参数
 | 参数 | 类型 | 描述 | 值 |
 |------|------|-----|----|
@@ -90,6 +83,31 @@ Vue.ajax.defaults = {
     'Content-Type': 'application/x-www-form-urlencoded'
   }
 }
+```
+
+### 使用例子
+``` shell
+// 返回response对象
+this.get('url').then(response => {
+  // this 指向当前vue实例
+  response.body
+}).catch(response => {
+  // this 指向当前vue实例
+  response.body
+  response.status
+})
+// 直接返回数据
+this.getJSON('url').then(data => {
+  // this 指向当前vue实例
+}).catch(data => {
+  // this 指向当前vue实例
+})
+// url参数和数据同时提交
+this.postJSON('url', {name: 'aaa'}, {params: {id: 1}}).then(data => {
+  // this 指向当前vue实例
+}).catch(data => {
+  // this 指向当前vue实例
+})
 ```
 
 ### 设置拦截器

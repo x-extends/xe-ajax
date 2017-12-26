@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xlz26296/xe-ajax.git"
+    "url": "git+https://github.com/xuliangzhan/xe-ajax.git"
   },
   "keywords": [
     "ajax",
@@ -23,7 +23,7 @@
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/xlz26296/xe-ajax/issues"
+    "url": "https://github.com/xuliangzhan/xe-ajax/issues"
   },
-  "homepage": "https://github.com/xlz26296/xe-ajax#readme"
+  "homepage": "https://github.com/xuliangzhan/xe-ajax#readme"
 }
