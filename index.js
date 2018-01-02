@@ -1,4 +1,5 @@
 import { XEAjax } from './ajax/constructor'
+import * as ajax from './ajax'
 
 /**
  * 函数扩展
@@ -17,6 +18,8 @@ export function mixin (methods) {
     })
   }
 }
+
+mixin(ajax)
 
 export var constructor = XEAjax
 export * from './ajax'

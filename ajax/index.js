@@ -19,7 +19,7 @@ function responseJSON (method) {
 
 // Http Request Batch
 export function all (iterable, context) {
-  return XEPromise.all(iterable, context || XEAjax.context)
+  return XEPromise.all(iterable || [], context || XEAjax.context)
 }
 
 // Http Request Method get
@@ -53,17 +53,8 @@ export function jsonp (url, params, opts) {
   return createAjax('get', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
 }
 
-// export default {
-//   all,
-//   get,
-//   getJSON: responseJSON('get'),
-//   post,
-//   postJSON: responseJSON('post'),
-//   put,
-//   putJSON: responseJSON('put'),
-//   patch,
-//   patchJSON: responseJSON('patch'),
-//   del,
-//   delJSON: responseJSON('delete'),
-//   jsonp
-// }
+export var getJSON = responseJSON('get')
+export var postJSON = responseJSON('post')
+export var putJSON = responseJSON('put')
+export var patchJSON = responseJSON('patch')
+export var delJSON = responseJSON('delete')
