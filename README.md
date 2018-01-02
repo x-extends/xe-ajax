@@ -6,7 +6,7 @@
 npm install xe-ajax --save
 ```
 
-### 局部使用
+### 按需引入
 ``` shell
 import { get, getJSON, post, postJSON } from 'xe-ajax'
 
@@ -22,13 +22,28 @@ getJSON ('url', {id: 1}).then(data => {
 })
 ```
 
-### 如果是全局安装，通过实例调用this.$ajax函数this默认指向当前vue实例
+### 引入所有
+``` shell
+import * as XEAjax from 'xe-ajax'
+
+XEAjax.post ('url').then().then(response => {
+  response.body
+}).catch(response => {
+  response.body
+})
+XEAjax.postJSON ('url', {id: 1}).then(data => {
+  data
+}).catch(data => {
+  data
+})
+```
+
+### Vue全局安装，通过实例调用this.$ajax函数this默认指向当前vue实例
 ``` shell
 import Vue from 'vue'
-import XEAjax from 'xe-ajax'
 import VXEAjax from 'vxe-ajax'
 
-Vue.use(VXEAjax, XEAjax)
+Vue.use(VXEAjax)
 
 // 在Vue实例中使用
 this.$ajax.getJSON ('url', {id: 1}).then(data => {
@@ -49,8 +64,8 @@ this.$ajax.getJSON ('url', {id: 1}).then(data => {
 * putJSON ( url, body, options )
 * patch ( url, body, options )
 * patchJSON ( url, body, options )
-* delete ( url, body, options )
-* deleteJSON ( url, body, options )
+* del ( url, body, options )
+* delJSON ( url, body, options )
 * jsonp ( url, params, options )
 
 ### 接受三个参数：
