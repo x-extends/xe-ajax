@@ -6,7 +6,7 @@ import * as ajax from './ajax'
  *
  * @param {Object} methods 扩展函数对象
  */
-export function mixin (methods) {
+function mixin (methods) {
   if (methods) {
     Object.keys(methods).forEach(function (name) {
       var fn = methods[name]
@@ -17,9 +17,11 @@ export function mixin (methods) {
       } : fn
     })
   }
+  return XEAjax
 }
 
 mixin(ajax)
+XEAjax.mixin = mixin
 
-export var constructor = XEAjax
 export * from './ajax'
+export default XEAjax
