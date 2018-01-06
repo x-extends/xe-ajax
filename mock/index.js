@@ -51,7 +51,6 @@ function getTime (timeout) {
 }
 
 function mateMockItem (request) {
-  debugger
   var url = (request.getUrl() || '').split(/\?|#/)[0]
   return defineMockServices.find(function (item) {
     if (request.method === item.method) {
