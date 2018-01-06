@@ -54,94 +54,10 @@ this.$ajax.getJSON ('url', {id: 1}).then(data => {
 })
 ```
 
-### 支持Mock虚拟服务
-``` shell
-import { getJSON, postJSON } from 'xe-ajax'
-import { mock } from 'xe-ajax/mock'
-
-// 单个定义
-mock('/services/test1/list', 'get', {msg: 'success'})
-mock('/services/test2/list', 'get', (resolve, reject, request) => {
-  // 模拟后台逻辑
-  if (request.params.id) {
-    resolve({msg: 'success'})
-  }else{
-    reject({msg: 'error'})
-  }
-})
-// 支持定义多个
-mock([{
-  url: '/services/test3',
-  children: [{
-    url: '/list',
-    method: 'get',
-    response (resolve, reject, request) {
-      resolve({msg: 'success'})
-    }
-  }, {
-    url: '/submit',
-    method: 'post',
-    response (resolve, reject, request) {
-      resolve({msg: 'success'})
-    }
-  }]
-}])
-
-// 调用方式查看XEAjax API
-getJSON('/services/test1/list').then(data => {
-  // data = {msg: 'success'}
-})
-
-getJSON('/services/test2/list', {id: 111}).then(data => {
-  // data = {msg: 'success'}
-})
-
-getJSON('/services/test2/list').catch(function (data => {
-  // data = {msg: 'error'}
-})
-
-getJSON('/services/test3/list').then(function (data => {
-  // data = {msg: 'success'}
-})
-
-postJSON('/services/test3/submit').then(function (data => {
-  // data = {msg: 'success'}
-})
-
-```
-
-## XEAjaxMock API :
-### xe-ajax/mock 提供的便捷方法：
-* mock( defines, options )
-* mock( url, method, response, options )
-* setup( options )
-
-### 接受两个参数：
-* defines（数组）定义多个
-* options （可选，对象）参数
-### 接受四个参数：
-* url（字符串）请求地址
-* method（字符串）请求方法 | 默认get
-* response （对象/方法）数据或返回数据方法
-* options （可选，对象）参数
-
-### 支持自定义扩展
-``` shell
-import Vue from 'vue'
-import XEAjax from 'xe-ajax'
-import VXEAjax from 'vxe-ajax'
-import customs from './customs' // ./customs.js export function custom1 () {} 
-
-XEAjax.mixin(customs)
-Vue.use(VXEAjax, XEAjax)
-
-// 调用自定义扩展函数
-this.$ajax.custom1()
-```
-
 ## XEAjax API :
 ### xe-ajax 提供的便捷方法：
 * ajax( options )
+* all (iterable, context)
 * get ( url, params, options )
 * getJSON ( url, params, options )
 * post ( url, body, options )
@@ -188,32 +104,34 @@ Vue.ajax.defaults = {
 
 ### 使用例子
 ``` shell
+import { get, getJSON, postJSON } from 'xe-ajax'
+
 // 返回response对象
-this.get('url').then(response => {
-  // this 指向当前vue实例
-  response.body
+get('url').then(response => {
+  // response.body
 }).catch(response => {
-  // this 指向当前vue实例
-  response.body
-  response.status
+  // response.body
+  // response.status
 })
 // 直接返回数据
-this.getJSON('url').then(data => {
-  // this 指向当前vue实例
+getJSON('url').then(data => {
+  // data
 }).catch(data => {
-  // this 指向当前vue实例
+  // data
 })
 // url参数和数据同时提交
-this.postJSON('url', {name: 'aaa'}, {params: {id: 1}}).then(data => {
-  // this 指向当前vue实例
+postJSON('url', {name: 'aaa'}, {params: {id: 1}}).then(data => {
+  // data
 }).catch(data => {
-  // this 指向当前vue实例
+  // data
 })
 ```
 
 ### 设置拦截器
 ``` shell
-Vue.ajax.oninterceptor = (request, next) => {
+import XEAjax from 'xe-ajax'
+
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 更改请求类型为POST
@@ -221,8 +139,8 @@ Vue.ajax.oninterceptor = (request, next) => {
 
   // 继续执行,如果不调用next则不会往下走
   next()
-}
-Vue.ajax.oninterceptor = (request, next) => {
+})
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 继续执行
@@ -232,23 +150,105 @@ Vue.ajax.oninterceptor = (request, next) => {
     // 更改请求结果数据
     response.body = {}
   })
-}
-Vue.ajax.oninterceptor = (request, next) => {
+})
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
-  // 继续执行,如果希望直接返回数据,结束请求
-
-  // 直接返回
+  // 继续执行,如果希望直接返回数据
   // next({response: [{id: 1}, {id: 2}], status: 500})
-  // 异步返回
+
+  // 异步操作
   new Promise( (resolve, reject) => {
-    setTimeout( () => {
-      next({response: {a: 1, b: 2}, status: 200})
-    }, 10)
+    setTimeout( () => next({response: {a: 1, b: 2}, status: 200}), 100)
   })
   
-}
+})
 ```
+
+### 自定义扩展
+``` shell
+import Vue from 'vue'
+import XEAjax from 'xe-ajax'
+import VXEAjax from 'vxe-ajax'
+import customs from './customs' // ./customs.js export function custom1 () {} 
+
+XEAjax.mixin(customs)
+Vue.use(VXEAjax, XEAjax)
+
+// 调用自定义扩展函数
+this.$ajax.custom1()
+```
+
+### Mock虚拟服务
+``` shell
+import { getJSON, postJSON } from 'xe-ajax'
+import { mock } from 'xe-ajax/mock'
+
+// 单个定义
+mock('/services/test1/list', 'get', {msg: 'success'})
+mock('/services/test2/list', 'get', (resolve, reject, request) => {
+  // 模拟后台逻辑
+  if (request.params.id) {
+    resolve({msg: 'success'})
+  }else{
+    reject({msg: 'error'})
+  }
+})
+// 支持定义多个
+mock([{
+  url: '/services/test3',
+  children: [{
+    url: '/list',
+    method: 'get',
+    response (resolve, reject, request) {
+      resolve({msg: 'success'})
+    }
+  }, {
+    url: '/submit',
+    method: 'post',
+    response (resolve, reject, request) {
+      resolve({msg: 'success'})
+    }
+  }]
+}])
+
+// 调用方式查看XEAjax API
+getJSON('/services/test1/list').then(data => {
+  // data = {msg: 'success'}
+})
+
+getJSON('/services/test2/list', {id: 111}).then(data => {
+  // data = {msg: 'success'}
+})
+
+getJSON('/services/test2/list').catch( (data => {
+  // data = {msg: 'error'}
+})
+
+getJSON('/services/test3/list').then( (data => {
+  // data = {msg: 'success'}
+})
+
+postJSON('/services/test3/submit').then( (data => {
+  // data = {msg: 'success'}
+})
+
+```
+
+## XEAjaxMock API :
+### xe-ajax/mock 提供的便捷方法：
+* mock( defines, options )
+* mock( url, method, response, options )
+* setup( options )
+
+### 接受两个参数：
+* defines（数组）定义多个
+* options （可选，对象）参数
+### 接受四个参数：
+* url（字符串）请求地址
+* method（字符串）请求方法 | 默认get
+* response （对象/方法）数据或返回数据方法
+* options （可选，对象）参数
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
