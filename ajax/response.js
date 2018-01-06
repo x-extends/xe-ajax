@@ -54,3 +54,5 @@ export function XEAjaxResponse (request, xhr) {
     }
   }
 }
+
+export default XEAjaxResponse

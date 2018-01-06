@@ -48,3 +48,5 @@ Object.assign(XEPromise, {
   }
 
 })
+
+export default XEPromise

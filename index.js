@@ -1,5 +1,5 @@
-import { XEAjax } from './ajax/constructor'
-import * as ajax from './ajax'
+import XEAjax from './ajax/constructor'
+import ajax from './ajax'
 
 /**
  * 函数扩展

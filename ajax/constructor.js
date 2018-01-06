@@ -1,6 +1,6 @@
-import { XEAjaxRequest } from './request'
-import { XEAjaxResponse } from './response'
-import { XEPromise } from './promise'
+import XEAjaxRequest from './request'
+import XEAjaxResponse from './response'
+import XEPromise from './promise'
 import { isFunction, isFormData, isUndefined, eachObj } from './util'
 
 var setupInterceptors = []
@@ -14,7 +14,7 @@ var setupDefaults = {
   }
 }
 
-/*
+/**
   * XHR AJAX
   *
   * @param Object options 请求参数
@@ -26,50 +26,6 @@ export function XEAjax (options, context) {
     return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(Object.assign(setupDefaults, {headers: Object.assign({}, setupDefaults.headers)}, options)), resolved, rejected, XEAjax.context)
   }, XEAjax.context)
 }
-
-Object.defineProperties(XEAjax, {
-
-  /**
-   * 拦截器
-   *
-   * @attribute function (request, next)
-   * next({response : {...}, status : 200}) 如果是对象值,则不再中断并返回结果
-   * next(function (response)) 如果是函数,则在请求之后执行
-   */
-  oninterceptor: {
-    get: function () {
-      return setupInterceptors
-    },
-    set: function (callback) {
-      setupInterceptors.push(callback)
-    }
-  },
-
-  /**
-   * 参数
-   *
-   * @attribute String url 请求地址
-   * @attribute String baseURL 基础路径
-   * @attribute String method 请求方法(默认get)
-   * @attribute Object params 请求参数
-   * @attribute Object body 提交参数
-   * @attribute String bodyMode 提交参数方式(默认json) 支持[json:以json方式提交数据] [formData:以formData方式提交数据]
-   * @attribute String jsonp 调用jsonp服务,回调属性默认callback
-   * @attribute String jsonpCallback jsonp回调函数名
-   * @attribute Boolean async 异步/同步(默认true)
-   * @attribute Number timeout 设置超时
-   * @attribute Object headers 请求头
-   * @attribute Function iterators(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
-   */
-  defaults: {
-    get: function () {
-      return setupDefaults
-    },
-    set: function (opts) {
-      Object.assign(setupDefaults, opts)
-    }
-  }
-})
 
 function afterSendHandle (request, response, context) {
   var afterPromises = XEPromise.resolve(response)
@@ -166,8 +122,48 @@ function jsonpHandle (request, response, resolved, rejected, context) {
   sendEnd(request, response, resolved, rejected, context)
 }
 
-// set request header
-XEAjax.oninterceptor = function (request, next) {
+/**
+ * 参数
+ *
+ * @param String url 请求地址
+ * @param String baseURL 基础路径
+ * @param String method 请求方法(默认get)
+ * @param Object params 请求参数
+ * @param Object body 提交参数
+ * @param String bodyMode 提交参数方式(默认json) 支持[json:以json方式提交数据] [formData:以formData方式提交数据]
+ * @param String jsonp 调用jsonp服务,回调属性默认callback
+ * @param String jsonpCallback jsonp回调函数名
+ * @param Boolean async 异步/同步(默认true)
+ * @param Number timeout 设置超时
+ * @param Object headers 请求头
+ * @param Function iterators(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
+ */
+export var setup = XEAjax.setup = function setup (options) {
+  Object.assign(setupDefaults, options)
+}
+
+/**
+ * 拦截器
+ *
+ * @param function (request, next)
+ *  request 请求对象
+ *  next Object 如果是对象值,则直接返回请求结果
+ *    next({...}) 返回结果，状态200
+ *    next({response : {...}, status : 500}) 支持状态自定义
+ *  next Function 如果是函数,则在请求之后执行
+ *    next(function (response) {return response}) 直接处理后的结果
+ *    next(function (response) {response.status = 200}) 将状态修改
+ */
+export var interceptor = XEAjax.interceptor = {
+  use: function (callback) {
+    if (isFunction(callback)) {
+      setupInterceptors.push(callback)
+    }
+    return interceptor
+  }
+}
+
+interceptor.use(function (request, next) {
   if (!isFormData(request.method === 'get' ? request.params : request.body)) {
     if (request.bodyMode === 'json') {
       request.setHeader('Content-Type', 'application/json; charset=utf-8')
@@ -179,4 +175,6 @@ XEAjax.oninterceptor = function (request, next) {
     request.setHeader('X-Requested-With', 'XMLHttpRequest')
   }
   next()
-}
+})
+
+export default XEAjax

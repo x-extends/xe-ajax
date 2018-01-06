@@ -63,3 +63,5 @@ Object.assign(XEAjaxRequest.prototype, {
     return null
   }
 })
+
+export default XEAjaxRequest

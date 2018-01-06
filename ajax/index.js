@@ -1,5 +1,5 @@
-import { XEAjax } from './constructor'
-import { XEPromise } from './promise'
+import XEAjax from './constructor'
+import XEPromise from './promise'
 import { isObject } from './util'
 
 function createAjax (method, def, opts) {
@@ -58,3 +58,17 @@ export var postJSON = responseJSON('post')
 export var putJSON = responseJSON('put')
 export var patchJSON = responseJSON('patch')
 export var delJSON = responseJSON('delete')
+
+export default {
+  get,
+  getJSON,
+  post,
+  postJSON,
+  put,
+  putJSON,
+  patch,
+  patchJSON,
+  del,
+  delJSON,
+  jsonp
+}
