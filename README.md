@@ -278,7 +278,7 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 import XEAjaxMock from 'xe-ajax/mock'
 
 XEAjaxMock.setup({
-  timeout: '100-300'
+  timeout: '100-500'
 })
 ```
 
