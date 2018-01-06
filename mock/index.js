@@ -7,15 +7,15 @@ var setupDefaults = {
   timeout: '10-200'
 }
 
-function XEMockService (url, method, response, options) {
-  if (url && method) {
-    this.url = url
+function XEMockService (path, method, response, options) {
+  if (path && method) {
+    this.path = path
     this.method = method
     this.response = response
     this.options = options
-    this.key = getMockKey(url, method)
+    this.key = getMockKey(path, method)
   } else {
-    throw new TypeError('url and method cannot be empty')
+    throw new TypeError('path and method cannot be empty')
   }
 }
 
@@ -51,8 +51,8 @@ function getTime (timeout) {
   return matchs.length === 3 ? random(parseInt(matchs[1]), parseInt(matchs[2])) : 0
 }
 
-function getMockKey (url, method) {
-  return method.toLocaleUpperCase() + '@' + url.split(/\?|#/)[0]
+function getMockKey (path, method) {
+  return method.toLocaleUpperCase() + '@' + path.split(/\?|#/)[0]
 }
 
 function mateMockItem (request) {
@@ -65,16 +65,16 @@ function mateMockItem (request) {
 function defineMocks (list, options, baseURL) {
   if (isArray(list)) {
     list.forEach(function (item) {
-      if (item.url) {
+      if (item.path) {
         if (!baseURL) {
-          baseURL = /\w+:\/{2}.*/.test(item.url) ? '' : options.baseURL
+          baseURL = /\w+:\/{2}.*/.test(item.path) ? '' : options.baseURL
         }
-        item.url = (baseURL ? baseURL.replace(/\/$/, '') + '/' : '') + item.url.replace(/^\//, '')
+        item.path = (baseURL ? baseURL.replace(/\/$/, '') + '/' : '') + item.path.replace(/^\//, '')
         if (item.response) {
           item.method = String(item.method || 'get')
-          defineMockServices.push(new XEMockService(item.url, item.method, item.response, options))
+          defineMockServices.push(new XEMockService(item.path, item.method, item.response, options))
         }
-        defineMocks(item.children, options, item.url)
+        defineMocks(item.children, options, item.path)
       }
     })
   }
@@ -92,13 +92,13 @@ export function setup (options) {
 /**
   * XEMock 虚拟服务
   *
-  * @param Array/String url 路径数组/请求路径
+  * @param Array/String path 路径数组/请求路径
   * @param String method 请求方法
   * @param Object/Function response 数据或返回数据方法
   * @param Object options 参数
   */
-export function mock (url, method, response, options) {
-  defineMocks(isArray(url) ? (options = method, url) : [{url: url, method: method, response: response}], Object.assign({}, setupDefaults, options))
+export function mock (path, method, response, options) {
+  defineMocks(isArray(path) ? (options = method, path) : [{path: path, method: method, response: response}], Object.assign({}, setupDefaults, options))
 }
 
 XEAjax.interceptor.use(function (request, next) {
