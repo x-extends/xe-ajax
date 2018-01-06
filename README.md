@@ -262,7 +262,7 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 * defines（数组）定义多个
 * options （可选，对象）参数
 ### 接受四个参数：
-* path（字符串）请求地址
+* path（字符串）请求地址 占位符\*支持动态路径: services/list/*/* 匹配 services/list/10/1
 * method（字符串）请求方法 | 默认get
 * response （对象/方法）数据或返回数据方法
 * options （可选，对象）参数

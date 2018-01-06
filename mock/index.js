@@ -13,7 +13,6 @@ function XEMockService (path, method, response, options) {
     this.method = method
     this.response = response
     this.options = options
-    this.key = getMockKey(path, method)
   } else {
     throw new TypeError('path and method cannot be empty')
   }
@@ -51,14 +50,14 @@ function getTime (timeout) {
   return matchs.length === 3 ? random(parseInt(matchs[1]), parseInt(matchs[2])) : 0
 }
 
-function getMockKey (path, method) {
-  return method.toLocaleUpperCase() + '@' + path.split(/\?|#/)[0]
-}
-
 function mateMockItem (request) {
-  var mockKey = getMockKey(request.getUrl() || '', request.method)
+  debugger
+  var url = (request.getUrl() || '').split(/\?|#/)[0]
   return defineMockServices.find(function (item) {
-    return item.key === mockKey
+    if (request.method === item.method) {
+      let matchs = url.match(new RegExp(item.path.replace(/\*/g, '[^/]+') + '(/.*)?'))
+      return matchs && matchs.length === 2 && !matchs[1]
+    }
   })
 }
 
