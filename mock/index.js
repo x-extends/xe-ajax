@@ -4,7 +4,8 @@ import { isArray, isFunction, random } from '../ajax/util'
 var defineMockServices = []
 var setupDefaults = {
   baseURL: location.origin,
-  timeout: '10-200'
+  timeout: '10-200',
+  log: true
 }
 
 function XEMockService (path, method, response, options) {
@@ -32,15 +33,15 @@ Object.assign(XEMockService.prototype, {
     })
   },
   sendResponse: function (request, next) {
+    var log = this.options.log
     var time = getTime(this.options.timeout)
-    var mockLog = 'XEAjaxMock: ' + this.key + ' ' + time + 'ms'
     return this.getTemplate(request, time).then(function (response) {
       return {status: 200, response: response}
     }).catch(function (response) {
       return {status: 0, response: response}
     }).then(function (xhr) {
       next(xhr)
-      console.info(mockLog)
+      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + '\nTime: ' + time + 'ms')
     })
   }
 })
