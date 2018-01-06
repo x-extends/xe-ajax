@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "xe-ajax 使用Promise提供便捷http调用函数",
   "main": "index.js",
   "scripts": {
