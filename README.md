@@ -93,18 +93,20 @@ this.$ajax.getJSON ('url', {id: 1}).then(data => {
 
 ### 设置默认参数
 ``` shell
-Vue.ajax.defaults = {
+import XEAjax from 'xe-ajax'
+
+XEAjax.setup({
   baseURL: 'xxx.com',
   bodyMode: 'formData',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   }
-}
+})
 ```
 
 ### 使用例子
 ``` shell
-import { get, getJSON, postJSON } from 'xe-ajax'
+import { all, get, getJSON, postJSON } from 'xe-ajax'
 
 // 返回response对象
 get('url').then(response => {
@@ -125,13 +127,20 @@ postJSON('url', {name: 'aaa'}, {params: {id: 1}}).then(data => {
 }).catch(data => {
   // data
 })
+// 在所有的异步操作执行完
+let iterable = [getJSON('url'), postJSON('url')]
+all(iterable).then(datas => {
+  // datas
+}).catch(datas => {
+  // datas
+})
 ```
 
 ### 设置拦截器
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.interceptor.use( (request, next) => {
+XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
   // 更改请求类型为POST
@@ -140,7 +149,7 @@ XEAjax.interceptor.use( (request, next) => {
   // 继续执行,如果不调用next则不会往下走
   next()
 })
-XEAjax.interceptor.use( (request, next) => {
+XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
   // 继续执行
@@ -151,15 +160,15 @@ XEAjax.interceptor.use( (request, next) => {
     response.body = {}
   })
 })
-XEAjax.interceptor.use( (request, next) => {
+XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
   // 继续执行,如果希望直接返回数据
   // next({response: [{id: 1}, {id: 2}], status: 500})
 
   // 异步操作
-  new Promise( (resolve, reject) => {
-    setTimeout( () => next({response: {a: 1, b: 2}, status: 200}), 100)
+  new Promise((resolve, reject) => {
+    setTimeout(() => next({response: {a: 1, b: 2}, status: 200}), 100)
   })
   
 })
@@ -181,12 +190,12 @@ this.$ajax.custom1()
 
 ### Mock虚拟服务
 ``` shell
-import { getJSON, postJSON } from 'xe-ajax'
+import { getJSON, postJSON, delJSON } from 'xe-ajax'
 import { mock } from 'xe-ajax/mock'
 
 // 单个定义
 mock('/services/test1/list', 'get', {msg: 'success'})
-mock('/services/test2/list', 'get', (resolve, reject, request) => {
+mock('services/test2/list', 'get', (resolve, reject, request) => {
   // 模拟后台逻辑
   if (request.params.id) {
     resolve({msg: 'success'})
@@ -194,43 +203,51 @@ mock('/services/test2/list', 'get', (resolve, reject, request) => {
     reject({msg: 'error'})
   }
 })
-// 支持定义多个
+// 定义多个
 mock([{
-  url: '/services/test3',
+  path: 'services/test3',
   children: [{
-    url: '/list',
-    method: 'get',
+    path: 'list',
     response (resolve, reject, request) {
       resolve({msg: 'success'})
     }
   }, {
-    url: '/submit',
+    path: 'submit',
     method: 'post',
-    response (resolve, reject, request) {
-      resolve({msg: 'success'})
-    }
+    response: {msg: 'success'},
+    children : [{
+      path : 'deletelist',
+      method: 'delete',
+      response (resolve, reject, request) {
+        reject({msg: 'success'})
+      },
+    }]
   }]
 }])
 
-// 调用方式查看XEAjax API
+// 调用
 getJSON('/services/test1/list').then(data => {
   // data = {msg: 'success'}
 })
 
-getJSON('/services/test2/list', {id: 111}).then(data => {
+getJSON('services/test2/list', {id: 111}).then(data => {
   // data = {msg: 'success'}
 })
 
-getJSON('/services/test2/list').catch( (data => {
+getJSON('services/test2/list').catch(data => {
   // data = {msg: 'error'}
 })
 
-getJSON('/services/test3/list').then( (data => {
+getJSON('services/test3/list').then(data => {
   // data = {msg: 'success'}
 })
 
-postJSON('/services/test3/submit').then( (data => {
+postJSON('services/test3/submit').then(data => {
   // data = {msg: 'success'}
+})
+
+delJSON('services/test3/submit/deletelist').catch(data => {
+  // data = {msg: 'error'}
 })
 
 ```
@@ -238,17 +255,32 @@ postJSON('/services/test3/submit').then( (data => {
 ## XEAjaxMock API :
 ### xe-ajax/mock 提供的便捷方法：
 * mock( defines, options )
-* mock( url, method, response, options )
+* mock( path, method, response, options )
 * setup( options )
 
 ### 接受两个参数：
 * defines（数组）定义多个
 * options （可选，对象）参数
 ### 接受四个参数：
-* url（字符串）请求地址
+* path（字符串）请求地址
 * method（字符串）请求方法 | 默认get
 * response （对象/方法）数据或返回数据方法
 * options （可选，对象）参数
+
+### 调用参数
+| 参数 | 类型 | 描述 | 值 |
+|------|------|-----|----|
+| baseURL | String | 基础路径 |  |
+| timeout | String | 模拟请求时间 | 默认'10-200' |
+
+### 设置默认参数
+``` shell
+import XEAjaxMock from 'xe-ajax/mock'
+
+XEAjaxMock.setup({
+  timeout: '100-300'
+})
+```
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
