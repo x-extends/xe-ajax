@@ -276,7 +276,7 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 | 参数 | 类型 | 描述 | 值 |
 |------|------|-----|----|
 | baseURL | String | 基础路径 |  |
-| timeout | String | 模拟请求时间 | 默认'10-200' |
+| timeout | String | 模拟请求时间 | 默认'20-400' |
 
 ### 设置默认参数
 ``` shell

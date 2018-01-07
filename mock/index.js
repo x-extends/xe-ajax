@@ -4,7 +4,7 @@ import { isArray, isFunction, random } from '../ajax/util'
 var defineMockServices = []
 var setupDefaults = {
   baseURL: location.origin,
-  timeout: '10-200',
+  timeout: '20-400',
   log: true
 }
 
