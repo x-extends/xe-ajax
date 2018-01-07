@@ -165,7 +165,7 @@ export var interceptor = XEAjax.interceptor = {
 
 interceptor.use(function (request, next) {
   if (!isFormData(request.method === 'get' ? request.params : request.body)) {
-    if (request.bodyMode === 'json') {
+    if (request.method !== 'get' && request.bodyMode === 'json') {
       request.setHeader('Content-Type', 'application/json; charset=utf-8')
     } else {
       request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
