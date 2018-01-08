@@ -60,16 +60,16 @@ export var patchJSON = responseJSON('patch')
 export var delJSON = responseJSON('delete')
 
 export default {
-  all,
-  get,
-  getJSON,
-  post,
-  postJSON,
-  put,
-  putJSON,
-  patch,
-  patchJSON,
-  del,
-  delJSON,
-  jsonp
+  all: all,
+  get: get,
+  getJSON: getJSON,
+  post: post,
+  postJSON: postJSON,
+  put: put,
+  putJSON: putJSON,
+  patch: patch,
+  patchJSON: patchJSON,
+  del: del,
+  delJSON: delJSON,
+  jsonp: jsonp
 }
