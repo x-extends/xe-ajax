@@ -1,4 +1,4 @@
-# xe-ajax 使用Promise提供便捷http调用函数
+# XExtends Utils 提供一整套实用函数式编程功能
 
 ## 通过NPM安装最新版本
 
@@ -6,39 +6,27 @@
 npm install xe-ajax --save
 ```
 
-### 按需引入
+### 部分引入
 ``` shell
 import { get, getJSON, post, postJSON } from 'xe-ajax'
 
-get ('url').then().then(response => {
-  response.body
-}).catch(response => {
-  response.body
-})
-getJSON ('url', {id: 1}).then(data => {
-  data
-}).catch(data => {
-  data
-})
+get ('url', {id: 1})
+getJSON ('url', {id: 1})
+post ('url', {id: 1})
+postJSON ('url', {id: 1})
 ```
 
 ### 引入所有
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.post ('url').then().then(response => {
-  response.body
-}).catch(response => {
-  response.body
-})
-XEAjax.postJSON ('url', {id: 1}).then(data => {
-  data
-}).catch(data => {
-  data
-})
+XEAjax.post('url', {id: 1})
+XEAjax.postJSON ('url', {id: 1})
+XEAjax.post ('url', {id: 1})
+XEAjax.postJSON ('url', {id: 1})
 ```
 
-### Vue全局安装，通过实例调用this.$ajax函数this默认指向当前vue实例
+### Vue全局安装
 ``` shell
 import Vue from 'vue'
 import XEAjax from 'xe-ajax'
@@ -46,11 +34,16 @@ import VXEAjax from 'vxe-ajax'
 
 Vue.use(VXEAjax, XEAjax)
 
-// 在Vue实例中使用
-this.$ajax.getJSON ('url', {id: 1}).then(data => {
-  data
-}).catch(data => {
-  data
+// 通过vue实例的调用方式
+this.$ajax.get('url', {id: 1})
+.then(response => {
+  // response.body
+  // this 指向当前vue实例
+})
+this.$ajax.getJSON('url', {id: 1})
+.then(data => {
+  // data
+  // this 指向当前vue实例
 })
 ```
 
@@ -122,7 +115,8 @@ getJSON('url').then(data => {
   // data
 })
 // url参数和数据同时提交
-postJSON('url', {name: 'aaa'}, {params: {id: 1}}).then(data => {
+postJSON('url', {name: 'aaa'}, {params: {id: 1}})
+.then(data => {
   // data
 }).catch(data => {
   // data
