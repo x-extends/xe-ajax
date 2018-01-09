@@ -36,12 +36,12 @@ Vue.use(VXEAjax, XEAjax)
 
 // 通过vue实例的调用方式
 this.$ajax.get('url', {id: 1})
-.then(response => {
+.then(function(response) {
   // response.body
   // this 指向当前vue实例
 })
 this.$ajax.getJSON('url', {id: 1})
-.then(data => {
+.then(function(data){
   // data
   // this 指向当前vue实例
 })
