@@ -20,28 +20,30 @@ function XEMockService (path, method, response, options) {
 }
 
 Object.assign(XEMockService.prototype, {
-  getTemplate: function (request, time) {
-    var response = this.response
+  resolve: function (obj) {
+    return Promise.resolve(obj)
+  },
+  reject: function (obj) {
+    return Promise.reject(obj)
+  },
+  getResponse: function (request, time) {
+    var mock = this
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        if (isFunction(response)) {
-          response(resolve, reject, request)
-        } else {
-          resolve(response)
-        }
+        Promise.resolve(isFunction(mock.response) ? mock.response(request, mock) : mock.response).then(resolve).catch(reject)
       }, time)
     })
   },
   sendResponse: function (request, next) {
     var log = this.options.log
     var time = getTime(this.options.timeout)
-    return this.getTemplate(request, time).then(function (response) {
+    return this.getResponse(request, time).then(function (response) {
       return {status: 200, response: response}
     }).catch(function (response) {
       return {status: 0, response: response}
     }).then(function (xhr) {
       next(xhr)
-      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + '\nTime: ' + time + 'ms')
+      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' => Time: ' + time + 'ms')
     })
   }
 })
@@ -55,8 +57,20 @@ function mateMockItem (request) {
   var url = (request.getUrl() || '').split(/\?|#/)[0]
   return defineMockServices.find(function (item) {
     if (request.method.toLowerCase() === item.method.toLowerCase()) {
-      var matchs = url.match(new RegExp(item.path.replace(/\*/g, '[^/]+') + '(/.*)?'))
-      return matchs && matchs.length === 2 && !matchs[1]
+      var done = false
+      var pathVariable = []
+      var matchs = url.match(new RegExp(item.path.replace(/{[^{}]+}/g, function (name) {
+        pathVariable.push(name.substring(1, name.length - 1))
+        return '([^/]+)'
+      }) + '(/.*)?'))
+      item.pathVariable = {}
+      done = matchs && matchs.length === pathVariable.length + 2 && !matchs[matchs.length - 1]
+      if (done && pathVariable.length) {
+        pathVariable.forEach(function (key, index) {
+          item.pathVariable[key] = matchs[index + 1]
+        })
+      }
+      return done
     }
   })
 }

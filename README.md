@@ -197,23 +197,33 @@ import { mock } from 'xe-ajax/mock'
 
 // 单个定义
 mock('/services/test1/list', 'get', {msg: 'success'})
-mock('services/test2/list', 'get', (resolve, reject, request) => {
+mock('services/test2/list', 'get', request => {
   // 模拟后台逻辑
   if (request.params.id) {
-    resolve({msg: 'success'})
-  }else{
-    reject({msg: 'error'})
+    // 请求成功 this.resolve 或 Promise.resolve
+    return this.resolve({msg: 'success'})
   }
+  // 请求失败 this.reject 或 Promise.reject
+  return this.reject({msg: 'error'})
 })
 // 动态路径
-mock('/services/test1/list/*/*', 'get', {msg: 'success'})
+mock('/services/test1/list/{pageSize}/{currentPage}', 'get', request => {
+  // 获取路径参数 
+  // this.pathVariable.pageSize 10
+  // this.pathVariable.currentPage 1
+  return {
+    pageVo: this.pathVariable,
+    result: [{msg: 'success'}]
+  }
+})
 // 定义多个
 mock([{
   path: 'services/test3',
   children: [{
     path: 'list',
-    response (resolve, reject, request) {
-      resolve({msg: 'success'})
+    response (request) {
+      // 默认请求成功 等同于 this.resolve 或 Promise.resolve
+      return {msg: 'success'}
     }
   }, {
     path: 'submit',
@@ -222,8 +232,8 @@ mock([{
     children : [{
       path : 'deletelist',
       method: 'delete',
-      response (resolve, reject, request) {
-        reject({msg: 'success'})
+      response (request) {
+        return {msg: 'success'}
       },
     }]
   }]
@@ -269,7 +279,7 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 * defines（数组）定义多个
 * options （可选，对象）参数
 ### 接受四个参数：
-* path（字符串）请求地址 占位符\*支持动态路径: 例如: services/list/\*/\* 匹配 services/list/10/1
+* path（字符串）请求地址 占位符{key}支持动态路径: 例如: services/list/{key1}/{key2} 匹配 services/list/10/1
 * method（字符串）请求方法 | 默认get
 * response （对象/方法）数据或返回数据方法
 * options （可选，对象）参数
