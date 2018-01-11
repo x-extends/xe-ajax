@@ -1,4 +1,4 @@
-import { isFormData, isCrossOrigin, serialize } from './util'
+import { isFunction, isFormData, isCrossOrigin, serialize } from './util'
 
 export function XEAjaxRequest (options) {
   Object.assign(this, options)
@@ -33,8 +33,8 @@ Object.assign(XEAjaxRequest.prototype, {
     var url = this.url
     var params = ''
     if (url) {
-      if (!isFormData(this.params)) {
-        params = this.params ? serialize(this.params) : ''
+      if (this.params && !isFormData(this.params)) {
+        params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this) : serialize(this.params)
       }
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -47,20 +47,24 @@ Object.assign(XEAjaxRequest.prototype, {
     return url
   },
   getBody: function () {
+    var result = null
     if (this.body && this.method !== 'get') {
-      if (isFormData(this.body)) {
-        return this.body
-      }
-      if (this.bodyMode === 'formData') {
-        return serialize(this.body)
-      }
       try {
-        return JSON.stringify(this.body)
+        if (isFormData(this.body)) {
+          result = this.body
+        } else if (this.bodyMode === 'formData') {
+          result = serialize(this.body)
+        } else {
+          result = JSON.stringify(this.body)
+        }
       } catch (e) {
         console.error(e)
       }
+      if (isFunction(this.transformBody)) {
+        return this.transformBody(result, this)
+      }
     }
-    return null
+    return result
   }
 })
 

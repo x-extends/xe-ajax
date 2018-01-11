@@ -1,4 +1,4 @@
-# XExtends Utils 提供一整套实用函数式编程功能
+# XExtends ajax 提供一套基于 Promise XHR请求函数
 
 ## 通过NPM安装最新版本
 
@@ -36,14 +36,12 @@ Vue.use(VXEAjax, XEAjax)
 
 // 通过vue实例的调用方式
 this.$ajax.get('url', {id: 1})
-.then(function(response) {
+.then(response => {
   // response.body
-  // this 指向当前vue实例
 })
 this.$ajax.getJSON('url', {id: 1})
-.then(function(data){
+.then(data => {
   // data
-  // this 指向当前vue实例
 })
 ```
 
@@ -82,7 +80,9 @@ this.$ajax.getJSON('url', {id: 1})
 | async | Boolean | 是否异步 | true |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 |  |
-| iterators | Function | 局部拦截器 |  |
+| interceptor | Function ( request, next ) | 局部拦截器 |  |
+| paramsSerializer | Function ( request ) | 自定义序列化函数 |  |
+| transformBody | Function ( body, request ) | 改变提交参数 | |
 
 ### 设置默认参数
 ``` shell
@@ -93,6 +93,14 @@ XEAjax.setup({
   bodyMode: 'formData',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  paramsSerializer (request) {
+    // 重写序列化函数
+    return 'id=1&type=2'
+  }，
+  transformBody (body) {
+    // 改变提交参数
+    return body
   }
 })
 ```

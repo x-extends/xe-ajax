@@ -1,6 +1,5 @@
 import XEAjaxRequest from './request'
 import XEAjaxResponse from './response'
-import XEPromise from './promise'
 import { isFunction, isFormData, isUndefined, eachObj } from './util'
 
 var setupInterceptors = []
@@ -18,20 +17,19 @@ var setupDefaults = {
   * XHR AJAX
   *
   * @param Object options 请求参数
-  * @param Object context 上下文对象(this默认指向当前vue组件)
   * @return Promise
   */
-export function XEAjax (options, context) {
-  return new XEPromise(function (resolved, rejected) {
-    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(Object.assign({}, setupDefaults, {headers: Object.assign({}, setupDefaults.headers)}, options)), resolved, rejected, XEAjax.context)
-  }, XEAjax.context)
+export function XEAjax (options) {
+  return new Promise(function (resolve, reject) {
+    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(Object.assign({}, setupDefaults, {headers: Object.assign({}, setupDefaults.headers)}, options)), resolve, reject)
+  })
 }
 
-function afterSendHandle (request, response, context) {
-  var afterPromises = XEPromise.resolve(response)
+function afterSendHandle (request, response) {
+  var afterPromises = Promise.resolve(response)
   request._afterSends.forEach(function (fn) {
     afterPromises = afterPromises.then(function (response) {
-      return fn.call(context, response) || response
+      return fn(response) || response
     })['catch'](function (message) {
       console.error(message)
     })
@@ -39,32 +37,32 @@ function afterSendHandle (request, response, context) {
   return afterPromises
 }
 
-function sendEnd (request, response, resolved, rejected, context) {
-  afterSendHandle(request, response, context).then(function (response) {
+function sendEnd (request, response, resolve, reject) {
+  afterSendHandle(request, response).then(function (response) {
     if ((response.status >= 200 && response.status < 300) || response.status === 304) {
-      resolved(response)
+      resolve(response)
     } else {
-      rejected(response)
+      reject(response)
     }
   })
 }
 
-function interceptorHandle (request, context) {
-  var interceptorPromises = XEPromise.resolve()
-  setupInterceptors.concat(request.iterators ? [request.iterators] : []).forEach(function (callback) {
+function interceptorHandle (request) {
+  var interceptorPromises = Promise.resolve()
+  setupInterceptors.concat(request.interceptor ? [request.interceptor] : []).forEach(function (callback) {
     interceptorPromises = interceptorPromises.then(function (response) {
       if (response) {
         return response
       } else {
-        return new XEPromise(function (resolved) {
-          callback.call(context, request, function (response) {
+        return new Promise(function (resolve) {
+          callback(request, function (response) {
             if (isUndefined(response)) {
-              resolved()
+              resolve()
             } else if (isFunction(response)) {
               request._afterSends.push(response)
-              resolved()
+              resolve()
             } else {
-              resolved(new XEAjaxResponse(request, response))
+              resolve(new XEAjaxResponse(request, response))
             }
           })
         })
@@ -76,11 +74,11 @@ function interceptorHandle (request, context) {
   return interceptorPromises
 }
 
-function sendXHR (request, resolved, rejected, context) {
+function sendXHR (request, resolve, reject) {
   var xhr = request.xhr
-  interceptorHandle(request, context).then(function (response) {
+  interceptorHandle(request).then(function (response) {
     if (response && response.constructor === XEAjaxResponse) {
-      return sendEnd(request, response, resolved, rejected, context)
+      return sendEnd(request, response, resolve, reject)
     }
     xhr.open(request.method, request.getUrl(), request.async !== false)
     if (request.timeout) {
@@ -91,35 +89,35 @@ function sendXHR (request, resolved, rejected, context) {
     })
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
-        sendEnd(request, new XEAjaxResponse(request, xhr), resolved, rejected, context)
+        sendEnd(request, new XEAjaxResponse(request, xhr), resolve, reject)
       }
     }
     xhr.send(request.getBody())
   })
 }
 
-function sendJSONP (request, resolved, rejected, context) {
+function sendJSONP (request, resolve, reject) {
   var script = request.script
   var url = request.getUrl()
   request.customCallback = global[request.jsonpCallback]
   global[request.jsonpCallback] = function (response) {
-    jsonpHandle(request, new XEAjaxResponse(request, {status: 200, body: response}), resolved, rejected, context)
+    jsonpHandle(request, new XEAjaxResponse(request, {status: 200, body: response}), resolve, reject)
   }
   script.type = 'text/javascript'
   script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
   script.onerror = function (evnt) {
-    jsonpHandle(request, new XEAjaxResponse(request, {status: 500, body: null}), resolved, rejected, context)
+    jsonpHandle(request, new XEAjaxResponse(request, {status: 500, body: null}), resolve, reject)
   }
   document.body.appendChild(script)
 }
 
-function jsonpHandle (request, response, resolved, rejected, context) {
+function jsonpHandle (request, response, resolve, reject) {
   delete global[request.jsonpCallback]
   document.body.removeChild(request.script)
   if (request.customCallback) {
-    (global[request.jsonpCallback] = request.customCallback).call(context, response)
+    (global[request.jsonpCallback] = request.customCallback)(response)
   }
-  sendEnd(request, response, resolved, rejected, context)
+  sendEnd(request, response, resolve, reject)
 }
 
 /**
@@ -136,7 +134,8 @@ function jsonpHandle (request, response, resolved, rejected, context) {
  * @param Boolean async 异步/同步(默认true)
  * @param Number timeout 设置超时
  * @param Object headers 请求头
- * @param Function iterators(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
+ * @param Function paramsSerializer(request) 参数序列化
+ * @param Function interceptor(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
  */
 export var setup = XEAjax.setup = function setup (options) {
   Object.assign(setupDefaults, options)

@@ -54,8 +54,8 @@ function getTime (timeout) {
 function mateMockItem (request) {
   var url = (request.getUrl() || '').split(/\?|#/)[0]
   return defineMockServices.find(function (item) {
-    if (request.method === item.method) {
-      let matchs = url.match(new RegExp(item.path.replace(/\*/g, '[^/]+') + '(/.*)?'))
+    if (request.method.toLowerCase() === item.method.toLowerCase()) {
+      var matchs = url.match(new RegExp(item.path.replace(/\*/g, '[^/]+') + '(/.*)?'))
       return matchs && matchs.length === 2 && !matchs[1]
     }
   })

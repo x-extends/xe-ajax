@@ -1,5 +1,4 @@
 import XEAjax from './constructor'
-import XEPromise from './promise'
 import { isObject } from './util'
 
 function createAjax (method, def, opts) {
@@ -12,14 +11,9 @@ function responseJSON (method) {
     return XEAjax[method].apply(this, arguments).then(function (response) {
       return response.body
     }).catch(function (response) {
-      return XEPromise.reject(response.body, this)
+      return Promise.reject(response.body, this)
     })
   }
-}
-
-// Http Request Batch
-export function all (iterable, context) {
-  return XEPromise.all(iterable || [], context || XEAjax.context)
 }
 
 // Http Request Method get
@@ -60,7 +54,7 @@ export var patchJSON = responseJSON('patch')
 export var delJSON = responseJSON('delete')
 
 export default {
-  all: all,
+  all: Promise.all,
   get: get,
   getJSON: getJSON,
   post: post,
