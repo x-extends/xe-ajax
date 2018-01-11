@@ -196,8 +196,8 @@ import { getJSON, postJSON, delJSON } from 'xe-ajax'
 import { mock } from 'xe-ajax/mock'
 
 // 单个定义
-mock('/services/test1/list', 'get', {msg: 'success'})
-mock('services/test2/list', 'get', request => {
+mock('/services/test1/list', 'GET', {msg: 'success'})
+mock('services/test2/list', 'GET', request => {
   // 模拟后台逻辑
   if (request.params.id) {
     // 请求成功 this.resolve 或 Promise.resolve
@@ -207,7 +207,7 @@ mock('services/test2/list', 'get', request => {
   return this.reject({msg: 'error'})
 })
 // 动态路径
-mock('/services/test1/list/{pageSize}/{currentPage}', 'get', request => {
+mock('/services/test1/list/{pageSize}/{currentPage}', 'GET', request => {
   // 获取路径参数 
   // this.pathVariable.pageSize 10
   // this.pathVariable.currentPage 1
@@ -220,14 +220,15 @@ mock('/services/test1/list/{pageSize}/{currentPage}', 'get', request => {
 mock([{
   path: 'services/test3',
   children: [{
+    method: 'GET',
     path: 'list',
     response (request) {
       // 默认请求成功 等同于 this.resolve 或 Promise.resolve
       return {msg: 'success'}
     }
   }, {
+    method: 'POST',
     path: 'submit',
-    method: 'post',
     response: {msg: 'success'},
     children : [{
       path : 'deletelist',
