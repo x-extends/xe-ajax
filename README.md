@@ -193,48 +193,57 @@ this.$ajax.custom1()
 ### Mock虚拟服务
 ``` shell
 import { getJSON, postJSON, delJSON } from 'xe-ajax'
-import { mock } from 'xe-ajax/mock'
+import { Mock } from 'xe-ajax/mock'
 
-// 单个定义
-mock('/services/test1/list', 'GET', {msg: 'success'})
-mock('services/test2/list', 'GET', request => {
+// 对象方式
+Mock('/services/test1/list', 'GET', {status: 200, response: {msg: 'success'}})
+// 函数方式
+Mock.GET('services/test2/list', (request, xhr) => {
   // 模拟后台逻辑
   if (request.params.id) {
-    // 请求成功 this.resolve 或 Promise.resolve
-    return this.resolve({msg: 'success'})
+    return {status: 200, response: {msg: 'success'}}
   }
-  // 请求失败 this.reject 或 Promise.reject
-  return this.reject({msg: 'error'})
+  return {status: 500, response: {msg: 'error'}}
+})
+// 异步方式
+Mock.GET('services/test2/list', (request, xhr) => {
+  return new Promise( (resolve, reject) => {
+    setTimeout(() = {
+      xhr.status = 200
+      xhr.response = {msg: 'success'}
+      resolve(xhr)
+    }, 100)
+  })
 })
 // 动态路径
-mock('/services/test1/list/{pageSize}/{currentPage}', 'GET', request => {
-  // 获取路径参数 
-  // this.pathVariable.pageSize 10
-  // this.pathVariable.currentPage 1
-  return {
-    pageVo: this.pathVariable,
-    result: [{msg: 'success'}]
-  }
+Mock.GET('/services/test1/list/{pageSize}/{currentPage}', (request, xhr) => {
+  // 获取路径参数 request.pathVariable
+  // request.pathVariable.pageSize 10
+  // request.pathVariable.currentPage 1
+  xhr.status = 200
+  xhr.response = {pageVO: this.pathVariable, result: []}
+  return xhr
 })
 // 定义多个
-mock([{
+Mock([{
   path: 'services/test3',
   children: [{
     method: 'GET',
     path: 'list',
-    response (request) {
-      // 默认请求成功 等同于 this.resolve 或 Promise.resolve
-      return {msg: 'success'}
+    xhr (request, xhr) {
+      xhr.response = {msg: 'success'}
+      return xhr
     }
   }, {
     method: 'POST',
     path: 'submit',
-    response: {msg: 'success'},
+    xhr: {status: 200, response: {msg: 'success'}},
     children : [{
       path : 'deletelist',
-      method: 'delete',
-      response (request) {
-        return {msg: 'success'}
+      method: 'DELETE',
+      xhr (request, xhr) {
+        xhr.response = {status: 500, msg: 'error'}
+        return xhr
       },
     }]
   }]
@@ -272,8 +281,13 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 
 ## XEAjaxMock API :
 ### xe-ajax/mock 提供的便捷方法：
-* mock( defines, options )
-* mock( path, method, response, options )
+* Mock( defines, options )
+* Mock( path, method, xhr, options )
+* Mock.GET( path, xhr, options )
+* Mock.POST( path, xhr, options )
+* Mock.PUT( path, xhr, options )
+* Mock.DELETE( path, xhr, options )
+* Mock.PATCH( path, xhr, options )
 * setup( options )
 
 ### 接受两个参数：
@@ -281,8 +295,8 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 * options （可选，对象）参数
 ### 接受四个参数：
 * path（字符串）请求地址 占位符{key}支持动态路径: 例如: services/list/{key1}/{key2} 匹配 services/list/10/1
-* method（字符串）请求方法 | 默认get
-* response （对象/方法）数据或返回数据方法
+* method（字符串）请求方法 | 默认GET
+* xhr（对象/方法(request, xhr)）数据或返回数据方法 {status: 200, response: []}
 * options （可选，对象）参数
 
 ### 调用参数

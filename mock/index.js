@@ -8,11 +8,11 @@ var setupDefaults = {
   log: true
 }
 
-function XEMockService (path, method, response, options) {
+function XEMockService (path, method, xhr, options) {
   if (path && method) {
     this.path = path
     this.method = method
-    this.response = response
+    this.xhr = xhr
     this.options = options
   } else {
     throw new TypeError('path and method cannot be empty')
@@ -20,30 +20,31 @@ function XEMockService (path, method, response, options) {
 }
 
 Object.assign(XEMockService.prototype, {
-  resolve: function (obj) {
-    return Promise.resolve(obj)
-  },
-  reject: function (obj) {
-    return Promise.reject(obj)
-  },
-  getResponse: function (request, time) {
+  getXHR: function (request, time) {
     var mock = this
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        Promise.resolve(isFunction(mock.response) ? mock.response(request, mock) : mock.response).then(resolve).catch(reject)
+        Promise.resolve(isFunction(mock.xhr) ? mock.xhr(request, {status: 200, response: null}) : mock.xhr)
+        .then(function (xhr) {
+          resolve(mock.getResponse(xhr, 200))
+        }).catch(function (xhr) {
+          reject(mock.getResponse(xhr, 500))
+        })
       }, time)
     })
   },
-  sendResponse: function (request, next) {
+  getResponse: function (xhr, status) {
+    if (xhr && (xhr.response || xhr.hasOwnProperty('response')) && (xhr.status || xhr.hasOwnProperty('status'))) {
+      return xhr
+    }
+    return {status: status, response: xhr}
+  },
+  reply: function (request, next) {
     var log = this.options.log
     var time = getTime(this.options.timeout)
-    return this.getResponse(request, time).then(function (response) {
-      return {status: 200, response: response}
-    }).catch(function (response) {
-      return {status: 0, response: response}
-    }).then(function (xhr) {
+    return this.getXHR(request, time).then(function (xhr) {
       next(xhr)
-      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' => Time: ' + time + 'ms')
+      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' Status Code: ' + xhr.status + ' => Time: ' + time + 'ms')
     })
   }
 })
@@ -83,9 +84,9 @@ function defineMocks (list, options, baseURL) {
           baseURL = /\w+:\/{2}.*/.test(item.path) ? '' : options.baseURL
         }
         item.path = (baseURL ? baseURL.replace(/\/$/, '') + '/' : '') + item.path.replace(/^\//, '')
-        if (item.response) {
+        if (item.xhr) {
           item.method = String(item.method || 'get')
-          defineMockServices.push(new XEMockService(item.path, item.method, item.response, options))
+          defineMockServices.push(new XEMockService(item.path, item.method, item.xhr, options))
         }
         defineMocks(item.children, options, item.path)
       }
@@ -94,33 +95,40 @@ function defineMocks (list, options, baseURL) {
 }
 
 /**
- * 设置全局参数
- *
- * @param Object options 参数
- */
-export function setup (options) {
-  Object.assign(setupDefaults, options)
-}
-
-/**
   * XEMock 虚拟服务
   *
   * @param Array/String path 路径数组/请求路径
   * @param String method 请求方法
-  * @param Object/Function response 数据或返回数据方法
+  * @param Object/Function xhr 数据或返回数据方法
   * @param Object options 参数
   */
-export function mock (path, method, response, options) {
-  defineMocks(isArray(path) ? (options = method, path) : [{path: path, method: method, response: response}], Object.assign({}, setupDefaults, options))
+export function Mock (path, method, xhr, options) {
+  defineMocks(isArray(path) ? (options = method, path) : [{path: path, method: method, xhr: xhr}], Object.assign({}, setupDefaults, options))
+}
+
+['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].forEach(function (method) {
+  Mock[method] = function (url, xhr, options) {
+    Mock(url, method, xhr, options)
+  }
+})
+
+/**
+ * 设置全局参数
+ *
+ * @param Object options 参数
+ */
+export var setup = Mock.setup = function setup (options) {
+  Object.assign(setupDefaults, options)
 }
 
 XEAjax.interceptor.use(function (request, next) {
   var mock = mateMockItem(request)
   if (mock) {
-    mock.sendResponse(request, next)
+    request.pathVariable = mock.pathVariable
+    mock.reply(request, next)
   } else {
     next()
   }
 })
 
-export default {mock, setup}
+export default {Mock, setup}
