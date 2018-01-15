@@ -196,9 +196,18 @@ import { getJSON, postJSON, delJSON } from 'xe-ajax'
 import { Mock } from 'xe-ajax/mock'
 
 // 对象方式
-Mock('/services/test1/list', 'GET', {status: 200, response: {msg: 'success'}})
+Mock.GET('/services/list', {status: 200, response: {msg: 'success'}})
+// 动态路径
+Mock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
+  // 获取路径参数 request.pathVariable
+  // request.pathVariable.pageSize 10
+  // request.pathVariable.currentPage 1
+  xhr.status = 200
+  xhr.response = {pageVO: this.pathVariable, result: []}
+  return xhr
+})
 // 函数方式
-Mock.GET('services/test2/list', (request, xhr) => {
+Mock.POST('services/save', (request, xhr) => {
   // 模拟后台逻辑
   if (request.params.id) {
     return {status: 200, response: {msg: 'success'}}
@@ -206,7 +215,7 @@ Mock.GET('services/test2/list', (request, xhr) => {
   return {status: 500, response: {msg: 'error'}}
 })
 // 异步方式
-Mock.GET('services/test2/list', (request, xhr) => {
+Mock.PATCH('services/patch', (request, xhr) => {
   return new Promise( (resolve, reject) => {
     setTimeout(() = {
       xhr.status = 200
@@ -215,65 +224,49 @@ Mock.GET('services/test2/list', (request, xhr) => {
     }, 100)
   })
 })
-// 动态路径
-Mock.GET('/services/test1/list/{pageSize}/{currentPage}', (request, xhr) => {
-  // 获取路径参数 request.pathVariable
-  // request.pathVariable.pageSize 10
-  // request.pathVariable.currentPage 1
-  xhr.status = 200
-  xhr.response = {pageVO: this.pathVariable, result: []}
-  return xhr
-})
 // 定义多个
 Mock([{
-  path: 'services/test3',
+  path: 'services',
   children: [{
-    method: 'GET',
-    path: 'list',
-    xhr (request, xhr) {
-      xhr.response = {msg: 'success'}
-      return xhr
-    }
-  }, {
     method: 'POST',
     path: 'submit',
     xhr: {status: 200, response: {msg: 'success'}},
-    children : [{
-      path : 'deletelist',
-      method: 'DELETE',
-      xhr (request, xhr) {
-        xhr.response = {status: 500, msg: 'error'}
-        return xhr
-      },
-    }]
-  }]
+  },
+  {
+    method: 'DELETE',
+    path : 'del',
+    xhr (request, xhr) {
+      xhr.response = {status: 500, msg: 'error'}
+      return xhr
+    }
+  ]
 }])
 
 // 调用
-getJSON('/services/test1/list').then(data => {
+getJSON('/services/list').then(data => {
   // data = {msg: 'success'}
 })
-getJSON('/services/test1/list/10/1').then(data => {
-  // data = {msg: 'success'}
-})
-
-getJSON('services/test2/list', {id: 111}).then(data => {
+getJSON('/services/list/10/1').then(data => {
   // data = {msg: 'success'}
 })
 
-getJSON('services/test2/list').catch(data => {
+postJSON('services/save', {id: 111}).then(data => {
+  // data = {msg: 'success'}
+})
+
+postJSON('services/save').catch(data => {
   // data = {msg: 'error'}
 })
 
-getJSON('services/test3/list').then(data => {
+patchJSON('services/patch').then(data => {
   // data = {msg: 'success'}
 })
 
-postJSON('services/test3/submit').then(data => {
+postJSON('services/submit').then(data => {
   // data = {msg: 'success'}
 })
 
-delJSON('services/test3/submit/deletelist').catch(data => {
+delJSON('services/del').catch(data => {
   // data = {msg: 'error'}
 })
 
@@ -296,7 +289,7 @@ delJSON('services/test3/submit/deletelist').catch(data => {
 ### 接受四个参数：
 * path（字符串）请求地址 占位符{key}支持动态路径: 例如: services/list/{key1}/{key2} 匹配 services/list/10/1
 * method（字符串）请求方法 | 默认GET
-* xhr（对象/方法(request, xhr)）数据或返回数据方法 {status: 200, response: []}
+* xhr（对象/方法(request, xhr)）数据或返回数据方法 {status: 200, response: [], headers: {}}
 * options （可选，对象）参数
 
 ### 调用参数

@@ -24,7 +24,7 @@ Object.assign(XEMockService.prototype, {
     var mock = this
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        Promise.resolve(isFunction(mock.xhr) ? mock.xhr(request, {status: 200, response: null}) : mock.xhr)
+        Promise.resolve(isFunction(mock.xhr) ? mock.xhr(request, {status: 200, response: null, headers: null}) : mock.xhr)
         .then(function (xhr) {
           resolve(mock.getResponse(xhr, 200))
         }).catch(function (xhr) {
@@ -37,14 +37,14 @@ Object.assign(XEMockService.prototype, {
     if (xhr && (xhr.response || xhr.hasOwnProperty('response')) && (xhr.status || xhr.hasOwnProperty('status'))) {
       return xhr
     }
-    return {status: status, response: xhr}
+    return {status: status, response: xhr, headers: null}
   },
   reply: function (request, next) {
     var log = this.options.log
     var time = getTime(this.options.timeout)
     return this.getXHR(request, time).then(function (xhr) {
       next(xhr)
-      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' Status Code: ' + xhr.status + ' => Time: ' + time + 'ms')
+      log && console.info('XEAjaxMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' => Status Code: ' + xhr.status + ' => Time: ' + time + 'ms')
     })
   }
 })
