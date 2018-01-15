@@ -131,4 +131,4 @@ XEAjax.interceptor.use(function (request, next) {
   }
 })
 
-export default {Mock, setup}
+export default Mock

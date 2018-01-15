@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "1.0.16",
+  "version": "1.0.18",
   "description": "XExtends ajax 提供一套基于 Promise XHR请求函数",
   "main": "index.js",
   "scripts": {
