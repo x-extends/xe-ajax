@@ -239,16 +239,16 @@ Vue.use(VXEAjax, XEAjax)
 this.$ajax.custom1()
 ```
 
-## XEAjaxMock 虚拟服务
+## XEMock 虚拟服务
 ### 'xe-ajax/mock' 提供的便捷方法：
-* Mock( defines, options )
-* Mock( path, method, xhr, options )
-* Mock.GET( path, xhr, options )
-* Mock.POST( path, xhr, options )
-* Mock.PUT( path, xhr, options )
-* Mock.DELETE( path, xhr, options )
-* Mock.PATCH( path, xhr, options )
-* setup( options )
+* XEMock( defines, options )
+* XEMock( path, method, xhr, options )
+* XEMock.GET( path, xhr, options )
+* XEMock.POST( path, xhr, options )
+* XEMock.PUT( path, xhr, options )
+* XEMock.DELETE( path, xhr, options )
+* XEMock.PATCH( path, xhr, options )
+* XEMock.setup( options )
 
 ### 接受两个参数：
 * defines（数组）定义多个
@@ -267,9 +267,9 @@ this.$ajax.custom1()
 
 ### 设置默认参数
 ``` shell
-import XEAjaxMock from 'xe-ajax/mock'
+import XEMock from 'xe-ajax/mock'
 
-XEAjaxMock.setup({
+XEMock.setup({
   baseURL: 'http://xuliangzhan.com',
   timeout: '100-500'
 })
@@ -278,12 +278,12 @@ XEAjaxMock.setup({
 ### 示例
 ``` shell
 import { getJSON, postJSON, deleteJSON } from 'xe-ajax'
-import { Mock } from 'xe-ajax/mock'
+import { XEMock } from 'xe-ajax/mock'
 
 // 对象方式
-Mock.GET('/services/list', {status: 200, response: {msg: 'success'}})
+XEMock.GET('/services/list', {status: 200, response: {msg: 'success'}})
 // 动态路径
-Mock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
+XEMock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
   // 获取路径参数 request.pathVariable
   // request.pathVariable.pageSize 10
   // request.pathVariable.currentPage 1
@@ -293,7 +293,7 @@ Mock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
   return xhr
 })
 // 函数方式
-Mock.POST('services/save', (request, xhr) => {
+XEMock.POST('services/save', (request, xhr) => {
   // 模拟后台逻辑 对参数进行校验
   if (request.params.id) {
     return {status: 200, response: {msg: 'success'}}
@@ -301,7 +301,7 @@ Mock.POST('services/save', (request, xhr) => {
   return {status: 500, response: {msg: 'error'}}
 })
 // 异步方式
-Mock.PATCH('services/patch', (request, xhr) => {
+XEMock.PATCH('services/patch', (request, xhr) => {
   return new Promise( (resolve, reject) => {
     setTimeout(() = {
       xhr.status = 200
@@ -311,13 +311,13 @@ Mock.PATCH('services/patch', (request, xhr) => {
   })
 })
 // 定义单个
-Mock('services/list2', 'GET', (request, xhr) => {
+XEMock('services/list2', 'GET', (request, xhr) => {
   xhr.response = {msg: 'success'}
   return xhr
 })
 
 // 定义多个
-Mock([{
+XEMock([{
   path: 'services',
   children: [{
     method: 'POST',
