@@ -44,7 +44,7 @@ Object.assign(XEMockService.prototype, {
     var time = getTime(this.options.timeout)
     return this.getXHR(request, time).then(function (xhr) {
       next(xhr)
-      log && console.info('XEMock:\nRequest URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' => Status Code: ' + xhr.status + ' => Time: ' + time + 'ms')
+      log && console.info('XEMock URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' => Status Code: ' + xhr.status + ' => Time: ' + time + 'ms')
     })
   }
 })
