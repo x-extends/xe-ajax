@@ -52,7 +52,7 @@ Object.assign(XEAjaxRequest.prototype, {
       try {
         if (isFormData(this.body)) {
           result = this.body
-        } else if (this.bodyMode === 'formData') {
+        } else if (this.bodyType === 'formData') {
           result = serialize(this.body)
         } else {
           result = JSON.stringify(this.body)

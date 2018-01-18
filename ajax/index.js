@@ -2,13 +2,13 @@ import XEAjax from './constructor'
 import { isObject } from './util'
 
 function createAjax (method, def, opts) {
-  return new XEAjax(Object.assign({method: method}, def, opts))
+  return XEAjax(Object.assign({method: method}, def, opts))
 }
 
 // xhr response JSON
 function responseJSON (method) {
   return function () {
-    return XEAjax[method].apply(this, arguments).then(function (response) {
+    return method.apply(this, arguments).then(function (response) {
       return response.body
     }).catch(function (response) {
       return Promise.reject(response.body, this)
@@ -16,28 +16,31 @@ function responseJSON (method) {
   }
 }
 
+// Http Request
+export var ajax = XEAjax
+
 // Http Request Method get
-export function get (url, params, opts) {
+export function doGet (url, params, opts) {
   return createAjax('get', isObject(url) ? {} : {url: url, params: params}, opts)
 }
 
 // Http Request Method post
-export function post (url, body, opts) {
+export function doPost (url, body, opts) {
   return createAjax('post', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method put
-export function put (url, body, opts) {
+export function doPut (url, body, opts) {
   return createAjax('put', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method patch
-export function patch (url, body, opts) {
+export function doPatch (url, body, opts) {
   return createAjax('patch', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method delete
-export function del (url, body, opts) {
+export function doDelete (url, body, opts) {
   return createAjax('delete', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
@@ -47,23 +50,23 @@ export function jsonp (url, params, opts) {
   return createAjax('get', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
 }
 
-export var getJSON = responseJSON('get')
-export var postJSON = responseJSON('post')
-export var putJSON = responseJSON('put')
-export var patchJSON = responseJSON('patch')
-export var delJSON = responseJSON('delete')
+export var getJSON = responseJSON(doGet)
+export var postJSON = responseJSON(doPost)
+export var putJSON = responseJSON(doPut)
+export var patchJSON = responseJSON(doPatch)
+export var deleteJSON = responseJSON(doDelete)
 
 export default {
-  all: Promise.all,
-  get: get,
+  doAll: Promise.all,
+  doGet: doGet,
   getJSON: getJSON,
-  post: post,
+  doPost: doPost,
   postJSON: postJSON,
-  put: put,
+  doPut: doPut,
   putJSON: putJSON,
-  patch: patch,
+  doPatch: doPatch,
   patchJSON: patchJSON,
-  del: del,
-  delJSON: delJSON,
+  doDelete: doDelete,
+  deleteJSON: deleteJSON,
   jsonp: jsonp
 }

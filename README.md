@@ -8,11 +8,11 @@ npm install xe-ajax --save
 
 ### 部分引入
 ``` shell
-import { get, getJSON, post, postJSON } from 'xe-ajax'
+import { doGet, getJSON, doPost, postJSON } from 'xe-ajax'
 
-get ('url', {id: 1})
+doGet ('url', {id: 1})
 getJSON ('url', {id: 1})
-post ('url', {id: 1})
+doPost ('url', {id: 1})
 postJSON ('url', {id: 1})
 ```
 
@@ -20,9 +20,9 @@ postJSON ('url', {id: 1})
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.post('url', {id: 1})
-XEAjax.postJSON ('url', {id: 1})
-XEAjax.post ('url', {id: 1})
+XEAjax.doGet('url', {id: 1})
+XEAjax.getJSON ('url', {id: 1})
+XEAjax.doPost ('url', {id: 1})
 XEAjax.postJSON ('url', {id: 1})
 ```
 
@@ -34,31 +34,32 @@ import VXEAjax from 'vxe-ajax'
 
 Vue.use(VXEAjax, XEAjax)
 
-// 通过vue实例的调用方式
-this.$ajax.get('url', {id: 1})
+// 通过vue实例的调用方式 返回response对象
+this.$ajax.doGet('url', {id: 1})
 .then(response => {
   // response.body
 })
+// 返回直接返回结果
 this.$ajax.getJSON('url', {id: 1})
 .then(data => {
   // data
 })
 ```
 
-## XEAjax API :
-### xe-ajax 提供的便捷方法：
+## XEAjax :
+### 'xe-ajax' 提供的便捷方法：
 * ajax( options )
-* all (iterable, context)
-* get ( url, params, options )
+* doAll (iterable, context)
+* doGet ( url, params, options )
 * getJSON ( url, params, options )
-* post ( url, body, options )
+* doPost ( url, body, options )
 * postJSON ( url, body, options )
-* put ( url, body, options )
+* doPut ( url, body, options )
 * putJSON ( url, body, options )
-* patch ( url, body, options )
+* doPatch ( url, body, options )
 * patchJSON ( url, body, options )
-* del ( url, body, options )
-* delJSON ( url, body, options )
+* doDelete ( url, body, options )
+* deleteJSON ( url, body, options )
 * jsonp ( url, params, options )
 
 ### 接受三个参数：
@@ -74,7 +75,7 @@ this.$ajax.getJSON('url', {id: 1})
 | method | String | 请求方法 | 默认get |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyMode | String | 提交参数方式 | 默认json，如果要以表单方式提交改为'formData' |
+| bodyType | String | 提交参数方式 | 默认'json'，如果要以表单方式提交改为'formData' |
 | jsonp | String | 调用jsonp服务,回调属性默认callback | 默认callback |
 | jsonpCallback | String | jsonp回调函数名 | 默认从window取值 |
 | async | Boolean | 是否异步 | true |
@@ -90,7 +91,7 @@ import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
   baseURL: 'xxx.com',
-  bodyMode: 'formData',
+  bodyType: 'formData',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   },
@@ -105,12 +106,34 @@ XEAjax.setup({
 })
 ```
 
-### 使用例子
+### 示例
 ``` shell
-import { all, get, getJSON, postJSON } from 'xe-ajax'
+import { ajax, doAll, doGet, getJSON, postJSON } from 'xe-ajax'
+
+// 完整参数
+ajax({
+  url: 'url',
+  method: 'GET',
+  params: {}
+}).then(response => {
+  // response.body
+}).catch(response => {
+  // response.body
+  // response.status
+})
+ajax({
+  url: 'url',
+  method: 'POST',
+  body: {}
+}).then(response => {
+  // response.body
+}).catch(response => {
+  // response.body
+  // response.status
+})
 
 // 返回response对象
-get('url').then(response => {
+doGet('url').then(response => {
   // response.body
 }).catch(response => {
   // response.body
@@ -122,6 +145,20 @@ getJSON('url').then(data => {
 }).catch(data => {
   // data
 })
+// 提交数据
+postJSON('url', {name: 'aaa'}})
+.then(data => {
+  // data
+}).catch(data => {
+  // data
+})
+// 以formData方式提交数据
+postJSON('url', {name: 'aaa'}}, {bodyType: 'formData'})
+.then(data => {
+  // data
+}).catch(data => {
+  // data
+})
 // url参数和数据同时提交
 postJSON('url', {name: 'aaa'}, {params: {id: 1}})
 .then(data => {
@@ -129,9 +166,14 @@ postJSON('url', {name: 'aaa'}, {params: {id: 1}})
 }).catch(data => {
   // data
 })
-// 在所有的异步操作执行完
-let iterable = [getJSON('url'), postJSON('url')]
-all(iterable).then(datas => {
+// 在所有的异步操作执行完 doAll和Promise.all 用法一致
+const iterable = [getJSON('url'), postJSON('url')]
+doAll(iterable).then(datas => {
+  // datas
+}).catch(datas => {
+  // datas
+})
+Promise.all(iterable).then(datas => {
   // datas
 }).catch(datas => {
   // datas
@@ -146,7 +188,7 @@ XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
   // 更改请求类型为POST
-  request.method = 'post'
+  request.method = 'POST'
 
   // 继续执行,如果不调用next则不会往下走
   next()
@@ -190,9 +232,45 @@ Vue.use(VXEAjax, XEAjax)
 this.$ajax.custom1()
 ```
 
-### Mock虚拟服务
+## XEAjaxMock 虚拟服务
+### 'xe-ajax/mock' 提供的便捷方法：
+* Mock( defines, options )
+* Mock( path, method, xhr, options )
+* Mock.GET( path, xhr, options )
+* Mock.POST( path, xhr, options )
+* Mock.PUT( path, xhr, options )
+* Mock.DELETE( path, xhr, options )
+* Mock.PATCH( path, xhr, options )
+* setup( options )
+
+### 接受两个参数：
+* defines（数组）定义多个
+* options （可选，对象）参数
+### 接受四个参数：
+* path（字符串）请求地址 占位符{key}支持动态路径: 例如: services/list/{key1}/{key2} 匹配 services/list/10/1
+* method（字符串）请求方法 | 默认GET
+* xhr（对象/方法(request, xhr)）数据或返回数据方法 {status: 200, response: [], headers: {}}
+* options （可选，对象）参数
+
+### 调用参数
+| 参数 | 类型 | 描述 | 值 |
+|------|------|-----|----|
+| baseURL | String | 基础路径 |  |
+| timeout | String | 模拟请求时间 | 默认'20-400' |
+
+### 设置默认参数
 ``` shell
-import { getJSON, postJSON, delJSON } from 'xe-ajax'
+import XEAjaxMock from 'xe-ajax/mock'
+
+XEAjaxMock.setup({
+  baseURL: 'http://xuliangzhan.com',
+  timeout: '100-500'
+})
+```
+
+### 示例
+``` shell
+import { getJSON, postJSON, deleteJSON } from 'xe-ajax'
 import { Mock } from 'xe-ajax/mock'
 
 // 对象方式
@@ -203,12 +281,13 @@ Mock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
   // request.pathVariable.pageSize 10
   // request.pathVariable.currentPage 1
   xhr.status = 200
+  xhr.headers = {'content-type': 'application/json;charset=UTF-8'}
   xhr.response = {pageVO: this.pathVariable, result: []}
   return xhr
 })
 // 函数方式
 Mock.POST('services/save', (request, xhr) => {
-  // 模拟后台逻辑
+  // 模拟后台逻辑 对参数进行校验
   if (request.params.id) {
     return {status: 200, response: {msg: 'success'}}
   }
@@ -224,6 +303,12 @@ Mock.PATCH('services/patch', (request, xhr) => {
     }, 100)
   })
 })
+// 定义单个
+Mock('services/list2', 'GET', (request, xhr) => {
+  xhr.response = {msg: 'success'}
+  return xhr
+})
+
 // 定义多个
 Mock([{
   path: 'services',
@@ -266,45 +351,10 @@ postJSON('services/submit').then(data => {
   // data = {msg: 'success'}
 })
 
-delJSON('services/del').catch(data => {
+deleteJSON('services/del').catch(data => {
   // data = {msg: 'error'}
 })
 
-```
-
-## XEAjaxMock API :
-### xe-ajax/mock 提供的便捷方法：
-* Mock( defines, options )
-* Mock( path, method, xhr, options )
-* Mock.GET( path, xhr, options )
-* Mock.POST( path, xhr, options )
-* Mock.PUT( path, xhr, options )
-* Mock.DELETE( path, xhr, options )
-* Mock.PATCH( path, xhr, options )
-* setup( options )
-
-### 接受两个参数：
-* defines（数组）定义多个
-* options （可选，对象）参数
-### 接受四个参数：
-* path（字符串）请求地址 占位符{key}支持动态路径: 例如: services/list/{key1}/{key2} 匹配 services/list/10/1
-* method（字符串）请求方法 | 默认GET
-* xhr（对象/方法(request, xhr)）数据或返回数据方法 {status: 200, response: [], headers: {}}
-* options （可选，对象）参数
-
-### 调用参数
-| 参数 | 类型 | 描述 | 值 |
-|------|------|-----|----|
-| baseURL | String | 基础路径 |  |
-| timeout | String | 模拟请求时间 | 默认'20-400' |
-
-### 设置默认参数
-``` shell
-import XEAjaxMock from 'xe-ajax/mock'
-
-XEAjaxMock.setup({
-  timeout: '100-500'
-})
 ```
 
 ## License
