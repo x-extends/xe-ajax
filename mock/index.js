@@ -104,11 +104,12 @@ function defineMocks (list, options, baseURL) {
   */
 export function Mock (path, method, xhr, options) {
   defineMocks(isArray(path) ? (options = method, path) : [{path: path, method: method, xhr: xhr}], Object.assign({}, setupDefaults, options))
+  return Mock
 }
 
 ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].forEach(function (method) {
   Mock[method] = function (url, xhr, options) {
-    Mock(url, method, xhr, options)
+    return Mock(url, method, xhr, options)
   }
 })
 
