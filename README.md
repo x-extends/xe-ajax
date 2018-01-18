@@ -170,13 +170,13 @@ postJSON('url', {name: 'aaa'}, {params: {id: 1}})
 const iterable = [getJSON('url'), postJSON('url')]
 doAll(iterable).then(datas => {
   // datas
-}).catch(datas => {
-  // datas
+}).catch(data => {
+  // data
 })
 Promise.all(iterable).then(datas => {
   // datas
-}).catch(datas => {
-  // datas
+}).catch(data => {
+  // data
 })
 ```
 
