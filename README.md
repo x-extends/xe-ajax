@@ -77,7 +77,7 @@ this.$ajax.getJSON('url', {id: 1})
 | body | Object/Array | 提交参数 |  |
 | bodyType | String | 提交参数方式 | 默认'JSON_DATA'，如果要以表单方式提交改为'FROM_DATA' |
 | jsonp | String | 调用jsonp服务,回调属性默认callback | 默认callback |
-| jsonpCallback | String | jsonp回调函数名 | 默认从window取值 |
+| jsonpCallback | String | jsonp回调函数名 | 默认从window获取函数 |
 | async | Boolean | 是否异步 | true |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 |  |
@@ -91,7 +91,7 @@ import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
-  bodyType: 'FROM_DATA',
+  bodyType: 'JSON_DATA',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   },

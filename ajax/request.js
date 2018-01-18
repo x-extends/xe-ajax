@@ -52,7 +52,7 @@ Object.assign(XEAjaxRequest.prototype, {
       try {
         if (isFormData(this.body)) {
           result = this.body
-        } else if (this.bodyType === 'FROM_DATA') {
+        } else if (String(this.bodyType).toLocaleUpperCase() === 'FROM_DATA') {
           result = serialize(this.body)
         } else {
           result = JSON.stringify(this.body)
