@@ -72,10 +72,10 @@ this.$ajax.getJSON('url', {id: 1})
 |------|------|-----|----|
 | url | String | 请求地址 |  |
 | baseURL | String | 基础路径 |  |
-| method | String | 请求方法 | 默认get |
+| method | String | 请求方法 | 默认GET |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式 | 默认'json'，如果要以表单方式提交改为'formData' |
+| bodyType | String | 提交参数方式 | 默认'JSON_DATA'，如果要以表单方式提交改为'FROM_DATA' |
 | jsonp | String | 调用jsonp服务,回调属性默认callback | 默认callback |
 | jsonpCallback | String | jsonp回调函数名 | 默认从window取值 |
 | async | Boolean | 是否异步 | true |
@@ -90,8 +90,8 @@ this.$ajax.getJSON('url', {id: 1})
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  baseURL: 'xxx.com',
-  bodyType: 'formData',
+  baseURL: 'http://xuliangzhan.com',
+  bodyType: 'FROM_DATA',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   },
@@ -153,7 +153,7 @@ postJSON('url', {name: 'aaa'}})
   // data
 })
 // 以formData方式提交数据
-postJSON('url', {name: 'aaa'}}, {bodyType: 'formData'})
+postJSON('url', {name: 'aaa'}}, {bodyType: 'FROM_DATA'})
 .then(data => {
   // data
 }).catch(data => {

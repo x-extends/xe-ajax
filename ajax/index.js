@@ -19,35 +19,35 @@ function responseJSON (method) {
 // Http Request
 export var ajax = XEAjax
 
-// Http Request Method get
+// Http Request Method GET
 export function doGet (url, params, opts) {
-  return createAjax('get', isObject(url) ? {} : {url: url, params: params}, opts)
+  return createAjax('GET', isObject(url) ? {} : {url: url, params: params}, opts)
 }
 
-// Http Request Method post
+// Http Request Method POST
 export function doPost (url, body, opts) {
-  return createAjax('post', isObject(url) ? {} : {url: url, body: body}, opts)
+  return createAjax('POST', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
-// Http Request Method put
+// Http Request Method PUT
 export function doPut (url, body, opts) {
-  return createAjax('put', isObject(url) ? {} : {url: url, body: body}, opts)
+  return createAjax('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
-// Http Request Method patch
+// Http Request Method PATCH
 export function doPatch (url, body, opts) {
-  return createAjax('patch', isObject(url) ? {} : {url: url, body: body}, opts)
+  return createAjax('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
-// Http Request Method delete
+// Http Request Method DELETE
 export function doDelete (url, body, opts) {
-  return createAjax('delete', isObject(url) ? {} : {url: url, body: body}, opts)
+  return createAjax('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method jsonp
 var jsonpIndex = 0
 export function jsonp (url, params, opts) {
-  return createAjax('get', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
+  return createAjax('GET', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
 }
 
 export var getJSON = responseJSON(doGet)

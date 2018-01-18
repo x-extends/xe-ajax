@@ -4,7 +4,7 @@ export function XEAjaxRequest (options) {
   Object.assign(this, options)
   this._afterSends = []
   this._options = options
-  this.method = this.method.toLowerCase()
+  this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
   if (options && options.jsonp) {
     this.script = document.createElement('script')
@@ -48,11 +48,11 @@ Object.assign(XEAjaxRequest.prototype, {
   },
   getBody: function () {
     var result = null
-    if (this.body && this.method !== 'get') {
+    if (this.body && this.method !== 'GET') {
       try {
         if (isFormData(this.body)) {
           result = this.body
-        } else if (this.bodyType === 'formData') {
+        } else if (this.bodyType === 'FROM_DATA') {
           result = serialize(this.body)
         } else {
           result = JSON.stringify(this.body)

@@ -4,10 +4,10 @@ import { isFunction, isFormData, isUndefined, eachObj } from './util'
 
 var setupInterceptors = []
 var setupDefaults = {
-  method: 'get',
+  method: 'GET',
   baseURL: location.origin,
   async: true,
-  bodyType: 'json',
+  bodyType: 'JSON_DATA',
   headers: {
     Accept: 'application/json, text/plain, */*;'
   }
@@ -125,10 +125,10 @@ function jsonpHandle (request, response, resolve, reject) {
  *
  * @param String url 请求地址
  * @param String baseURL 基础路径
- * @param String method 请求方法(默认get)
+ * @param String method 请求方法(默认GET)
  * @param Object params 请求参数
  * @param Object body 提交参数
- * @param String bodyType 提交参数方式(默认json) 支持[json:以json方式提交数据] [formData:以formData方式提交数据]
+ * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FROM_DATA:以form data方式提交数据]
  * @param String jsonp 调用jsonp服务,回调属性默认callback
  * @param String jsonpCallback jsonp回调函数名
  * @param Boolean async 异步/同步(默认true)
@@ -163,8 +163,8 @@ export var interceptor = XEAjax.interceptor = {
 }
 
 interceptor.use(function (request, next) {
-  if (!isFormData(request.method === 'get' ? request.params : request.body)) {
-    if (request.method !== 'get' && request.bodyType === 'json') {
+  if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
+    if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
       request.setHeader('Content-Type', 'application/json; charset=utf-8')
     } else {
       request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
