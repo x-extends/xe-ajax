@@ -49,7 +49,7 @@ this.$ajax.getJSON('url', {id: 1})
 ## XEAjax :
 ### 'xe-ajax' 提供的便捷方法：
 * ajax( options )
-* doAll (iterable, context)
+* doAll (iterable)
 * doGet ( url, params, options )
 * getJSON ( url, params, options )
 * doPost ( url, body, options )
@@ -75,12 +75,12 @@ this.$ajax.getJSON('url', {id: 1})
 | method | String | 请求方法 | 默认GET |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式 | 默认'JSON_DATA'，如果要以表单方式提交改为'FROM_DATA' |
+| bodyType | String | 提交参数方式，如果要以表单方式提交改为'FROM_DATA' | 默认'JSON_DATA' |
 | jsonp | String | 调用jsonp服务,回调属性默认callback | 默认callback |
-| jsonpCallback | String | jsonp回调函数名 | 默认从window获取函数 |
-| async | Boolean | 是否异步 | true |
+| jsonpCallback | String | jsonp回调函数名 | 默认从window获取该函数 |
+| async | Boolean | 是否异步 | 默认true |
 | timeout | Number | 设置超时 |  |
-| headers | Object | 请求头 |  |
+| headers | Object | 请求头 | {Accept: 'application/json, text/plain, */*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
 | paramsSerializer | Function ( request ) | 自定义序列化函数 |  |
 | transformBody | Function ( body, request ) | 改变提交参数 | |
@@ -110,7 +110,7 @@ XEAjax.setup({
 ``` shell
 import { ajax, doAll, doGet, getJSON, postJSON } from 'xe-ajax'
 
-// 完整参数
+// 调用方式
 ajax({
   url: 'url',
   method: 'GET',
@@ -184,6 +184,7 @@ Promise.all(iterable).then(datas => {
 ``` shell
 import XEAjax from 'xe-ajax'
 
+// 请求之前拦截
 XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
@@ -193,6 +194,7 @@ XEAjax.interceptor.use((request, next) => {
   // 继续执行,如果不调用next则不会往下走
   next()
 })
+// 请求之前拦截和请求之后拦截
 XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
@@ -200,36 +202,59 @@ XEAjax.interceptor.use((request, next) => {
   next( (response) => {
     // 请求之后处理
 
-    // 更改请求结果数据
+    // 更改状态
+    response.status = 403
+
+    // 更改数据
     response.body = {}
   })
 })
+// 请求之前拦截和请求之后拦截
+XEAjax.interceptor.use((request, next) => {
+  // 请求之前处理
+
+  // 继续执行
+  next( (response) => {
+    // 请求之后处理
+
+    // 也可以直接返回自定义数据
+    return {}
+  })
+})
+// 请求之前拦截中断请求并直接返回结果
 XEAjax.interceptor.use((request, next) => {
   // 请求之前处理
 
   // 继续执行,如果希望直接返回数据
-  // next({response: [{id: 1}, {id: 2}], status: 500})
+  next({response: [{id: 1}, {id: 2}], status: 200})
+})
+// 请求之前拦截中断请求并异步返回结果
+XEAjax.interceptor.use((request, next) => {
+  // 请求之前处理
 
   // 异步操作
   new Promise((resolve, reject) => {
-    setTimeout(() => next({response: {a: 1, b: 2}, status: 200}), 100)
+    setTimeout(() => {
+      next({response: {text: '成功'}, status: 200})
+      // next({response: {text: '失败'}, status: 500})
+    }, 100)
   })
-  
 })
 ```
 
-### 自定义扩展
+### 混合函数
 #### 文件 ./customs.js
 ``` shell
 export function custom1 () {
   console.log('自定义的函数')
 } 
 ```
-#### 代码
+#### 示例
 ``` shell
 import Vue from 'vue'
 import XEAjax from 'xe-ajax'
 import VXEAjax from 'vxe-ajax'
+
 import customs from './customs'
 
 XEAjax.mixin(customs)
