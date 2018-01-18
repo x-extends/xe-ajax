@@ -75,7 +75,7 @@ this.$ajax.getJSON('url', {id: 1})
 | method | String | 请求方法 | 默认GET |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式，如果要以表单方式提交改为'FROM_DATA' | 默认'JSON_DATA' |
+| bodyType | String | 提交参数方式，如果要以表单方式提交改为FROM_DATA | 默认JSON_DATA |
 | jsonp | String | 调用jsonp服务,回调属性默认callback | 默认callback |
 | jsonpCallback | String | jsonp回调函数名 | 默认从window获取该函数 |
 | async | Boolean | 是否异步 | 默认true |
