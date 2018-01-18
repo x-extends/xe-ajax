@@ -219,11 +219,18 @@ XEAjax.interceptor.use((request, next) => {
 ```
 
 ### 自定义扩展
+#### 文件 ./customs.js
+``` shell
+export function custom1 () {
+  console.log('自定义的函数')
+} 
+```
+#### 代码
 ``` shell
 import Vue from 'vue'
 import XEAjax from 'xe-ajax'
 import VXEAjax from 'vxe-ajax'
-import customs from './customs' // ./customs.js export function custom1 () {} 
+import customs from './customs'
 
 XEAjax.mixin(customs)
 Vue.use(VXEAjax, XEAjax)
