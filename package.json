@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "XEAjax 是一个轻量级XHR处理函数，基于 Promise 实现，支持 Mock 虚拟服务",
   "main": "index.js",
   "scripts": {
