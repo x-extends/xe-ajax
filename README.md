@@ -1,4 +1,4 @@
-# XExtends ajax 提供一套基于 Promise XHR请求函数
+# XEAjax 是一个轻量级XHR处理函数，基于 Promise 实现，支持 Mock 虚拟服务
 
 ## 通过NPM安装最新版本
 
@@ -80,7 +80,7 @@ this.$ajax.getJSON('url', {id: 1})
 | jsonpCallback | String | jsonp回调函数名 | 默认从window获取该函数 |
 | async | Boolean | 是否异步 | 默认true |
 | timeout | Number | 设置超时 |  |
-| headers | Object | 请求头 | {Accept: 'application/json, text/plain, */*;'} |
+| headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
 | paramsSerializer | Function ( request ) | 自定义序列化函数 |  |
 | transformBody | Function ( body, request ) | 改变提交参数 | |
