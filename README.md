@@ -289,6 +289,7 @@ this.$ajax.custom1()
 |------|------|-----|----|
 | baseURL | String | 基础路径 |  |
 | timeout | String | 模拟请求时间 | 默认'20-400' |
+| log | Boolean | 控制台是输出 Mock 记录 | true |
 
 ### 设置默认参数
 ``` shell
@@ -303,7 +304,7 @@ XEMock.setup({
 ### 示例
 ``` shell
 import { getJSON, postJSON, deleteJSON } from 'xe-ajax'
-import { XEMock } from 'xe-ajax/mock'
+import XEMock from 'xe-ajax/mock'
 
 // 对象方式
 XEMock.GET('/services/list', {status: 200, response: {msg: 'success'}})

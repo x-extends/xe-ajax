@@ -102,14 +102,14 @@ function defineMocks (list, options, baseURL) {
   * @param Object/Function xhr 数据或返回数据方法
   * @param Object options 参数
   */
-export function Mock (path, method, xhr, options) {
+function XEMock (path, method, xhr, options) {
   defineMocks(isArray(path) ? (options = method, path) : [{path: path, method: method, xhr: xhr}], Object.assign({}, setupDefaults, options))
-  return Mock
+  return XEMock
 }
 
 ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].forEach(function (method) {
-  Mock[method] = function (url, xhr, options) {
-    return Mock(url, method, xhr, options)
+  XEMock[method] = function (url, xhr, options) {
+    return XEMock(url, method, xhr, options)
   }
 })
 
@@ -118,7 +118,7 @@ export function Mock (path, method, xhr, options) {
  *
  * @param Object options 参数
  */
-export var setup = Mock.setup = function setup (options) {
+export var setup = XEMock.setup = function setup (options) {
   Object.assign(setupDefaults, options)
 }
 
@@ -132,4 +132,5 @@ XEAjax.interceptor.use(function (request, next) {
   }
 })
 
-export default Mock
+export var Mock = XEMock
+export default XEMock
