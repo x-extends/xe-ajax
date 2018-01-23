@@ -34,16 +34,11 @@ import VXEAjax from 'vxe-ajax'
 
 Vue.use(VXEAjax, XEAjax)
 
-// 通过vue实例的调用方式 返回response对象
+// 通过vue实例的调用方式
 this.$ajax.doGet('services/user/list', {id: 1})
-.then(response => {
-  // response.body
-})
-// 返回直接返回结果
 this.$ajax.getJSON('services/user/list', {id: 1})
-.then(data => {
-  // data
-})
+this.$ajax.doPost ('services/user/save', {id: 1})
+this.$ajax.postJSON ('services/user/save', {id: 1})
 ```
 
 ## XEAjax :
@@ -68,7 +63,7 @@ this.$ajax.getJSON('services/user/list', {id: 1})
 * options （可选，对象）参数
 
 ### 参数说明
-| 参数 | 类型 | 描述 | 值 |
+| 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
 | baseURL | String | 基础路径 |  |
@@ -114,76 +109,54 @@ XEAjax.setup({
 
 ### 示例
 ``` shell
-import { ajax, doAll, doGet, getJSON, postJSON } from 'xe-ajax'
+import { ajax, doAll, doGet, getJSON, doPost, postJSON } from 'xe-ajax'
 
-// 调用方式
+// 参数调用，返回 response 对象
 ajax({
   url: 'services/user/list',
   method: 'GET',
   params: {}
-}).then(response => {
-  // response.body
-}).catch(response => {
-  // response.body
-  // response.status
 })
 ajax({
   url: 'services/user/submit',
   method: 'POST',
   body: {}
-}).then(response => {
-  // response.body
-}).catch(response => {
-  // response.body
-  // response.status
 })
 
-// 返回response对象
+// 返回 response 对象
 doGet('services/user/list').then(response => {
   // response.body
-}).catch(response => {
-  // response.body
   // response.status
+  // response.headers
 })
-// 直接返回数据
+// 直接返回请求结果
 getJSON('services/user/list').then(data => {
   // data
-}).catch(data => {
-  // data
 })
+
 // 提交数据
+doPost('services/user/save', {name: 'aaa'})
 postJSON('services/user/save', {name: 'aaa'})
-.then(data => {
-  // data
-}).catch(data => {
-  // data
-})
+
 // 以formData方式提交数据
+doPost('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
 postJSON('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
-.then(data => {
-  // data
-}).catch(data => {
-  // data
-})
+
 // 查询参数和数据同时提交
+doPost('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
-.then(data => {
-  // data
-}).catch(data => {
-  // data
-})
-// 在所有的异步操作执行完,doAll和Promise.all用法一致
-const iterable1 = [getJSON('services/user/list'), postJSON('services/user/save', {id: 1})]
-// 在所有的异步操作执行完
+
+// 在所有的异步操作执行完, doAll 和 Promise.all 用法一致
+const iterable1 = [getJSON('services/user/list'), doPost('services/user/save', {id: 1})]
 Promise.all(iterable1).then(datas => {
-  // datas
+  // datas 数组
 }).catch(data => {
-  // data
+  // data 
 })
-// doAll支持对象参数
+// doAll 支持对象参数
 const iterable2 = [{url: 'services/user/list', method: 'GET'}, postJSON('services/user/save', {id: 1})]
 doAll(iterable2).then(datas => {
-  // datas
+  // datas 数组
 }).catch(data => {
   // data
 })
@@ -193,7 +166,7 @@ doAll(iterable2).then(datas => {
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 局部拦截器
+// 支持局部拦截器
 XEAjax.ajax({
   url: 'services/user/list',
   interceptor (request, next) {
@@ -201,55 +174,45 @@ XEAjax.ajax({
   }
 })
 
-// 全局拦截器
-// 请求之前拦截
+// 请求之前拦截和请求之后拦截
 XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
-
+  next( (response) => {
+    // 请求之后处理
+    return response
+  })
+})
+// 请求之前拦截
+XEAjax.interceptor.use( (request, next) => {
   // 更改请求类型为POST
   request.method = 'POST'
-
   // 继续执行,如果不调用next则不会往下走
   next()
 })
 // 请求之前拦截和请求之后拦截
 XEAjax.interceptor.use( (request, next) => {
-  // 请求之前处理
-
-  // 继续执行
   next( (response) => {
     // 请求之后处理
-
-    // 更改状态
-    response.status = 403
-
-    // 更改数据
-    response.body = {}
+    return response
   })
 })
 // 请求之前拦截和请求之后拦截
 XEAjax.interceptor.use( (request, next) => {
-  // 请求之前处理
-
   // 继续执行
   next( (response) => {
-    // 请求之后处理
-
-    // 也可以直接返回自定义数据
-    return {}
+    // 更改状态
+    response.status = 403
+    // 更改数据
+    response.body = {}
   })
 })
 // 请求之前拦截中断请求并直接返回结果
 XEAjax.interceptor.use( (request, next) => {
-  // 请求之前处理
-
   // 继续执行,如果希望直接返回数据
   next({response: [{id: 1}, {id: 2}], status: 200})
 })
 // 请求之前拦截中断请求并异步返回结果
 XEAjax.interceptor.use( (request, next) => {
-  // 请求之前处理
-
   // 异步操作
   new Promise( (resolve, reject) => {
     setTimeout(() => {
