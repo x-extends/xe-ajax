@@ -83,6 +83,7 @@ this.$ajax.postJSON ('services/user/save', {id: 1})
 ### 全局参数
 ``` shell
 import XEAjax from 'xe-ajax'
+import { dateToString } from 'xe-utils'
 
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
@@ -96,7 +97,7 @@ XEAjax.setup({
   }，
   transformBody (body, request) {
     // 改变提交参数
-    const body = {type: 'submit', data: body}
+    body.startDate = dateToString(body.startDate, 'yyyy-MM-dd HH:mm:ss')
     return body
 
     // 支持异步Promise
@@ -110,6 +111,7 @@ XEAjax.setup({
 ### 示例
 ``` shell
 import { ajax, doAll, doGet, getJSON, doPost, postJSON } from 'xe-ajax'
+import { stringToDate } from 'xe-utils'
 
 // 参数调用，返回 response 对象
 ajax({
@@ -132,6 +134,12 @@ doGet('services/user/list').then(response => {
 // 直接返回请求结果
 getJSON('services/user/list').then(data => {
   // data
+  // 对数据进行处理
+  data.map(item => {
+    return Object.assign(item, {
+      startDate: stringToDate(item.startDate, 'yyyy-MM-dd HH:mm:ss')
+    })
+  })
 })
 
 // 提交数据
@@ -284,7 +292,7 @@ XEMock.setup({
 
 ### 示例
 ``` shell
-import { getJSON, postJSON, deleteJSON } from 'xe-ajax'
+import { doGet, getJSON, postJSON, deleteJSON } from 'xe-ajax'
 import XEMock from 'xe-ajax/mock'
 
 // 对象方式
@@ -342,8 +350,9 @@ XEMock([{
 }])
 
 // 调用
-getJSON('services/user/list').then(data => {
-  // data = {msg: 'success'}
+doGet('services/user/list').then(response => {
+  // response.status = 200
+  // response.body = {msg: 'success'}
 })
 getJSON('services/user/list/10/1').then(data => {
   // data = {msg: 'success'}
