@@ -26,21 +26,6 @@ XEAjax.doPost ('services/user/save', {id: 1})
 XEAjax.postJSON ('services/user/save', {id: 1})
 ```
 
-### Vue全局安装
-``` shell
-import Vue from 'vue'
-import XEAjax from 'xe-ajax'
-import VXEAjax from 'vxe-ajax'
-
-Vue.use(VXEAjax, XEAjax)
-
-// 通过vue实例的调用方式
-this.$ajax.doGet('services/user/list', {id: 1})
-this.$ajax.getJSON('services/user/list', {id: 1})
-this.$ajax.doPost ('services/user/save', {id: 1})
-this.$ajax.postJSON ('services/user/save', {id: 1})
-```
-
 ## XEAjax :
 ### 'xe-ajax' 提供的便捷方法：
 * ajax( options )
