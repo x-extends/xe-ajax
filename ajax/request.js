@@ -52,18 +52,19 @@ Object.assign(XEAjaxRequest.prototype, {
       var result = null
       if (request.body && request.method !== 'GET') {
         try {
-          if (isFormData(request.body)) {
-            result = request.body
-          } else if (String(request.bodyType).toLocaleUpperCase() === 'FROM_DATA') {
-            result = serialize(request.body)
+          if (isFunction(request.transformBody)) {
+            return Promise.resolve(request.transformBody(result, request))
           } else {
-            result = JSON.stringify(request.body)
+            if (isFormData(request.body)) {
+              result = request.body
+            } else if (String(request.bodyType).toLocaleUpperCase() === 'FROM_DATA') {
+              result = serialize(request.body)
+            } else {
+              result = JSON.stringify(request.body)
+            }
           }
         } catch (e) {
           console.error(e)
-        }
-        if (isFunction(request.transformBody)) {
-          return Promise.resolve(request.transformBody(result, request))
         }
       }
       resolve(result)
