@@ -92,7 +92,11 @@ function sendXHR (request, resolve, reject) {
         sendEnd(request, new XEAjaxResponse(request, xhr), resolve, reject)
       }
     }
-    xhr.send(request.getBody())
+    request.getBody().then(function (body) {
+      xhr.send(body)
+    }).catch(function () {
+      xhr.send()
+    })
   })
 }
 

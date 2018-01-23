@@ -47,24 +47,27 @@ Object.assign(XEAjaxRequest.prototype, {
     return url
   },
   getBody: function () {
-    var result = null
-    if (this.body && this.method !== 'GET') {
-      try {
-        if (isFormData(this.body)) {
-          result = this.body
-        } else if (String(this.bodyType).toLocaleUpperCase() === 'FROM_DATA') {
-          result = serialize(this.body)
-        } else {
-          result = JSON.stringify(this.body)
+    var request = this
+    return new Promise(function (resolve, reject) {
+      var result = null
+      if (request.body && request.method !== 'GET') {
+        try {
+          if (isFormData(request.body)) {
+            result = request.body
+          } else if (String(request.bodyType).toLocaleUpperCase() === 'FROM_DATA') {
+            result = serialize(request.body)
+          } else {
+            result = JSON.stringify(request.body)
+          }
+        } catch (e) {
+          console.error(e)
         }
-      } catch (e) {
-        console.error(e)
+        if (isFunction(request.transformBody)) {
+          return Promise.resolve(request.transformBody(result, request))
+        }
       }
-      if (isFunction(this.transformBody)) {
-        return this.transformBody(result, this)
-      }
-    }
-    return result
+      resolve(result)
+    })
   }
 })
 

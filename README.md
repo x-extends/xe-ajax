@@ -67,7 +67,7 @@ this.$ajax.getJSON('services/user/list', {id: 1})
 * params/body（可选，对象/数组），要发送的数据。可被options属性覆盖。
 * options （可选，对象）参数
 
-### 调用参数
+### 参数说明
 | 参数 | 类型 | 描述 | 值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
@@ -82,10 +82,10 @@ this.$ajax.getJSON('services/user/list', {id: 1})
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
-| paramsSerializer | Function ( request ) | 自定义序列化函数 |  |
+| paramsSerializer | Function ( request ) | 自定义序列化参数 |  |
 | transformBody | Function ( body, request ) | 改变提交参数 | |
 
-### 设置默认参数
+### 全局参数
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -99,9 +99,15 @@ XEAjax.setup({
     // 重写序列化函数
     return 'id=1&type=2'
   }，
-  transformBody (body) {
+  transformBody (body, request) {
     // 改变提交参数
+    const body = {type: 'submit', data: body}
     return body
+
+    // 支持异步Promise
+    // return new Promise( (resolve, reject) = {
+    //   resolve(body)
+    // })
   }
 })
 ```
@@ -166,21 +172,24 @@ postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id:
 }).catch(data => {
   // data
 })
-// 在所有的异步操作执行完 doAll和Promise.all 用法一致
-const iterable = [getJSON('services/user/list'), postJSON('services/user/save', {id: 1})]
-doAll(iterable).then(datas => {
+// 在所有的异步操作执行完,doAll和Promise.all用法一致
+const iterable1 = [getJSON('services/user/list'), postJSON('services/user/save', {id: 1})]
+// 在所有的异步操作执行完
+Promise.all(iterable1).then(datas => {
   // datas
 }).catch(data => {
   // data
 })
-Promise.all(iterable).then(datas => {
+// doAll支持对象参数
+const iterable2 = [{url: 'services/user/list', method: 'GET'}, postJSON('services/user/save', {id: 1})]
+doAll(iterable2).then(datas => {
   // datas
 }).catch(data => {
   // data
 })
 ```
 
-### 设置拦截器
+### 拦截器
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -293,14 +302,14 @@ this.$ajax.custom1()
 * xhr（对象/方法(request, xhr)）数据或返回数据方法 {status: 200, response: [], headers: {}}
 * options （可选，对象）参数
 
-### 调用参数
+### 参数说明
 | 参数 | 类型 | 描述 | 值 |
 |------|------|-----|----|
 | baseURL | String | 基础路径 |  |
 | timeout | String | 模拟请求时间 | 默认'20-400' |
 | log | Boolean | 控制台输出 Mock 日志 | true |
 
-### 设置默认参数
+### 全局参数
 ``` shell
 import XEMock from 'xe-ajax/mock'
 

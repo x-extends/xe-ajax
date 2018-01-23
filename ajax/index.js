@@ -19,6 +19,18 @@ function responseJSON (method) {
 // Http Request
 export var ajax = XEAjax
 
+// Http Request All
+export function doAll (iterable) {
+  return Promise.all(iterable.map(function (item) {
+    if (item instanceof Promise) {
+      return item
+    } else if (item && isObject(item)) {
+      return ajax(item)
+    }
+    return item
+  }))
+}
+
 // Http Request Method GET
 export function doGet (url, params, opts) {
   return createAjax('GET', isObject(url) ? {} : {url: url, params: params}, opts)
@@ -57,7 +69,7 @@ export var patchJSON = responseJSON(doPatch)
 export var deleteJSON = responseJSON(doDelete)
 
 export default {
-  doAll: Promise.all,
+  doAll: doAll,
   doGet: doGet,
   getJSON: getJSON,
   doPost: doPost,
