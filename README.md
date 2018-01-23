@@ -147,7 +147,7 @@ doGet('services/user/list').then(response => {
 })
 // 直接返回数据
 getJSON('services/user/list').then(data => {
-  # // data
+  // data
 }).catch(data => {
   // data
 })
