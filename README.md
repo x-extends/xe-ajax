@@ -10,20 +10,20 @@ npm install xe-ajax --save
 ``` shell
 import { doGet, getJSON, doPost, postJSON } from 'xe-ajax'
 
-doGet ('url', {id: 1})
-getJSON ('url', {id: 1})
-doPost ('url', {id: 1})
-postJSON ('url', {id: 1})
+doGet ('services/user/list', {id: 1})
+getJSON ('services/user/list', {id: 1})
+doPost ('services/user/save', {id: 1})
+postJSON ('services/user/save', {id: 1})
 ```
 
 ### 引入所有
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.doGet('url', {id: 1})
-XEAjax.getJSON ('url', {id: 1})
-XEAjax.doPost ('url', {id: 1})
-XEAjax.postJSON ('url', {id: 1})
+XEAjax.doGet('services/user/list', {id: 1})
+XEAjax.getJSON ('services/user/list', {id: 1})
+XEAjax.doPost ('services/user/save', {id: 1})
+XEAjax.postJSON ('services/user/save', {id: 1})
 ```
 
 ### Vue全局安装
@@ -35,12 +35,12 @@ import VXEAjax from 'vxe-ajax'
 Vue.use(VXEAjax, XEAjax)
 
 // 通过vue实例的调用方式 返回response对象
-this.$ajax.doGet('url', {id: 1})
+this.$ajax.doGet('services/user/list', {id: 1})
 .then(response => {
   // response.body
 })
 // 返回直接返回结果
-this.$ajax.getJSON('url', {id: 1})
+this.$ajax.getJSON('services/user/list', {id: 1})
 .then(data => {
   // data
 })
@@ -112,7 +112,7 @@ import { ajax, doAll, doGet, getJSON, postJSON } from 'xe-ajax'
 
 // 调用方式
 ajax({
-  url: 'url',
+  url: 'services/user/list',
   method: 'GET',
   params: {}
 }).then(response => {
@@ -122,7 +122,7 @@ ajax({
   // response.status
 })
 ajax({
-  url: 'url',
+  url: 'services/user/submit',
   method: 'POST',
   body: {}
 }).then(response => {
@@ -133,41 +133,41 @@ ajax({
 })
 
 // 返回response对象
-doGet('url').then(response => {
+doGet('services/user/list').then(response => {
   // response.body
 }).catch(response => {
   // response.body
   // response.status
 })
 // 直接返回数据
-getJSON('url').then(data => {
+getJSON('services/user/list').then(data => {
   // data
 }).catch(data => {
   // data
 })
 // 提交数据
-postJSON('url', {name: 'aaa'}})
+postJSON('services/user/save', {name: 'aaa'})
 .then(data => {
   // data
 }).catch(data => {
   // data
 })
 // 以formData方式提交数据
-postJSON('url', {name: 'aaa'}}, {bodyType: 'FROM_DATA'})
+postJSON('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
 .then(data => {
   // data
 }).catch(data => {
   // data
 })
-// url参数和数据同时提交
-postJSON('url', {name: 'aaa'}, {params: {id: 1}})
+// 查询参数和数据同时提交
+postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 .then(data => {
   // data
 }).catch(data => {
   // data
 })
 // 在所有的异步操作执行完 doAll和Promise.all 用法一致
-const iterable = [getJSON('url'), postJSON('url')]
+const iterable = [getJSON('services/user/list'), postJSON('services/user/save', {id: 1})]
 doAll(iterable).then(datas => {
   // datas
 }).catch(data => {
@@ -184,8 +184,17 @@ Promise.all(iterable).then(datas => {
 ``` shell
 import XEAjax from 'xe-ajax'
 
+// 局部拦截器
+XEAjax.ajax({
+  url: 'services/user/list',
+  interceptor (request, next) {
+    next()
+  }
+})
+
+// 全局拦截器
 // 请求之前拦截
-XEAjax.interceptor.use((request, next) => {
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 更改请求类型为POST
@@ -195,7 +204,7 @@ XEAjax.interceptor.use((request, next) => {
   next()
 })
 // 请求之前拦截和请求之后拦截
-XEAjax.interceptor.use((request, next) => {
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 继续执行
@@ -210,7 +219,7 @@ XEAjax.interceptor.use((request, next) => {
   })
 })
 // 请求之前拦截和请求之后拦截
-XEAjax.interceptor.use((request, next) => {
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 继续执行
@@ -222,18 +231,18 @@ XEAjax.interceptor.use((request, next) => {
   })
 })
 // 请求之前拦截中断请求并直接返回结果
-XEAjax.interceptor.use((request, next) => {
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 继续执行,如果希望直接返回数据
   next({response: [{id: 1}, {id: 2}], status: 200})
 })
 // 请求之前拦截中断请求并异步返回结果
-XEAjax.interceptor.use((request, next) => {
+XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
 
   // 异步操作
-  new Promise((resolve, reject) => {
+  new Promise( (resolve, reject) => {
     setTimeout(() => {
       next({response: {text: '成功'}, status: 200})
       // next({response: {text: '失败'}, status: 500})
@@ -307,9 +316,9 @@ import { getJSON, postJSON, deleteJSON } from 'xe-ajax'
 import XEMock from 'xe-ajax/mock'
 
 // 对象方式
-XEMock.GET('/services/list', {status: 200, response: {msg: 'success'}})
+XEMock.GET('services/user/list', {status: 200, response: {msg: 'success'}})
 // 动态路径
-XEMock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
+XEMock.GET('services/user/list/{pageSize}/{currentPage}', (request, xhr) => {
   // 获取路径参数 request.pathVariable
   // request.pathVariable.pageSize 10
   // request.pathVariable.currentPage 1
@@ -319,7 +328,7 @@ XEMock.GET('/services/list/{pageSize}/{currentPage}', (request, xhr) => {
   return xhr
 })
 // 函数方式
-XEMock.POST('services/save', (request, xhr) => {
+XEMock.POST('services/user/save', (request, xhr) => {
   // 模拟后台逻辑 对参数进行校验
   if (request.params.id) {
     return {status: 200, response: {msg: 'success'}}
@@ -327,7 +336,7 @@ XEMock.POST('services/save', (request, xhr) => {
   return {status: 500, response: {msg: 'error'}}
 })
 // 异步方式
-XEMock.PATCH('services/patch', (request, xhr) => {
+XEMock.PATCH('services/user/patch', (request, xhr) => {
   return new Promise( (resolve, reject) => {
     setTimeout(() = {
       xhr.status = 200
@@ -337,14 +346,14 @@ XEMock.PATCH('services/patch', (request, xhr) => {
   })
 })
 // 定义单个
-XEMock('services/list2', 'GET', (request, xhr) => {
+XEMock('services/user/list', 'GET', (request, xhr) => {
   xhr.response = {msg: 'success'}
   return xhr
 })
 
 // 定义多个
 XEMock([{
-  path: 'services',
+  path: 'services/user',
   children: [{
     method: 'POST',
     path: 'submit',
@@ -361,10 +370,10 @@ XEMock([{
 }])
 
 // 调用
-getJSON('/services/list').then(data => {
+getJSON('services/user/list').then(data => {
   // data = {msg: 'success'}
 })
-getJSON('/services/list/10/1').then(data => {
+getJSON('services/user/list/10/1').then(data => {
   // data = {msg: 'success'}
 })
 
@@ -372,19 +381,19 @@ postJSON('services/save', {id: 111}).then(data => {
   // data = {msg: 'success'}
 })
 
-postJSON('services/save').catch(data => {
+postJSON('services/user/save').catch(data => {
   // data = {msg: 'error'}
 })
 
-patchJSON('services/patch').then(data => {
+patchJSON('services/user/patch').then(data => {
   // data = {msg: 'success'}
 })
 
-postJSON('services/submit').then(data => {
+postJSON('services/user/submit').then(data => {
   // data = {msg: 'success'}
 })
 
-deleteJSON('services/del').catch(data => {
+deleteJSON('services/user/del').catch(data => {
   // data = {msg: 'error'}
 })
 
