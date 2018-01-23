@@ -53,7 +53,7 @@ Object.assign(XEAjaxRequest.prototype, {
       if (request.body && request.method !== 'GET') {
         try {
           if (isFunction(request.transformBody)) {
-            return Promise.resolve(request.transformBody(request.body, request))
+            result = request.transformBody(request.body, request)
           } else {
             if (isFormData(request.body)) {
               result = request.body
