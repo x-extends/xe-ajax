@@ -289,7 +289,7 @@ this.$ajax.custom1()
 |------|------|-----|----|
 | baseURL | String | 基础路径 |  |
 | timeout | String | 模拟请求时间 | 默认'20-400' |
-| log | Boolean | 控制台是输出 Mock 记录 | true |
+| log | Boolean | 控制台输出 Mock 日志 | true |
 
 ### 设置默认参数
 ``` shell
