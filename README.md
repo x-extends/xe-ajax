@@ -77,8 +77,8 @@ this.$ajax.postJSON ('services/user/save', {id: 1})
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
-| paramsSerializer | Function ( request ) | 自定义序列化参数 |  |
-| transformBody | Function ( body, request ) | 改变提交参数 | |
+| paramsSerializer | Function ( request ) | 重写序列化函数 |  |
+| transformBody | Function ( body, request ) | 重写提交数据函数 | |
 
 ### 全局参数
 ``` shell
@@ -93,12 +93,12 @@ XEAjax.setup({
   },
   paramsSerializer (request) {
     // 重写序列化函数
-    return 'id=1&type=2'
+    return 'id=1&name=2'
   }，
   transformBody (body, request) {
     // 改变提交参数
     body.startDate = dateToString(body.startDate, 'yyyy-MM-dd HH:mm:ss')
-    return body
+    return JSON.stringify(body)
 
     // 支持异步Promise
     // return new Promise( (resolve, reject) = {
