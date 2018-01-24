@@ -264,28 +264,6 @@ XEAjax.interceptor.use( (request, next) => {
 })
 ```
 
-### 混合函数
-#### 文件 ./customs.js
-``` shell
-export function custom1 () {
-  console.log('自定义的函数')
-} 
-```
-#### 示例
-``` shell
-import Vue from 'vue'
-import XEAjax from 'xe-ajax'
-import VXEAjax from 'vxe-ajax'
-
-import customs from './customs'
-
-XEAjax.mixin(customs)
-Vue.use(VXEAjax, XEAjax)
-
-// 调用自定义扩展函数
-this.$ajax.custom1()
-```
-
 ## XEMock 虚拟服务
 ### 'xe-ajax/mock' 提供的便捷方法：
 * XEMock( defines, options )
