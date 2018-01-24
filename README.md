@@ -168,7 +168,7 @@ doAll(iterable2).then(datas => {
 
 ### 取消操作
 | 属性 | 类型 | 描述 |
-|------|------|-----|----|
+|------|------|-----|
 | cancel | Function () | 取消请求 |
 | resolve | Function (response) | 取消请求，承诺完成 |
 | reject | Function (response) | 取消请求，承诺失败 |
