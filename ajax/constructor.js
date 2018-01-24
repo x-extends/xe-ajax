@@ -27,10 +27,10 @@ export function XEAjax (options) {
 
 function afterSendHandle (request, response) {
   var afterPromises = Promise.resolve(response)
-  request._afterSends.forEach(function (fn) {
+  request.AFTER_SEND_CALLS.forEach(function (fn) {
     afterPromises = afterPromises.then(function (response) {
       return fn(response) || response
-    })['catch'](function (message) {
+    }).catch(function (message) {
       console.error(message)
     })
   })
@@ -59,7 +59,7 @@ function interceptorHandle (request) {
             if (isUndefined(response)) {
               resolve()
             } else if (isFunction(response)) {
-              request._afterSends.push(response)
+              request.AFTER_SEND_CALLS.push(response)
               resolve()
             } else {
               resolve(new XEAjaxResponse(request, response))
@@ -96,6 +96,12 @@ function sendXHR (request, resolve, reject) {
       xhr.send(body)
     }).catch(function () {
       xhr.send()
+    }).then(function () {
+      if (request.ABORT_STATUS !== false) {
+        if (xhr.readyState === 1) {
+          xhr.abort()
+        }
+      }
     })
   })
 }

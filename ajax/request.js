@@ -1,9 +1,12 @@
 import { isFunction, isFormData, isCrossOrigin, serialize } from './util'
+import { setCancelableItem } from './cancelable'
 
 export function XEAjaxRequest (options) {
-  Object.assign(this, options)
-  this._afterSends = []
-  this._options = options
+  Object.assign(this, {body: null, params: null}, options)
+  this.ABORT_STATUS = false
+  this.ABORT_RESPONSE = undefined
+  this.AFTER_SEND_CALLS = []
+  this.OPTIONS = options
   this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
   if (options && options.jsonp) {
@@ -11,11 +14,21 @@ export function XEAjaxRequest (options) {
   } else {
     this.xhr = new XMLHttpRequest()
   }
+  setCancelableItem(this)
 }
 
 Object.assign(XEAjaxRequest.prototype, {
-  abort: function () {
-    this.xhr.abort()
+  abort: function (response) {
+    if (this.ABORT_STATUS === false) {
+      this.ABORT_STATUS = true
+      this.ABORT_RESPONSE = response
+      if (isFunction(this.resolveMock)) {
+        this.resolveMock()
+      }
+      if (this.xhr.readyState === 1) {
+        this.xhr.abort()
+      }
+    }
   },
   setHeader: function (name, value) {
     this.headers[name] = value
@@ -53,7 +66,10 @@ Object.assign(XEAjaxRequest.prototype, {
       if (request.body && request.method !== 'GET') {
         try {
           if (isFunction(request.transformBody)) {
-            result = request.transformBody(request.body, request)
+            request.body = request.transformBody(request.body, request) || request.body
+          }
+          if (isFunction(request.formatBody)) {
+            result = request.formatBody(request.body, request) || null
           } else {
             if (isFormData(request.body)) {
               result = request.body

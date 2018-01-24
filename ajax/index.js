@@ -1,4 +1,5 @@
 import XEAjax from './constructor'
+import XEAjaxCancelable from './cancelable'
 import { isObject } from './util'
 
 function createAjax (method, def, opts) {
@@ -62,6 +63,11 @@ export function jsonp (url, params, opts) {
   return createAjax('GET', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
 }
 
+// promise cancelable
+export function cancelable () {
+  return new XEAjaxCancelable()
+}
+
 export var getJSON = responseJSON(doGet)
 export var postJSON = responseJSON(doPost)
 export var putJSON = responseJSON(doPut)
@@ -80,5 +86,6 @@ export default {
   patchJSON: patchJSON,
   doDelete: doDelete,
   deleteJSON: deleteJSON,
-  jsonp: jsonp
+  jsonp: jsonp,
+  cancelable: cancelable
 }

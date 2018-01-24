@@ -62,8 +62,10 @@ XEAjax.postJSON ('services/user/save', {id: 1})
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
-| paramsSerializer | Function ( request ) | 重写序列化函数 |  |
-| transformBody | Function ( body, request ) | 重写提交数据函数 | |
+| transformParams | Function ( params, request ) | 用于改变URL参数 | |
+| paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
+| transformBody | Function ( body, request ) | 用于改变提交数据 | |
+| formatBody | Function ( body, request ) | 自定义格式化数据函数 | |
 
 ### 全局参数
 ``` shell
@@ -76,19 +78,23 @@ XEAjax.setup({
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   },
-  paramsSerializer (request) {
-    // 重写序列化函数
+  transformParams (params, request) {
+    // 用于在请求发送之前改变URL参数
+    params.id = 123
+    return params
+  },
+  paramsSerializer (params, request) {
+    // 自定义URL序列化函数,最终拼接在url
     return 'id=1&name=2'
   }，
   transformBody (body, request) {
-    // 改变提交参数
+    // 用于在请求发送之前改变提交数据
     body.startDate = dateToString(body.startDate, 'yyyy-MM-dd HH:mm:ss')
+    return body
+  },
+  bodyFormat (body, request) {
+    // 自定义格式化数据函数,除了GET之外都支持提交数据
     return JSON.stringify(body)
-
-    // 支持异步Promise
-    // return new Promise( (resolve, reject) = {
-    //   resolve(body)
-    // })
   }
 })
 ```
@@ -140,19 +146,59 @@ doPost('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1
 postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 
 // 在所有的异步操作执行完, doAll 和 Promise.all 用法一致
-const iterable1 = [getJSON('services/user/list'), doPost('services/user/save', {id: 1})]
+const iterable1 = []
+iterable1.push(getJSON('services/user/list'))
+iterable1.push(getJSON('services/user/save'), {id: 1})
 Promise.all(iterable1).then(datas => {
   // datas 数组
 }).catch(data => {
   // data 
 })
 // doAll 支持对象参数
-const iterable2 = [{url: 'services/user/list', method: 'GET'}, postJSON('services/user/save', {id: 1})]
+const iterable2 = []
+iterable2.push({url: 'services/user/list', method: 'GET'})
+iterable2.push(postJSON('services/user/save', {id: 1}))
 doAll(iterable2).then(datas => {
   // datas 数组
 }).catch(data => {
   // data
 })
+
+```
+
+### 取消操作
+| 属性 | 类型 | 描述 |
+|------|------|-----|----|
+| cancel | Function () | 取消请求 |
+| resolve | Function (response) | 取消请求，承诺完成 |
+| reject | Function (response) | 取消请求，承诺失败 |
+
+### 示例
+``` shell
+import { cancelable, doGet, doPost } from 'xe-ajax'
+
+// 中断XHR请求之前如果承诺已经完成了，则调用无效
+
+// 中断XHR请求
+const handle1 = cancelable()
+doGet('services/user/list', null, {cancelable: handle1})
+handle1.cancel() // {status: 0, response: ''}
+
+// 中断XHR请求，执行承诺完成
+const handle2 = cancelable()
+doGet('services/user/list', null, {cancelable: handle2})
+handle2.resolve()
+// handle2.resolve({msg: 'cancel2'}) // 支持自定义响应数据 {status: 200, response: {msg: 'cancel2'}}
+
+// 中断XHR请求，执行承诺失败
+const handle3 = cancelable()
+doGet('services/user/list', null, {cancelable: handle3})
+doPost('services/user/save', {name: 'test', password: '123456'}, {cancelable: handle3, bodyType: 'FROM_DATA'})
+setTimeout(() => {
+  handle3.reject()
+  // handle3.reject({msg: 'cancel3'}) // 支持自定义响应数据 {status: 500, response: {msg: 'cancel3'}}
+}, 20)
+
 ```
 
 ### 拦截器
@@ -171,7 +217,7 @@ XEAjax.ajax({
 XEAjax.interceptor.use( (request, next) => {
   // 请求之前处理
   next( (response) => {
-    // 请求之后处理
+    / 请求之后处理
     return response
   })
 })
@@ -184,10 +230,12 @@ XEAjax.interceptor.use( (request, next) => {
 })
 // 请求之前拦截和请求之后拦截
 XEAjax.interceptor.use( (request, next) => {
-  next( (response) => {
-    // 请求之后处理
-    return response
-  })
+  // 例如，是否登录权限拦截
+  if (isLogin()) {
+    next()
+  } else {
+    location.href = 'http://xuliangzhan.com/login'
+  }
 })
 // 请求之前拦截和请求之后拦截
 XEAjax.interceptor.use( (request, next) => {

@@ -9,10 +9,22 @@ export function XEAjaxResponse (request, xhr) {
   this.bodyText = ''
 
   // xhr handle
-  if (xhr && (xhr.response || xhr.hasOwnProperty('response')) && (xhr.status || xhr.hasOwnProperty('status'))) {
+  if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
     this.status = xhr.status || this.status
-    this.body = xhr.response
-    this.bodyText = xhr.responseText || ''
+
+    // cancel xhr
+    if (request.ABORT_STATUS) {
+      var cancelXHR = request.ABORT_RESPONSE
+      if (cancelXHR && cancelXHR.response !== undefined && cancelXHR.status !== undefined) {
+        this.body = cancelXHR.response
+        this.status = cancelXHR.status || this.status
+      } else {
+        this.body = cancelXHR === undefined ? xhr.response : cancelXHR
+      }
+    } else {
+      this.body = xhr.response
+      this.bodyText = xhr.responseText || ''
+    }
 
     // if no content
     if (this.status === 1223 || this.status === 204) {
@@ -27,10 +39,13 @@ export function XEAjaxResponse (request, xhr) {
 
     // parse headers
     if (xhr.getAllResponseHeaders) {
-      xhr.getAllResponseHeaders().trim().split('\n').forEach(function (row) {
-        var index = row.indexOf(':')
-        this.headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
-      }, this)
+      var allResponseHeaders = xhr.getAllResponseHeaders().trim()
+      if (allResponseHeaders) {
+        allResponseHeaders.split('\n').forEach(function (row) {
+          var index = row.indexOf(':')
+          this.headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+        }, this)
+      }
     } else if (xhr.headers) {
       Object.assign(this.headers, xhr.headers)
     }

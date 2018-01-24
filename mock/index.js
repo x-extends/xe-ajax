@@ -12,6 +12,7 @@ function XEMockService (path, method, xhr, options) {
   if (path && method) {
     this.path = path
     this.method = method
+    this.time = 0
     this.xhr = xhr
     this.options = options
   } else {
@@ -20,31 +21,42 @@ function XEMockService (path, method, xhr, options) {
 }
 
 Object.assign(XEMockService.prototype, {
-  getXHR: function (request, time) {
+  getXHR: function (request) {
     var mock = this
     return new Promise(function (resolve, reject) {
-      setTimeout(function () {
-        Promise.resolve(isFunction(mock.xhr) ? mock.xhr(request, {status: 200, response: null, headers: null}) : mock.xhr)
-        .then(function (xhr) {
-          resolve(mock.getResponse(xhr, 200))
-        }).catch(function (xhr) {
-          reject(mock.getResponse(xhr, 500))
-        })
-      }, time)
+      if (request.ABORT_STATUS) {
+        mock.time = 0
+        resolve({status: 0, response: null, headers: null})
+      } else {
+        var startTime = Date.now()
+        var mockTimeout = setTimeout(function () {
+          Promise.resolve(isFunction(mock.xhr) ? mock.xhr(request, {status: 200, response: null, headers: null}) : mock.xhr)
+          .then(function (xhr) {
+            resolve(mock.getResponse(xhr, 200))
+          }).catch(function (xhr) {
+            reject(mock.getResponse(xhr, 500))
+          })
+        }, mock.time)
+        request.resolveMock = function () {
+          mock.time = Date.now() - startTime
+          clearTimeout(mockTimeout)
+          resolve({status: 0, response: null, headers: null})
+        }
+      }
     })
   },
   getResponse: function (xhr, status) {
-    if (xhr && (xhr.response || xhr.hasOwnProperty('response')) && (xhr.status || xhr.hasOwnProperty('status'))) {
+    if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
       return xhr
     }
     return {status: status, response: xhr, headers: null}
   },
   reply: function (request, next) {
-    var log = this.options.log
-    var time = getTime(this.options.timeout)
-    return this.getXHR(request, time).then(function (xhr) {
+    var mock = this
+    this.time = getTime(this.options.timeout)
+    return this.getXHR(request).then(function (xhr) {
       next(xhr)
-      log && console.info('XEMock URL: ' + request.getUrl() + '\nRequest Method: ' + request.method.toLocaleUpperCase() + ' => Status Code: ' + xhr.status + ' => Time: ' + time + 'ms')
+      mock.options.log && console.info('XEMock URL: ' + request.getUrl() + '\nMethod: ' + request.method.toLocaleUpperCase() + ' => Status: ' + (xhr ? xhr.status : 'canceled') + ' => Time: ' + mock.time + 'ms')
     })
   }
 })
