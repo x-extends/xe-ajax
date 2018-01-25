@@ -65,7 +65,7 @@ XEAjax.postJSON ('services/user/save', {id: 1})
 | transformParams | Function ( params, request ) | 用于改变URL参数 | |
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 | |
-| formatBody | Function ( body, request ) | 自定义格式化数据函数 | |
+| stringifyBody | Function ( body, request ) | 自定义格式化数据函数 | |
 
 ### 全局参数
 ``` shell

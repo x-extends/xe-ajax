@@ -144,7 +144,10 @@ function jsonpHandle (request, response, resolve, reject) {
  * @param Boolean async 异步/同步(默认true)
  * @param Number timeout 设置超时
  * @param Object headers 请求头
- * @param Function paramsSerializer(request) 参数序列化
+ * @param Function transformParams(request) 用于改变URL参数
+ * @param Function paramsSerializer(request) 自定义URL序列化函数
+ * @param Function transformBody(request) 用于改变提交数据
+ * @param Function stringifyBody(request) 自定义格式化数据函数
  * @param Function interceptor(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
  */
 export var setup = XEAjax.setup = function setup (options) {

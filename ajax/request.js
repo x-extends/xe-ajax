@@ -68,8 +68,8 @@ Object.assign(XEAjaxRequest.prototype, {
           if (isFunction(request.transformBody)) {
             request.body = request.transformBody(request.body, request) || request.body
           }
-          if (isFunction(request.formatBody)) {
-            result = request.formatBody(request.body, request) || null
+          if (isFunction(request.stringifyBody)) {
+            result = request.stringifyBody(request.body, request) || null
           } else {
             if (isFormData(request.body)) {
               result = request.body
