@@ -377,7 +377,7 @@ XEMock([{
 }])
 ```
 
-### 正常调用,不需要任何改动
+### 正常调用,自动拦截响应
 ``` shell
 import { doGet, getJSON, postJSON, deleteJSON } from 'xe-ajax'
 
