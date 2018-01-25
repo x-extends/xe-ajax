@@ -145,4 +145,9 @@ XEAjax.interceptor.use(function (request, next) {
 })
 
 export var Mock = XEMock
+export var GET = XEMock.GET
+export var POST = XEMock.POST
+export var PUT = XEMock.PUT
+export var DELETE = XEMock.DELETE
+export var PATCH = XEMock.PATCH
 export default XEMock

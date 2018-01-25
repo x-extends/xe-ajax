@@ -268,12 +268,12 @@ XEAjax.interceptor.use( (request, next) => {
 ### 'xe-ajax/mock' 提供的便捷方法：
 * XEMock( defines, options )
 * XEMock( path, method, xhr, options )
-* XEMock.GET( path, xhr, options )
-* XEMock.POST( path, xhr, options )
-* XEMock.PUT( path, xhr, options )
-* XEMock.DELETE( path, xhr, options )
-* XEMock.PATCH( path, xhr, options )
-* XEMock.setup( options )
+* GET( path, xhr, options )
+* POST( path, xhr, options )
+* PUT( path, xhr, options )
+* DELETE( path, xhr, options )
+* PATCH( path, xhr, options )
+* setup( options )
 
 ### 接受两个参数：
 * defines（数组）定义多个
@@ -301,15 +301,14 @@ XEMock.setup({
 })
 ```
 
-### 示例
+### 示例1
 ``` shell
-import { doGet, getJSON, postJSON, deleteJSON } from 'xe-ajax'
-import XEMock from 'xe-ajax/mock'
+import { GET, POST, PUT, PATCH, DELETE } from 'xe-ajax/mock'
 
 // 对象方式
-XEMock.GET('services/user/list', {status: 200, response: {msg: 'success'}})
+GET('services/user/list', {status: 200, response: {msg: 'success'}})
 // 动态路径
-XEMock.GET('services/user/list/{pageSize}/{currentPage}', (request, xhr) => {
+PUT('services/user/list/{pageSize}/{currentPage}', (request, xhr) => {
   // 获取路径参数 request.pathVariable
   // request.pathVariable.pageSize 10
   // request.pathVariable.currentPage 1
@@ -319,15 +318,11 @@ XEMock.GET('services/user/list/{pageSize}/{currentPage}', (request, xhr) => {
   return xhr
 })
 // 函数方式
-XEMock.POST('services/user/save', (request, xhr) => {
-  // 模拟后台逻辑 对参数进行校验
-  if (request.params.id) {
-    return {status: 200, response: {msg: 'success'}}
-  }
-  return {status: 500, response: {msg: 'error'}}
+POST('services/user/save', (request, xhr) => {
+  return {status: 200, response: {msg: 'success'}}
 })
 // 异步方式
-XEMock.PATCH('services/user/patch', (request, xhr) => {
+PATCH('services/user/patch', (request, xhr) => {
   return new Promise( (resolve, reject) => {
     setTimeout(() = {
       xhr.status = 200
@@ -336,6 +331,27 @@ XEMock.PATCH('services/user/patch', (request, xhr) => {
     }, 100)
   })
 })
+// 函数方式,模拟后台校验
+DELETE('services/user/del', (request, xhr) => {
+  // 模拟后台逻辑 对参数进行校验
+  if (request.params.id) {
+    return {status: 200, response: {msg: 'success'}}
+  }
+  return {status: 500, response: {msg: 'error'}}
+})
+```
+
+### 示例2
+``` shell
+import XEMock from 'xe-ajax/mock'
+
+// 定义
+XEMock.GET('services/user/list', {status: 200, response: {msg: 'success'}})
+XEMock.POST('services/user/save', {status: 200, response: {msg: 'success'}})
+XEMock.PUT('services/user/update', {status: 200, response: {msg: 'success'}})
+XEMock.DELETE('services/user/delete', {status: 200, response: {msg: 'success'}})
+XEMock.PATCH('services/user/patch', {status: 200, response: {msg: 'success'}})
+
 // 定义单个
 XEMock('services/user/list', 'GET', (request, xhr) => {
   xhr.response = {msg: 'success'}
@@ -359,8 +375,12 @@ XEMock([{
     }
   ]
 }])
+```
 
-// 调用
+### 调用
+``` shell
+import { doGet, getJSON, postJSON, deleteJSON } from 'xe-ajax'
+
 doGet('services/user/list').then(response => {
   // response.status = 200
   // response.body = {msg: 'success'}
@@ -388,7 +408,6 @@ postJSON('services/user/submit').then(data => {
 deleteJSON('services/user/del').catch(data => {
   // data = {msg: 'error'}
 })
-
 ```
 
 ## License
