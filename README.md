@@ -377,7 +377,7 @@ XEMock([{
 }])
 ```
 
-### 调用
+### 正常调用,不需要任何改动
 ``` shell
 import { doGet, getJSON, postJSON, deleteJSON } from 'xe-ajax'
 
