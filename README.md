@@ -345,12 +345,12 @@ DELETE('services/user/del', (request, xhr) => {
 ``` shell
 import XEMock from 'xe-ajax/mock'
 
-// 定义
-XEMock.GET('services/user/list', {status: 200, response: {msg: 'success'}})
-XEMock.POST('services/user/save', {status: 200, response: {msg: 'success'}})
-XEMock.PUT('services/user/update', {status: 200, response: {msg: 'success'}})
-XEMock.DELETE('services/user/delete', {status: 200, response: {msg: 'success'}})
-XEMock.PATCH('services/user/patch', {status: 200, response: {msg: 'success'}})
+// 快捷定义
+XEMock.GET('services/user/list', {msg: 'success'})
+XEMock.POST('services/user/save', {msg: 'success'})
+XEMock.PUT('services/user/update', {msg: 'success'})
+XEMock.DELETE('services/user/delete', {msg: 'success'})
+XEMock.PATCH('services/user/patch', {msg: 'success'})
 
 // 定义单个
 XEMock('services/user/list', 'GET', (request, xhr) => {
