@@ -27,6 +27,26 @@ XEAjax.doPost ('services/user/save', {id: 1})
 XEAjax.postJSON ('services/user/save', {id: 1})
 ```
 
+### 混合函数
+#### 文件 ./customs.js
+``` shell
+export function custom1 () {
+  console.log('自定义的函数')
+} 
+```
+#### 示例
+``` shell
+import Vue from 'vue'
+import XEAjax from 'xe-ajax'
+
+import customs from './customs'
+
+XEAjax.mixin(customs)
+
+// 调用自定义扩展函数
+XEAjax.custom1()
+```
+
 ## XEAjax :
 ### 'xe-ajax' 提供的便捷方法：
 * ajax( options )
