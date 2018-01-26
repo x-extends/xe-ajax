@@ -2,7 +2,7 @@
 
 XEAjax 是一个不依赖于任何框架的XHR请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，任何使用ES6模块编程的项目都能使用。
 
-## 通过NPM安装最新版本
+### 通过NPM安装最新版本
 ``` shell
 npm install xe-ajax --save
 ```
