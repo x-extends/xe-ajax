@@ -47,7 +47,7 @@ XEAjax.mixin(customs)
 XEAjax.custom1()
 ```
 
-## XEAjax :
+## XEAjax API:
 ### 'xe-ajax' 提供的便捷方法：
 * ajax( options )
 * doAll (iterable)
