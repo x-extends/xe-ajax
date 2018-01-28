@@ -317,5 +317,7 @@ import XEAjaxMock from 'xe-ajax-mock'
 XEAjax.use(XEAjaxMock)
 ```
 
+请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例
+
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
