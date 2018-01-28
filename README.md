@@ -1,6 +1,6 @@
 # XEAjax 轻量级XHR请求函数，基于 Promise 实现，支持 Mock 虚拟服务
 
-XEAjax 是一个不依赖于任何框架的XHR请求函数，支持XHR、jsonp以及mock等常用函数。对于前后端分离开发模式，使用 ajax+mock 就非常有必要，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+。
+XEAjax 是一个不依赖于任何框架、开源的XHR请求函数，支持XHR、jsonp以及mock等常用函数。对于前后端分离开发模式，使用 ajax+mock 就非常有必要，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+。
 
 ### 直接引用 script 全局安装，XEAjax 会定义为全局变量
 ``` shell
