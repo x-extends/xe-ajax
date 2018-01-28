@@ -91,7 +91,7 @@ XEAjax.custom1()
 ### 全局参数
 ``` shell
 import XEAjax from 'xe-ajax'
-import { dateToString } from 'xe-utils'
+import XEUtils from 'xe-utils'
 
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
@@ -110,7 +110,7 @@ XEAjax.setup({
   }，
   transformBody (body, request) {
     // 用于在请求发送之前改变提交数据
-    body.startDate = dateToString(body.startDate, 'yyyy-MM-dd HH:mm:ss')
+    body.startDate = XEUtils.dateToString(body.startDate, 'yyyy-MM-dd HH:mm:ss')
     return body
   },
   bodyFormat (body, request) {
