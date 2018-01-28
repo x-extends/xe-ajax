@@ -31,7 +31,7 @@ define(['xe-ajax'], function (XEAjax) {
 npm install xe-ajax --save
 ```
 
-### 部分引入
+### 部分导入
 ``` shell
 import { doGet, getJSON, doPost, postJSON } from 'xe-ajax'
 
@@ -41,7 +41,7 @@ doPost ('services/user/save', {id: 1})
 postJSON ('services/user/save', {id: 1})
 ```
 
-### 引入所有
+### 导入所有
 ``` shell
 import XEAjax from 'xe-ajax'
 
