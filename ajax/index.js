@@ -1,4 +1,4 @@
-import XEAjax from './constructor'
+import XEAjax, { setup, interceptor } from './constructor'
 import XEAjaxCancelable from './cancelable'
 import { isObject } from './util'
 
@@ -87,5 +87,7 @@ export default {
   doDelete: doDelete,
   deleteJSON: deleteJSON,
   jsonp: jsonp,
-  cancelable: cancelable
+  cancelable: cancelable,
+  setup: setup,
+  interceptor: interceptor
 }

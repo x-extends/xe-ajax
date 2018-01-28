@@ -10,7 +10,15 @@ function mixin (methods) {
   return Object.assign(XEAjax, methods)
 }
 
+/**
+ * 安装插件
+ */
+function use (plugin) {
+  plugin.install(XEAjax)
+}
+
 mixin(ajax)
+XEAjax.use = use
 XEAjax.mixin = mixin
 
 export * from './ajax'

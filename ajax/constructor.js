@@ -150,7 +150,7 @@ function jsonpHandle (request, response, resolve, reject) {
  * @param Function stringifyBody(request) 自定义转换提交数据的函数
  * @param Function interceptor(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
  */
-export var setup = XEAjax.setup = function setup (options) {
+export var setup = function setup (options) {
   Object.assign(setupDefaults, options)
 }
 
@@ -166,7 +166,7 @@ export var setup = XEAjax.setup = function setup (options) {
  *    next(function (response) {return response}) 直接处理后的结果
  *    next(function (response) {response.status = 200}) 将状态修改
  */
-export var interceptor = XEAjax.interceptor = {
+export var interceptor = {
   use: function (callback) {
     if (isFunction(callback)) {
       setupInterceptors.push(callback)

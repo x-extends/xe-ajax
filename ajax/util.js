@@ -31,10 +31,6 @@ export function isUndefined (obj) {
   return typeof obj === 'undefined'
 }
 
-export function random (min, max) {
-  return min >= max ? min : ((min = min || 0) + Math.round(Math.random() * ((max || 9) - min)))
-}
-
 export function eachObj (obj, iteratee, context) {
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
