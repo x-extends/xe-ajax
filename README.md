@@ -12,12 +12,16 @@ XEAjax.getJSON ('services/user/list', {id: 1})
 
 ### AMD 安装， 以 require.js 为例
 ``` shell
+// require 配置
 require.config({
   paths: {
+    // ...,
     'xe-ajax': './dist/xe-ajax.min'
   }
 })
-require(['xe-ajax'], function (XEAjax) {
+
+// ./app,js 调用
+define(['xe-ajax'], function (XEAjax) {
   XEAjax.getJSON ('services/user/list', {id: 1})
 })
 ```
