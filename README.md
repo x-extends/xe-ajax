@@ -1,6 +1,6 @@
 # XEAjax 轻量级XHR请求函数，基于 Promise 实现，支持 Mock 虚拟服务
 
-XEAjax 是一个不依赖于任何框架的XHR请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，任何使用ES6模块编程的项目都能使用。
+XEAjax 是一个不依赖于任何框架的XHR请求函数，支持XHR、jsonp以及mock等常用函数。对于前后端分离开发模式，使用 ajax+mock 就非常有必要，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，任何使用ES6模块编程的项目都能使用。
 
 ### 通过NPM安装最新版本
 ``` shell
@@ -83,10 +83,10 @@ XEAjax.custom1()
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
-| transformParams | Function ( params, request ) | 用于改变URL参数 | |
+| transformParams | Function ( params, request ) | 用于改变URL参数 |  |
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
-| transformBody | Function ( body, request ) | 用于改变提交数据 | |
-| stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 | |
+| transformBody | Function ( body, request ) | 用于改变提交数据 |  |
+| stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
 
 ### 全局参数
 ``` shell
@@ -123,7 +123,7 @@ XEAjax.setup({
 ### 示例
 ``` shell
 import { ajax, doAll, doGet, getJSON, doPost, postJSON } from 'xe-ajax'
-import { stringToDate } from 'xe-utils'
+import XEUtils from 'xe-utils'
 
 // 参数调用，返回 response 对象
 ajax({
@@ -149,7 +149,7 @@ getJSON('services/user/list').then(data => {
   // 对数据进行处理
   data.map(item => {
     return Object.assign(item, {
-      startDate: stringToDate(item.startDate, 'yyyy-MM-dd HH:mm:ss')
+      startDate: XEUtils.stringToDate(item.startDate, 'yyyy-MM-dd HH:mm:ss')
     })
   })
 })
@@ -201,23 +201,23 @@ import { cancelable, doGet, doPost } from 'xe-ajax'
 // 中断XHR请求之前如果承诺已经完成了，则调用无效
 
 // 中断XHR请求
-const handle1 = cancelable()
-doGet('services/user/list', null, {cancelable: handle1})
-handle1.cancel() // {status: 0, response: ''}
+const ajaxHandle = cancelable()
+doGet('services/user/list', null, {cancelable: ajaxHandle})
+ajaxHandle.cancel() // {status: 0, response: ''}
 
 // 中断XHR请求，执行承诺完成
-const handle2 = cancelable()
-doGet('services/user/list', null, {cancelable: handle2})
-handle2.resolve()
-// handle2.resolve({msg: 'cancel2'}) // 支持自定义响应数据 {status: 200, response: {msg: 'cancel2'}}
+const ajaxHandle2 = cancelable()
+doGet('services/user/list', null, {cancelable: ajaxHandle2})
+ajaxHandle2.resolve()
+// ajaxHandle2.resolve({msg: 'cancel2'}) // 支持自定义响应数据 {status: 200, response: {msg: 'cancel2'}}
 
 // 中断XHR请求，执行承诺失败
-const handle3 = cancelable()
-doGet('services/user/list', null, {cancelable: handle3})
-doPost('services/user/save', {name: 'test', password: '123456'}, {cancelable: handle3, bodyType: 'FROM_DATA'})
+const ajaxHandle3 = cancelable()
+doGet('services/user/list', null, {cancelable: ajaxHandle3})
+doPost('services/user/save', {name: 'test', password: '123456'}, {cancelable: ajaxHandle3, bodyType: 'FROM_DATA'})
 setTimeout(() => {
-  handle3.reject()
-  // handle3.reject({msg: 'cancel3'}) // 支持自定义响应数据 {status: 500, response: {msg: 'cancel3'}}
+  ajaxHandle3.reject()
+  // ajaxHandle3.reject({msg: 'cancel3'}) // 支持自定义响应数据 {status: 500, response: {msg: 'cancel3'}}
 }, 20)
 
 ```
@@ -356,9 +356,13 @@ PATCH('services/user/patch', (request, xhr) => {
 DELETE('services/user/del', (request, xhr) => {
   // 模拟后台逻辑 对参数进行校验
   if (request.params.id) {
-    return {status: 200, response: {msg: 'success'}}
+    xhr.status = 200
+    xhr.response = {msg: 'success'}
+  } else {
+    xhr.status = 500
+    xhr.response = {msg: 'error'}
   }
-  return {status: 500, response: {msg: 'error'}}
+  return xhr
 })
 ```
 
@@ -391,7 +395,8 @@ XEMock([{
     method: 'DELETE',
     path : 'del',
     xhr (request, xhr) {
-      xhr.response = {status: 500, msg: 'error'}
+      xhr.status = 500
+      xhr.response = {msg: 'error'}
       return xhr
     }
   ]
