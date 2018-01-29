@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v2.5.1
+ * xe-ajax.js v2.6.0
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -78,7 +78,6 @@
 
   function XEAjaxRequest (options) {
     Object.assign(this, {body: null, params: null}, options)
-    this.ABORT_STATUS = false
     this.ABORT_RESPONSE = undefined
     this.AFTER_SEND_CALLS = []
     this.OPTIONS = options
@@ -87,23 +86,14 @@
     if (options && options.jsonp) {
       this.script = document.createElement('script')
     } else {
-      this.xhr = new XMLHttpRequest()
+      this.xhr = options.getXMLHttpRequest(this)
     }
     setCancelableItem(this)
   }
 
   Object.assign(XEAjaxRequest.prototype, {
     abort: function (response) {
-      if (this.ABORT_STATUS === false) {
-        this.ABORT_STATUS = true
-        this.ABORT_RESPONSE = response
-        if (isFunction(this.resolveMock)) {
-          this.resolveMock()
-        }
-        if (this.xhr.readyState === 1) {
-          this.xhr.abort()
-        }
-      }
+      this.xhr.abort(response)
     },
     setHeader: function (name, value) {
       this.headers[name] = value
@@ -171,23 +161,12 @@
     this.statusText = ''
     this.bodyText = ''
 
-   // xhr handle
+    // xhr handle
     if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
       this.status = xhr.status || this.status
 
-      // cancel xhr
-      if (request.ABORT_STATUS) {
-        var cancelXHR = request.ABORT_RESPONSE
-        if (cancelXHR && cancelXHR.response !== undefined && cancelXHR.status !== undefined) {
-          this.body = cancelXHR.response
-          this.status = cancelXHR.status || this.status
-        } else {
-          this.body = cancelXHR === undefined ? xhr.response : cancelXHR
-        }
-      } else {
-        this.body = xhr.response
-        this.bodyText = xhr.responseText || ''
-      }
+      this.body = xhr.response
+      this.bodyText = xhr.responseText || ''
 
       // if no content
       if (this.status === 1223 || this.status === 204) {
@@ -241,6 +220,12 @@
     bodyType: 'JSON_DATA',
     headers: {
       Accept: 'application/json, text/plain, */*;'
+    },
+    getXMLHttpRequest: function () {
+      return new XMLHttpRequest()
+    },
+    getPromiseStatus: function (response) {
+      return (response.status >= 200 && response.status < 300) || response.status === 304
     }
   }
 
@@ -270,11 +255,7 @@
 
   function sendEnd (request, response, resolve, reject) {
     afterSendHandle(request, response).then(function (response) {
-      if ((response.status >= 200 && response.status < 300) || response.status === 304) {
-        resolve(response)
-      } else {
-        reject(response)
-      }
+      (request.OPTIONS.getPromiseStatus(response) ? resolve : reject)(response)
     })
   }
 
@@ -327,38 +308,47 @@
         xhr.send(body)
       }).catch(function () {
         xhr.send()
-      }).then(function () {
-        if (request.ABORT_STATUS !== false) {
-          if (xhr.readyState === 1) {
-            xhr.abort()
-          }
-        }
       })
     })
   }
 
+  var jsonpIndex = 0
   function sendJSONP (request, resolve, reject) {
+    var options = request.OPTIONS
     var script = request.script
     var url = request.getUrl()
+    if (!request.jsonpCallback) {
+      request.jsonpCallback = 'xeajax_jsonp' + (++jsonpIndex)
+    }
     request.customCallback = global[request.jsonpCallback]
     global[request.jsonpCallback] = function (response) {
-      jsonpHandle(request, new XEAjaxResponse(request, {status: 200, body: response}), resolve, reject)
+      jsonpHandle(request, {status: 200, response: response}, resolve, reject)
     }
     script.type = 'text/javascript'
     script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
     script.onerror = function (evnt) {
-      jsonpHandle(request, new XEAjaxResponse(request, {status: 500, body: null}), resolve, reject)
+      jsonpHandle(request, {status: 500, response: null}, resolve, reject)
     }
-    document.body.appendChild(script)
+    if (isFunction(options.sendJSONP)) {
+      options.sendJSONP(script, request, resolve, reject)
+    } else {
+      document.body.appendChild(script)
+    }
   }
 
-  function jsonpHandle (request, response, resolve, reject) {
+  function jsonpHandle (request, xhr, resolve, reject) {
+    var options = request.OPTIONS
+    var response = new XEAjaxResponse(request, xhr)
     delete global[request.jsonpCallback]
-    document.body.removeChild(request.script)
+    if (isFunction(options.sendEndJSONP)) {
+      options.sendEndJSONP(request.script, request)
+    } else {
+      document.body.removeChild(request.script)
+    }
     if (request.customCallback) {
       (global[request.jsonpCallback] = request.customCallback)(response)
     }
-    sendEnd(request, response, resolve, reject)
+    (request.OPTIONS.getPromiseStatus(xhr) ? resolve : reject)(response)
   }
 
   /**
@@ -371,7 +361,7 @@
    * @param Object body 提交参数
    * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FROM_DATA:以form data方式提交数据]
    * @param String jsonp 调用jsonp服务,回调属性默认callback
-   * @param String jsonpCallback jsonp回调函数名
+   * @param String jsonpCallback jsonp回调函数名(不建议使用，无意义)
    * @param Boolean async 异步/同步(默认true)
    * @param Number timeout 设置超时
    * @param Object headers 请求头
@@ -381,7 +371,7 @@
    * @param Function stringifyBody(request) 自定义转换提交数据的函数
    * @param Function interceptor(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
    */
-  var setup = XEAjax.setup = function setup (options) {
+  var setup = function setup (options) {
     Object.assign(setupDefaults, options)
   }
 
@@ -397,7 +387,7 @@
    *    next(function (response) {return response}) 直接处理后的结果
    *    next(function (response) {response.status = 200}) 将状态修改
    */
-  var interceptor = XEAjax.interceptor = {
+  var interceptor = {
     use: function (callback) {
       if (isFunction(callback)) {
         setupInterceptors.push(callback)
@@ -441,7 +431,9 @@
     var index = getIndex(this)
     if (index !== undefined) {
       requestList[index][1].forEach(function (request) {
-        request.abort(xhr)
+        setTimeout(function () {
+          request.abort(xhr)
+        })
       })
       requestList.splice(index, 1)
     }
@@ -529,9 +521,8 @@
   }
 
   // Http Request Method jsonp
-  var jsonpIndex = 0
   function jsonp (url, params, opts) {
-    return createAjax('GET', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
+    return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
   }
 
   // promise cancelable
@@ -554,9 +545,17 @@
     return Object.assign(XEAjax, methods)
   }
 
+  /**
+   * 安装插件
+   */
+  function use (plugin) {
+    plugin.install(XEAjax)
+  }
+
   mixin({
     doAll: doAll, doGet: doGet, getJSON: getJSON, doPost: doPost, postJSON: postJSON, doPut: doPut, putJSON: putJSON, doPatch: doPatch, patchJSON: patchJSON, doDelete: doDelete, deleteJSON: deleteJSON, jsonp: jsonp, cancelable: cancelable, setup: setup, interceptor: interceptor
   })
+  XEAjax.use = use
   XEAjax.mixin = mixin
 
   return XEAjax

@@ -3,7 +3,6 @@ import { setCancelableItem } from './cancelable'
 
 export function XEAjaxRequest (options) {
   Object.assign(this, {body: null, params: null}, options)
-  this.ABORT_STATUS = false
   this.ABORT_RESPONSE = undefined
   this.AFTER_SEND_CALLS = []
   this.OPTIONS = options
@@ -12,23 +11,14 @@ export function XEAjaxRequest (options) {
   if (options && options.jsonp) {
     this.script = document.createElement('script')
   } else {
-    this.xhr = new XMLHttpRequest()
+    this.xhr = options.getXMLHttpRequest(this)
   }
   setCancelableItem(this)
 }
 
 Object.assign(XEAjaxRequest.prototype, {
   abort: function (response) {
-    if (this.ABORT_STATUS === false) {
-      this.ABORT_STATUS = true
-      this.ABORT_RESPONSE = response
-      if (isFunction(this.resolveMock)) {
-        this.resolveMock()
-      }
-      if (this.xhr.readyState === 1) {
-        this.xhr.abort()
-      }
-    }
+    this.xhr.abort(response)
   },
   setHeader: function (name, value) {
     this.headers[name] = value

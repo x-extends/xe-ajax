@@ -17,6 +17,12 @@ function use (plugin) {
   plugin.install(XEAjax)
 }
 
+var s = ''
+for (var key in ajax) {
+  s += key + ': ' + key + ', '
+}
+console.log(s)
+
 mixin(ajax)
 XEAjax.use = use
 XEAjax.mixin = mixin

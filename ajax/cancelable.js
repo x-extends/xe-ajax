@@ -19,7 +19,9 @@ function cancelHandle (xhr) {
   var index = getIndex(this)
   if (index !== undefined) {
     requestList[index][1].forEach(function (request) {
-      request.abort(xhr)
+      setTimeout(function () {
+        request.abort(xhr)
+      })
     })
     requestList.splice(index, 1)
   }

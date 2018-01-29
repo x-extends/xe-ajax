@@ -58,9 +58,8 @@ export function doDelete (url, body, opts) {
 }
 
 // Http Request Method jsonp
-var jsonpIndex = 0
 export function jsonp (url, params, opts) {
-  return createAjax('GET', {url: url, params: params, jsonp: 'callback', jsonpCallback: 'XEAjax_JSONP_' + (++jsonpIndex)}, opts)
+  return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
 }
 
 // promise cancelable

@@ -10,6 +10,12 @@ var setupDefaults = {
   bodyType: 'JSON_DATA',
   headers: {
     Accept: 'application/json, text/plain, */*;'
+  },
+  getXMLHttpRequest: function () {
+    return new XMLHttpRequest()
+  },
+  getPromiseStatus: function (response) {
+    return (response.status >= 200 && response.status < 300) || response.status === 304
   }
 }
 
@@ -39,11 +45,7 @@ function afterSendHandle (request, response) {
 
 function sendEnd (request, response, resolve, reject) {
   afterSendHandle(request, response).then(function (response) {
-    if ((response.status >= 200 && response.status < 300) || response.status === 304) {
-      resolve(response)
-    } else {
-      reject(response)
-    }
+    (request.OPTIONS.getPromiseStatus(response) ? resolve : reject)(response)
   })
 }
 
@@ -96,38 +98,47 @@ function sendXHR (request, resolve, reject) {
       xhr.send(body)
     }).catch(function () {
       xhr.send()
-    }).then(function () {
-      if (request.ABORT_STATUS !== false) {
-        if (xhr.readyState === 1) {
-          xhr.abort()
-        }
-      }
     })
   })
 }
 
+var jsonpIndex = 0
 function sendJSONP (request, resolve, reject) {
+  var options = request.OPTIONS
   var script = request.script
   var url = request.getUrl()
+  if (!request.jsonpCallback) {
+    request.jsonpCallback = 'xeajax_jsonp' + (++jsonpIndex)
+  }
   request.customCallback = global[request.jsonpCallback]
   global[request.jsonpCallback] = function (response) {
-    jsonpHandle(request, new XEAjaxResponse(request, {status: 200, body: response}), resolve, reject)
+    jsonpHandle(request, {status: 200, response: response}, resolve, reject)
   }
   script.type = 'text/javascript'
   script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
   script.onerror = function (evnt) {
-    jsonpHandle(request, new XEAjaxResponse(request, {status: 500, body: null}), resolve, reject)
+    jsonpHandle(request, {status: 500, response: null}, resolve, reject)
   }
-  document.body.appendChild(script)
+  if (isFunction(options.sendJSONP)) {
+    options.sendJSONP(script, request, resolve, reject)
+  } else {
+    document.body.appendChild(script)
+  }
 }
 
-function jsonpHandle (request, response, resolve, reject) {
+function jsonpHandle (request, xhr, resolve, reject) {
+  var options = request.OPTIONS
+  var response = new XEAjaxResponse(request, xhr)
   delete global[request.jsonpCallback]
-  document.body.removeChild(request.script)
+  if (isFunction(options.sendEndJSONP)) {
+    options.sendEndJSONP(request.script, request)
+  } else {
+    document.body.removeChild(request.script)
+  }
   if (request.customCallback) {
     (global[request.jsonpCallback] = request.customCallback)(response)
   }
-  sendEnd(request, response, resolve, reject)
+  (request.OPTIONS.getPromiseStatus(xhr) ? resolve : reject)(response)
 }
 
 /**
@@ -140,7 +151,7 @@ function jsonpHandle (request, response, resolve, reject) {
  * @param Object body 提交参数
  * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FROM_DATA:以form data方式提交数据]
  * @param String jsonp 调用jsonp服务,回调属性默认callback
- * @param String jsonpCallback jsonp回调函数名
+ * @param String jsonpCallback jsonp回调函数名(不建议使用，无意义)
  * @param Boolean async 异步/同步(默认true)
  * @param Number timeout 设置超时
  * @param Object headers 请求头

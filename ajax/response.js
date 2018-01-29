@@ -12,19 +12,8 @@ export function XEAjaxResponse (request, xhr) {
   if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
     this.status = xhr.status || this.status
 
-    // cancel xhr
-    if (request.ABORT_STATUS) {
-      var cancelXHR = request.ABORT_RESPONSE
-      if (cancelXHR && cancelXHR.response !== undefined && cancelXHR.status !== undefined) {
-        this.body = cancelXHR.response
-        this.status = cancelXHR.status || this.status
-      } else {
-        this.body = cancelXHR === undefined ? xhr.response : cancelXHR
-      }
-    } else {
-      this.body = xhr.response
-      this.bodyText = xhr.responseText || ''
-    }
+    this.body = xhr.response
+    this.bodyText = xhr.responseText || ''
 
     // if no content
     if (this.status === 1223 || this.status === 204) {

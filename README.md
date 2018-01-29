@@ -76,16 +76,17 @@ XEAjax.custom1()
 * ajax( options )
 * doAll (iterable)
 * doGet ( url, params, options )
-* getJSON ( url, params, options )
 * doPost ( url, body, options )
-* postJSON ( url, body, options )
 * doPut ( url, body, options )
-* putJSON ( url, body, options )
 * doPatch ( url, body, options )
-* patchJSON ( url, body, options )
 * doDelete ( url, body, options )
-* deleteJSON ( url, body, options )
 * jsonp ( url, params, options )
+* 
+* getJSON ( url, params, options )
+* postJSON ( url, body, options )
+* putJSON ( url, body, options )
+* deleteJSON ( url, body, options )
+* patchJSON ( url, body, options )
 
 ### 接受三个参数：
 * url（字符串），请求地址。可被options属性覆盖。
@@ -101,8 +102,7 @@ XEAjax.custom1()
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
 | bodyType | String | 提交参数方式，如果要以表单方式提交改为FROM_DATA | 默认JSON_DATA |
-| jsonp | String | 调用jsonp服务,回调属性默认callback | 默认callback |
-| jsonpCallback | String | jsonp回调函数名 | 默认从window获取该函数 |
+| jsonp | String | 调用jsonp服务,属性名默认callback | 默认callback |
 | async | Boolean | 是否异步 | 默认true |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
@@ -111,6 +111,8 @@ XEAjax.custom1()
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
+| getXMLHttpRequest | Function ( request ) | 自定义 XMLHttpRequest 的函数 |  |
+| sendJSONP | Function ( script, request ) | 自定义 jsonp 请求的函数 |  |
 
 ### 全局参数
 ``` shell
@@ -140,13 +142,17 @@ XEAjax.setup({
   bodyFormat (body, request) {
     // 自定义格式化数据函数,除了GET之外都支持提交数据
     return JSON.stringify(body)
+  },
+  getXMLHttpRequest () {
+    // 自定义获取 xhr 函数
+    return new XMLHttpRequest()
   }
 })
 ```
 
 ### 示例
 ``` shell
-import { ajax, doAll, doGet, getJSON, doPost, postJSON } from 'xe-ajax'
+import { ajax, doAll, doGet, getJSON, doPost, postJSON, jsonp } from 'xe-ajax'
 import XEUtils from 'xe-utils'
 
 // 参数调用，返回 response 对象
@@ -209,6 +215,17 @@ doAll(iterable2).then(datas => {
   // data
 })
 
+// jsonp 跨域调用
+jsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
+  // response.body = {msg: 'success'}
+}).catch(data => {
+  // response.body = {msg: 'error'}
+})
+jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}})
+ajax({
+  url: 'http://xuliangzhan.com/jsonp/user/message',
+  jsonp: 'callback'
+})
 ```
 
 ### 取消操作
