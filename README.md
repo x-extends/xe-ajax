@@ -96,7 +96,7 @@ XEAjax.custom1()
 
 ### Response 对象
 | 属性 | 类型 | 描述 |
-|------|------|-----|----|
+|------|------|-----|
 | json | Function | 返回 Promise 对象，结果得到 json 数据 | 
 | test | Function | 返回 Promise 对象，结果得到 text 数据 | 
 | headers | Object | 返回响应头 |
