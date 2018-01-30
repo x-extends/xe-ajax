@@ -104,6 +104,7 @@ XEAjax.custom1()
 | bodyType | String | 提交参数方式，如果要以表单方式提交改为FROM_DATA | 默认JSON_DATA |
 | jsonp | String | 调用jsonp服务,属性名默认callback | 默认callback |
 | async | Boolean | 是否异步 | 默认true |
+| credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | interceptor | Function ( request, next ) | 局部拦截器 |  |
@@ -122,6 +123,7 @@ import XEUtils from 'xe-utils'
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'JSON_DATA',
+  credentials: 'include',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   },

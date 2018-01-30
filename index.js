@@ -2,9 +2,9 @@ import XEAjax from './ajax/constructor'
 import ajax from './ajax'
 
 /**
- * 函数扩展
+ * 混合函数
  *
- * @param {Object} methods 扩展函数对象
+ * @param {Object} methods 扩展
  */
 function mixin (methods) {
   return Object.assign(XEAjax, methods)
@@ -16,12 +16,6 @@ function mixin (methods) {
 function use (plugin) {
   plugin.install(XEAjax)
 }
-
-var s = ''
-for (var key in ajax) {
-  s += key + ': ' + key + ', '
-}
-console.log(s)
 
 mixin(ajax)
 XEAjax.use = use

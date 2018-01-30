@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v2.6.0
+ * xe-ajax.js v2.6.1
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -212,11 +212,13 @@
     }
   }
 
+  var global = typeof window === 'undefined' ? this : window
   var setupInterceptors = []
   var setupDefaults = {
     method: 'GET',
     baseURL: location.origin,
     async: true,
+    credentials: true,
     bodyType: 'JSON_DATA',
     headers: {
       Accept: 'application/json, text/plain, */*;'
@@ -293,7 +295,7 @@
         return sendEnd(request, response, resolve, reject)
       }
       xhr.open(request.method, request.getUrl(), request.async !== false)
-      if (request.timeout) {
+      if (request.timeout && !isNaN(request.timeout)) {
         xhr.timeout = request.timeout
       }
       eachObj(request.headers, function (value, name) {
@@ -303,6 +305,11 @@
         if (xhr.readyState === 4) {
           sendEnd(request, new XEAjaxResponse(request, xhr), resolve, reject)
         }
+      }
+      if (request.credentials === 'include') {
+        request.xhr.withCredentials = true
+      } else if (request.credentials === 'omit') {
+        request.xhr.withCredentials = false
       }
       request.getBody().then(function (body) {
         xhr.send(body)
@@ -314,7 +321,6 @@
 
   var jsonpIndex = 0
   function sendJSONP (request, resolve, reject) {
-    var options = request.OPTIONS
     var script = request.script
     var url = request.getUrl()
     if (!request.jsonpCallback) {
@@ -329,19 +335,18 @@
     script.onerror = function (evnt) {
       jsonpHandle(request, {status: 500, response: null}, resolve, reject)
     }
-    if (isFunction(options.sendJSONP)) {
-      options.sendJSONP(script, request, resolve, reject)
+    if (isFunction(request.sendJSONP)) {
+      request.sendJSONP(script, request, resolve, reject)
     } else {
       document.body.appendChild(script)
     }
   }
 
   function jsonpHandle (request, xhr, resolve, reject) {
-    var options = request.OPTIONS
     var response = new XEAjaxResponse(request, xhr)
     delete global[request.jsonpCallback]
-    if (isFunction(options.sendEndJSONP)) {
-      options.sendEndJSONP(request.script, request)
+    if (isFunction(request.sendEndJSONP)) {
+      request.sendEndJSONP(request.script, request)
     } else {
       document.body.removeChild(request.script)
     }
@@ -363,6 +368,7 @@
    * @param String jsonp 调用jsonp服务,回调属性默认callback
    * @param String jsonpCallback jsonp回调函数名(不建议使用，无意义)
    * @param Boolean async 异步/同步(默认true)
+   * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param Number timeout 设置超时
    * @param Object headers 请求头
    * @param Function transformParams(request) 用于改变URL参数
