@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v2.6.1
+ * xe-ajax.js v2.6.2
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -211,6 +211,15 @@
       }
     }
   }
+
+  Object.assign(XEAjaxResponse.prototype, {
+    json: function () {
+      return Promise.resolve(this.body)
+    },
+    test: function () {
+      return Promise.resolve(this.bodyText)
+    }
+  })
 
   var global = typeof window === 'undefined' ? this : window
   var setupInterceptors = []

@@ -59,4 +59,13 @@ export function XEAjaxResponse (request, xhr) {
   }
 }
 
+Object.assign(XEAjaxResponse.prototype, {
+  json: function () {
+    return Promise.resolve(this.body)
+  },
+  test: function () {
+    return Promise.resolve(this.bodyText)
+  }
+})
+
 export default XEAjaxResponse

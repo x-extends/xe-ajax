@@ -73,6 +73,7 @@ XEAjax.custom1()
 
 ## XEAjax API:
 ### 'xe-ajax' 提供的便捷方法：
+### 返回 Response 对象
 * ajax( options )
 * doAll (iterable)
 * doGet ( url, params, options )
@@ -81,7 +82,7 @@ XEAjax.custom1()
 * doPatch ( url, body, options )
 * doDelete ( url, body, options )
 * jsonp ( url, params, options )
-* 
+### 返回 json 数据
 * getJSON ( url, params, options )
 * postJSON ( url, body, options )
 * putJSON ( url, body, options )
@@ -92,6 +93,15 @@ XEAjax.custom1()
 * url（字符串），请求地址。可被options属性覆盖。
 * params/body（可选，对象/数组），要发送的数据。可被options属性覆盖。
 * options （可选，对象）参数
+
+### Response 对象
+| 属性 | 类型 | 描述 |
+|------|------|-----|----|
+| json | Function | 返回 Promise 对象，结果得到 json 数据 | 
+| test | Function | 返回 Promise 对象，结果得到 text 数据 | 
+| headers | Object | 返回响应头 |
+| status | Number | 返回状态码 | 
+| url | String | 返回请求路径 | 
 
 ### 参数说明
 | 参数 | 类型 | 描述 | 默认值 |
