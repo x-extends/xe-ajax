@@ -12,7 +12,11 @@ Object.assign(XEReadableStream.prototype, {
       if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
         if (xhr.responseText) {
           body.responseText = xhr.responseText
-          body.response = JSON.parse(xhr.responseText)
+          try {
+            body.response = JSON.parse(xhr.responseText)
+          } catch (e) {
+            body.response = null
+          }
         } else {
           body.response = xhr.response
           body.responseText = JSON.stringify(xhr.response)
