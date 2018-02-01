@@ -254,7 +254,7 @@
             resolve(data)
           })
         })
-      })['catch'](function (data) {
+      }).catch(function (data) {
         console.error(data)
       })
     })
@@ -410,7 +410,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      })['catch'](function () {
+      }).catch(function () {
         xhr.send()
       })
     })
@@ -458,7 +458,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    })['catch'](function (data) {
+    }).catch(function (data) {
       reject(data)
     })
   }
@@ -497,7 +497,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          })['catch'](function (data) {
+          }).catch(function (data) {
             reject(data)
           })
         })
@@ -521,27 +521,27 @@
   }
 
   // Http Request Method GET
-  function doGet (url, params, opts) {
+  function fetchGet (url, params, opts) {
     return createAjax('GET', isObject(url) ? {} : {url: url, params: params}, opts)
   }
 
   // Http Request Method POST
-  function doPost (url, body, opts) {
+  function fetchPost (url, body, opts) {
     return createAjax('POST', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method PUT
-  function doPut (url, body, opts) {
+  function fetchPut (url, body, opts) {
     return createAjax('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method PATCH
-  function doPatch (url, body, opts) {
+  function fetchPatch (url, body, opts) {
     return createAjax('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method DELETE
-  function doDelete (url, body, opts) {
+  function fetchDelete (url, body, opts) {
     return createAjax('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
@@ -550,11 +550,11 @@
     return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
   }
 
-  var getJSON = responseJSON(doGet)
-  var postJSON = responseJSON(doPost)
-  var putJSON = responseJSON(doPut)
-  var patchJSON = responseJSON(doPatch)
-  var deleteJSON = responseJSON(doDelete)
+  var getJSON = responseJSON(fetchGet)
+  var postJSON = responseJSON(fetchPost)
+  var putJSON = responseJSON(fetchPut)
+  var patchJSON = responseJSON(fetchPatch)
+  var deleteJSON = responseJSON(fetchDelete)
 
   /**
    * 函数扩展
@@ -573,7 +573,7 @@
   }
 
   mixin({
-    doAll: doAll, doGet: doGet, getJSON: getJSON, doPost: doPost, postJSON: postJSON, doPut: doPut, putJSON: putJSON, doPatch: doPatch, patchJSON: patchJSON, doDelete: doDelete, deleteJSON: deleteJSON, jsonp: jsonp, cancelXHR: cancelXHR, setup: setup, interceptors: interceptors
+    doAll: doAll, fetchGet: fetchGet, getJSON: getJSON, fetchPost: fetchPost, postJSON: postJSON, fetchPut: fetchPut, putJSON: putJSON, fetchPatch: fetchPatch, patchJSON: patchJSON, fetchDelete: fetchDelete, deleteJSON: deleteJSON, jsonp: jsonp, cancelXHR: cancelXHR, setup: setup, interceptors: interceptors
   })
   XEAjax.use = use
   XEAjax.mixin = mixin

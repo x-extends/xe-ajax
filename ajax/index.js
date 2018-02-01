@@ -38,27 +38,27 @@ export function doAll (iterable) {
 }
 
 // Http Request Method GET
-export function doGet (url, params, opts) {
+export function fetchGet (url, params, opts) {
   return createAjax('GET', isObject(url) ? {} : {url: url, params: params}, opts)
 }
 
 // Http Request Method POST
-export function doPost (url, body, opts) {
+export function fetchPost (url, body, opts) {
   return createAjax('POST', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method PUT
-export function doPut (url, body, opts) {
+export function fetchPut (url, body, opts) {
   return createAjax('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method PATCH
-export function doPatch (url, body, opts) {
+export function fetchPatch (url, body, opts) {
   return createAjax('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method DELETE
-export function doDelete (url, body, opts) {
+export function fetchDelete (url, body, opts) {
   return createAjax('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
@@ -67,23 +67,23 @@ export function jsonp (url, params, opts) {
   return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
 }
 
-export var getJSON = responseJSON(doGet)
-export var postJSON = responseJSON(doPost)
-export var putJSON = responseJSON(doPut)
-export var patchJSON = responseJSON(doPatch)
-export var deleteJSON = responseJSON(doDelete)
+export var getJSON = responseJSON(fetchGet)
+export var postJSON = responseJSON(fetchPost)
+export var putJSON = responseJSON(fetchPut)
+export var patchJSON = responseJSON(fetchPatch)
+export var deleteJSON = responseJSON(fetchDelete)
 
 export default {
   doAll: doAll,
-  doGet: doGet,
+  fetchGet: fetchGet,
   getJSON: getJSON,
-  doPost: doPost,
+  fetchPost: fetchPost,
   postJSON: postJSON,
-  doPut: doPut,
+  fetchPut: fetchPut,
   putJSON: putJSON,
-  doPatch: doPatch,
+  fetchPatch: fetchPatch,
   patchJSON: patchJSON,
-  doDelete: doDelete,
+  fetchDelete: fetchDelete,
   deleteJSON: deleteJSON,
   jsonp: jsonp,
   cancelXHR: cancelXHR,

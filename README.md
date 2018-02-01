@@ -33,10 +33,10 @@ npm install xe-ajax --save
 
 ### 部分导入
 ``` shell
-import { doGet, getJSON, doPost, postJSON } from 'xe-ajax'
+import { fetchGet, getJSON, fetchPost, postJSON } from 'xe-ajax'
 
-doGet ('services/user/list', {id: 1})
-doPost ('services/user/save', {id: 1})
+fetchGet ('services/user/list', {id: 1})
+fetchPost ('services/user/save', {id: 1})
 
 getJSON ('services/user/list', {id: 1})
 postJSON ('services/user/save', {id: 1})
@@ -46,8 +46,8 @@ postJSON ('services/user/save', {id: 1})
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.doGet('services/user/list', {id: 1})
-XEAjax.doPost ('services/user/save', {id: 1})
+XEAjax.fetchGet('services/user/list', {id: 1})
+XEAjax.fetchPost ('services/user/save', {id: 1})
 
 XEAjax.getJSON ('services/user/list', {id: 1})
 XEAjax.postJSON ('services/user/save', {id: 1})
@@ -73,15 +73,15 @@ XEAjax.header1()
 ```
 
 ## XEAjax API:
-### 'xe-ajax' 提供常用便捷方法：
 * doAll (iterable)
-### fetch 响应模式,无论请求成功或失败都是完成，返回 Response 对象
 * ajax ( options )
-* doGet ( url, params, options )
-* doPost ( url, body, options )
-* doPut ( url, body, options )
-* doPatch ( url, body, options )
-* doDelete ( url, body, options )
+### 'xe-ajax' 提供常用便捷方法：
+### fetch 响应模式,无论请求成功或失败都是完成，返回 Response 对象
+* fetchGet ( url, params, options )
+* fetchPost ( url, body, options )
+* fetchPut ( url, body, options )
+* fetchPatch ( url, body, options )
+* fetchDelete ( url, body, options )
 ### 根据请求状态决定完成或失败，直接返回 json 数据
 * getJSON ( url, params, options )
 * postJSON ( url, body, options )
@@ -169,7 +169,7 @@ XEAjax.setup({
 
 ### 示例
 ``` shell
-import { ajax, doAll, doGet, getJSON, postJSON, jsonp } from 'xe-ajax'
+import { ajax, doAll, fetchGet, getJSON, postJSON, jsonp } from 'xe-ajax'
 import XEUtils from 'xe-utils'
 
 // 参数调用，返回 response 对象
@@ -185,7 +185,7 @@ ajax({
 })
 
 // 返回 Response 对象,无论请求成功或失败都是完成
-doGet('services/user/list').then(response => {
+fetchGet('services/user/list').then(response => {
   // response.ok 请求成功或失败
   // response.status
   // response.headers
@@ -250,12 +250,12 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 ### 通过 Request 设置 cancelToken
 ### 示例
 ``` shell
-import { cancelXHR, getJSON, doPost } from 'xe-ajax'
+import { cancelXHR, getJSON, fetchPost } from 'xe-ajax'
 
 // 中断XHR请求之前如果承诺已经完成了，则调用无效
 
 // 取消 XHR 请求
-doGet('services/user/list', {id: 1}, {cancelToken: 'userPromise'}).then(response => {
+fetchGet('services/user/list', {id: 1}, {cancelToken: 'userPromise'}).then(response => {
   // response.ok = false
   // response.status = 0
   response.json().then(data => {
