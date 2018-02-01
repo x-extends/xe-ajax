@@ -56,7 +56,7 @@ XEAjax.postJSON ('services/user/save', {id: 1})
 ### 混合函数
 #### 文件 ./customs.js
 ``` shell
-export function header1 () {
+export function get1 () {
   console.log('自定义的函数')
 } 
 ```
@@ -69,7 +69,7 @@ import customs from './customs'
 XEAjax.mixin(customs)
 
 // 调用自定义扩展函数
-XEAjax.header1()
+XEAjax.get1()
 ```
 
 ## XEAjax API:
