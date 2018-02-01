@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v2.6.2
+ * xe-ajax.js v3.0.0
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -7,10 +7,6 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global.XEAjax = factory())
 }(this, function () {
   'use strict'
-
-  var isArray = Array.isArray || function (val) {
-    return Object.prototype.toString.call(val) === '[object Array]'
-  }
 
   function isFormData (obj) {
     return typeof FormData !== 'undefined' && obj instanceof FormData
@@ -29,16 +25,8 @@
     return obj && typeof obj === 'object'
   }
 
-  function isString (obj) {
-    return typeof obj === 'string'
-  }
-
   function isFunction (obj) {
     return typeof obj === 'function'
-  }
-
-  function isUndefined (obj) {
-    return typeof obj === 'undefined'
   }
 
   function eachObj (obj, iteratee, context) {
@@ -53,7 +41,7 @@
     var result = []
     eachObj(resultVal, function (item, key) {
       if (isObject(item)) {
-        result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
+        result = result.concat(parseParam(item, resultKey + '[' + key + ']', Array.isArray(item)))
       } else {
         result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
       }
@@ -61,13 +49,13 @@
     return result
   }
 
-  // Serialize Body
+    // Serialize Body
   function serialize (body) {
     var params = []
     eachObj(body, function (item, key) {
       if (item !== undefined) {
         if (isObject(item)) {
-          params = params.concat(parseParam(item, key, isArray(item)))
+          params = params.concat(parseParam(item, key, Array.isArray(item)))
         } else {
           params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
         }
@@ -77,10 +65,8 @@
   }
 
   function XEAjaxRequest (options) {
-    Object.assign(this, {body: null, params: null}, options)
+    Object.assign(this, {url: '', body: null, params: null, cancelToken: null}, options)
     this.ABORT_RESPONSE = undefined
-    this.AFTER_SEND_CALLS = []
-    this.OPTIONS = options
     this.method = String(this.method).toLocaleUpperCase()
     this.crossOrigin = isCrossOrigin(this)
     if (options && options.jsonp) {
@@ -88,7 +74,7 @@
     } else {
       this.xhr = options.getXMLHttpRequest(this)
     }
-    setCancelableItem(this)
+    setRequest(this)
   }
 
   Object.assign(XEAjaxRequest.prototype, {
@@ -153,29 +139,77 @@
     }
   })
 
+  function XEReadableStream (xhr) {
+    this.locked = false
+    this._xhr = xhr
+  }
+
+  Object.assign(XEReadableStream.prototype, {
+    _getBody: function () {
+      var that = this
+      var xhr = this._xhr
+      return new Promise(function (resolve, reject) {
+        var body = {responseText: '', response: xhr}
+        if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
+          if (xhr.responseText) {
+            body.responseText = xhr.responseText
+            body.response = JSON.parse(xhr.responseText)
+          } else {
+            body.response = xhr.response
+            body.responseText = JSON.stringify(xhr.response)
+          }
+        } else {
+          body.responseText = JSON.stringify(body.response)
+        }
+        if (that.locked) {
+          reject(new TypeError('body stream already read'))
+        } else {
+          that.locked = true
+          resolve(body)
+        }
+      })
+    }
+  })
+
   function XEAjaxResponse (request, xhr) {
-    this.request = request
+    var that = this
+    this.body = new XEReadableStream(xhr)
+    this.bodyUsed = false
     this.url = request.url
     this.headers = {}
     this.status = 0
     this.statusText = ''
-    this.bodyText = ''
+    this.ok = false
+    this.redirected = false
+
+    this.json = function () {
+      return this.body._getBody().then(function (body) {
+        that.bodyUsed = true
+        return body.response
+      })
+    }
+
+    this.text = function () {
+      return this.body._getBody().then(function (body) {
+        that.bodyUsed = true
+        return body.responseText
+      })
+    }
 
     // xhr handle
     if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
-      this.status = xhr.status || this.status
-
-      this.body = xhr.response
-      this.bodyText = xhr.responseText || ''
+      this.status = xhr.status
+      this.redirected = this.status === 302
+      this.ok = request.getPromiseStatus(this)
 
       // if no content
       if (this.status === 1223 || this.status === 204) {
         this.statusText = 'No Content'
       } else if (this.status === 304) {
-      // if not modified
+        // if not modified
         this.statusText = 'Not Modified'
       } else {
-      // statusText
+        // statusText
         this.statusText = (xhr.statusText || this.statusText).trim()
       }
 
@@ -188,41 +222,124 @@
             this.headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
           }, this)
         }
-      } else if (xhr.headers) {
-        Object.assign(this.headers, xhr.headers)
-      }
-    } else if (xhr) {
-      this.body = xhr
-    }
-
-    // stringify bodyText
-    try {
-      if (this.body && !this.bodyText) {
-        this.bodyText = JSON.stringify(this.body)
-      }
-    } catch (e) {}
-
-    // parse body
-    if (this.body && isString(this.body)) {
-      try {
-        this.body = JSON.parse(this.body)
-      } catch (e) {
-        this.body = this.bodyText
       }
     }
   }
 
-  Object.assign(XEAjaxResponse.prototype, {
-    json: function () {
-      return Promise.resolve(this.body)
-    },
-    test: function () {
-      return Promise.resolve(this.bodyText)
+  /**
+   * 拦截器
+   */
+  var requestCalls = []
+  var responseCalls = []
+
+  function useInterceptors (state) {
+    return function (callback) {
+      if (state.indexOf(callback) === -1) {
+        state.push(callback)
+      }
     }
+  }
+
+  /**
+   * 拦截器处理
+   * @param { Array } calls 调用链
+   * @param { Object } result 数据
+   */
+  function callPromises (calls, result) {
+    var thenInterceptor = Promise.resolve(result)
+    calls.forEach(function (callback) {
+      thenInterceptor = thenInterceptor.then(function (data) {
+        return new Promise(function (resolve) {
+          callback(data, function () {
+            resolve(data)
+          })
+        })
+      })['catch'](function (data) {
+        console.error(data)
+      })
+    })
+    return thenInterceptor
+  }
+
+  function requestInterceptor (data) {
+    return callPromises(requestCalls, data)
+  }
+
+  function responseInterceptor (data) {
+    return callPromises(responseCalls, data)
+  }
+
+  var interceptors = {
+    request: {
+      use: useInterceptors(requestCalls)
+    },
+    response: {
+      use: useInterceptors(responseCalls)
+    }
+  }
+
+  interceptors.request.use(function (request, next) {
+    if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
+      if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
+        request.setHeader('Content-Type', 'application/json; charset=utf-8')
+      } else {
+        request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+      }
+    }
+    if (request.crossOrigin) {
+      request.setHeader('X-Requested-With', 'XMLHttpRequest')
+    }
+    next()
   })
 
+  var requestList = []
+
+  /**
+   * 索引 XHR Request 是否存在
+   * @param { XEAjaxRequest } item 对象
+   */
+  function getIndex (item) {
+    for (var index = 0, len = requestList.length; index < len; index++) {
+      if (item === requestList[index][0]) {
+        return index
+      }
+    }
+  }
+
+  /**
+   * 将可取消的 XHR Request 放入队列
+   *
+   * @param { XEAjaxRequest } request 对象
+   */
+  function setRequest (request) {
+    if (request.cancelToken) {
+      var index = getIndex(request.cancelToken)
+      if (index === undefined) {
+        requestList.push([request.cancelToken, [request]])
+      } else {
+        requestList[index][1].push(request)
+      }
+    }
+  }
+
+  /**
+   * 根据 cancelToken 中断 XHR 请求
+   *
+   * @param { String } cancelToken 名字
+   */
+  function cancelXHR (cancelToken) {
+    var index = getIndex(cancelToken)
+    if (index !== undefined) {
+      requestList[index][1].forEach(function (request) {
+        setTimeout(function () {
+          request.abort()
+        })
+      })
+      requestList.splice(index, 1)
+    }
+  }
+
   var global = typeof window === 'undefined' ? this : window
-  var setupInterceptors = []
   var setupDefaults = {
     method: 'GET',
     baseURL: location.origin,
@@ -252,57 +369,28 @@
     })
   }
 
-  function afterSendHandle (request, response) {
-    var afterPromises = Promise.resolve(response)
-    request.AFTER_SEND_CALLS.forEach(function (fn) {
-      afterPromises = afterPromises.then(function (response) {
-        return fn(response) || response
-      }).catch(function (message) {
-        console.error(message)
-      })
-    })
-    return afterPromises
-  }
-
-  function sendEnd (request, response, resolve, reject) {
-    afterSendHandle(request, response).then(function (response) {
-      (request.OPTIONS.getPromiseStatus(response) ? resolve : reject)(response)
+  /**
+   * 响应结束
+   * @param { XEAjaxRequest } request 对象
+   * @param { XHR } xhr 请求
+   * @param { Promise.resolve } resolve 成功
+   * @param { Promise.reject } reject 失败
+   */
+  function sendEnd (request, xhr, resolve, reject) {
+    responseInterceptor(new XEAjaxResponse(request, xhr)).then(function (response) {
+      resolve(response)
     })
   }
 
-  function interceptorHandle (request) {
-    var interceptorPromises = Promise.resolve()
-    setupInterceptors.concat(request.interceptor ? [request.interceptor] : []).forEach(function (callback) {
-      interceptorPromises = interceptorPromises.then(function (response) {
-        if (response) {
-          return response
-        } else {
-          return new Promise(function (resolve) {
-            callback(request, function (response) {
-              if (isUndefined(response)) {
-                resolve()
-              } else if (isFunction(response)) {
-                request.AFTER_SEND_CALLS.push(response)
-                resolve()
-              } else {
-                resolve(new XEAjaxResponse(request, response))
-              }
-            })
-          })
-        }
-      }).catch(function (message) {
-        console.error(message)
-      })
-    })
-    return interceptorPromises
-  }
-
+  /**
+   * XHR 请求处理
+   * @param { XHR } xhr 请求
+   * @param { Promise.resolve } resolve 成功 Promise
+   * @param { Promise.reject } reject 失败 Promise
+   */
   function sendXHR (request, resolve, reject) {
     var xhr = request.xhr
-    interceptorHandle(request).then(function (response) {
-      if (response && response.constructor === XEAjaxResponse) {
-        return sendEnd(request, response, resolve, reject)
-      }
+    requestInterceptor(request).then(function () {
       xhr.open(request.method, request.getUrl(), request.async !== false)
       if (request.timeout && !isNaN(request.timeout)) {
         xhr.timeout = request.timeout
@@ -312,7 +400,7 @@
       })
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
-          sendEnd(request, new XEAjaxResponse(request, xhr), resolve, reject)
+          sendEnd(request, xhr, resolve, reject)
         }
       }
       if (request.credentials === 'include') {
@@ -322,20 +410,22 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      }).catch(function () {
+      })['catch'](function () {
         xhr.send()
       })
     })
   }
 
+  /**
+   * jsonp 请求处理
+   */
   var jsonpIndex = 0
   function sendJSONP (request, resolve, reject) {
     var script = request.script
     var url = request.getUrl()
     if (!request.jsonpCallback) {
-      request.jsonpCallback = 'xeajax_jsonp' + (++jsonpIndex)
+      request.jsonpCallback = '_xeajax_jsonp' + (++jsonpIndex)
     }
-    request.customCallback = global[request.jsonpCallback]
     global[request.jsonpCallback] = function (response) {
       jsonpHandle(request, {status: 200, response: response}, resolve, reject)
     }
@@ -351,6 +441,13 @@
     }
   }
 
+  /**
+   * jsonp 请求结果处理
+   * @param { XEAjaxRequest } request 对象
+   * @param { XHR } xhr 请求
+   * @param { resolve } resolve 成功 Promise
+   * @param { reject } reject 失败 Promise
+   */
   function jsonpHandle (request, xhr, resolve, reject) {
     var response = new XEAjaxResponse(request, xhr)
     delete global[request.jsonpCallback]
@@ -359,14 +456,15 @@
     } else {
       document.body.removeChild(request.script)
     }
-    if (request.customCallback) {
-      (global[request.jsonpCallback] = request.customCallback)(response)
-    }
-    (request.OPTIONS.getPromiseStatus(xhr) ? resolve : reject)(response)
+    response.json().then(function (data) {
+      (response.ok ? resolve : reject)(data)
+    })['catch'](function (data) {
+      reject(data)
+    })
   }
 
   /**
-   * 参数
+   * Request 对象
    *
    * @param String url 请求地址
    * @param String baseURL 基础路径
@@ -375,7 +473,6 @@
    * @param Object body 提交参数
    * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FROM_DATA:以form data方式提交数据]
    * @param String jsonp 调用jsonp服务,回调属性默认callback
-   * @param String jsonpCallback jsonp回调函数名(不建议使用，无意义)
    * @param Boolean async 异步/同步(默认true)
    * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param Number timeout 设置超时
@@ -384,113 +481,26 @@
    * @param Function paramsSerializer(request) 自定义URL序列化函数
    * @param Function transformBody(request) 用于改变提交数据
    * @param Function stringifyBody(request) 自定义转换提交数据的函数
-   * @param Function interceptor(request, next(xhr)) 局部拦截器,继续执行;如果有值则结束执行并将结果返回 next({response : {...}, status : 200})
    */
   var setup = function setup (options) {
     Object.assign(setupDefaults, options)
   }
 
-  /**
-   * 拦截器
-   *
-   * @param function (request, next)
-   *  request 请求对象
-   *  next Object 如果是对象值,则直接返回请求结果
-   *    next({...}) 返回结果，状态200
-   *    next({response : {...}, status : 500}) 支持状态自定义
-   *  next Function 如果是函数,则在请求之后执行
-   *    next(function (response) {return response}) 直接处理后的结果
-   *    next(function (response) {response.status = 200}) 将状态修改
-   */
-  var interceptor = {
-    use: function (callback) {
-      if (isFunction(callback)) {
-        setupInterceptors.push(callback)
-      }
-      return interceptor
-    }
-  }
-
-  interceptor.use(function (request, next) {
-    if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
-      if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
-        request.setHeader('Content-Type', 'application/json; charset=utf-8')
-      } else {
-        request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
-      }
-    }
-    if (request.crossOrigin) {
-      request.setHeader('X-Requested-With', 'XMLHttpRequest')
-    }
-    next()
-  })
-
-  var requestList = []
-  var cmdIndex = 0
-
-  function XEAjaxCancelable () {
-    this._ID = 'XEAjax_' + (++cmdIndex)
-  }
-
-  function promiseHandle (status) {
-    return function (resp) {
-      var xhr = {status: status, response: resp || ''}
-      if (resp && resp.response !== undefined && resp.status !== undefined) {
-        xhr = resp
-      }
-      cancelHandle.call(this, xhr)
-    }
-  }
-
-  function cancelHandle (xhr) {
-    var index = getIndex(this)
-    if (index !== undefined) {
-      requestList[index][1].forEach(function (request) {
-        setTimeout(function () {
-          request.abort(xhr)
-        })
-      })
-      requestList.splice(index, 1)
-    }
-  }
-
-  Object.assign(XEAjaxCancelable.prototype, {
-    cancel: cancelHandle,
-    resolve: promiseHandle(200),
-    reject: promiseHandle(500)
-  })
-
-  function getIndex (item) {
-    for (var index = 0, len = requestList.length; index < len; index++) {
-      if (item === requestList[index][0]) {
-        return index
-      }
-    }
-  }
-
-  function setCancelableItem (request) {
-    var item = request.cancelable
-    if (item && item.constructor === XEAjaxCancelable) {
-      var index = getIndex(item)
-      if (index === undefined) {
-        requestList.push([item, [request]])
-      } else {
-        requestList[index][1].push(request)
-      }
-    }
-  }
-
-  function createAjax (method, def, opts) {
-    return XEAjax(Object.assign({method: method}, def, opts))
+  function createAjax (method, def, options) {
+    return XEAjax(Object.assign({method: method}, def, options))
   }
 
   // xhr response JSON
   function responseJSON (method) {
     return function () {
       return method.apply(this, arguments).then(function (response) {
-        return response.body
-      }).catch(function (response) {
-        return Promise.reject(response.body, this)
+        return new Promise(function (resolve, reject) {
+          response.json().then(function (data) {
+            (response.ok ? resolve : reject)(data)
+          })['catch'](function (data) {
+            reject(data)
+          })
+        })
       })
     }
   }
@@ -540,11 +550,6 @@
     return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
   }
 
-  // promise cancelable
-  function cancelable () {
-    return new XEAjaxCancelable()
-  }
-
   var getJSON = responseJSON(doGet)
   var postJSON = responseJSON(doPost)
   var putJSON = responseJSON(doPut)
@@ -568,7 +573,7 @@
   }
 
   mixin({
-    doAll: doAll, doGet: doGet, getJSON: getJSON, doPost: doPost, postJSON: postJSON, doPut: doPut, putJSON: putJSON, doPatch: doPatch, patchJSON: patchJSON, doDelete: doDelete, deleteJSON: deleteJSON, jsonp: jsonp, cancelable: cancelable, setup: setup, interceptor: interceptor
+    doAll: doAll, doGet: doGet, getJSON: getJSON, doPost: doPost, postJSON: postJSON, doPut: doPut, putJSON: putJSON, doPatch: doPatch, patchJSON: patchJSON, doDelete: doDelete, deleteJSON: deleteJSON, jsonp: jsonp, cancelXHR: cancelXHR, setup: setup, interceptors: interceptors
   })
   XEAjax.use = use
   XEAjax.mixin = mixin

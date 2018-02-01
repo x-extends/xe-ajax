@@ -1,7 +1,3 @@
-export var isArray = Array.isArray || function (val) {
-  return Object.prototype.toString.call(val) === '[object Array]'
-}
-
 export function isFormData (obj) {
   return typeof FormData !== 'undefined' && obj instanceof FormData
 }
@@ -19,16 +15,8 @@ export function isObject (obj) {
   return obj && typeof obj === 'object'
 }
 
-export function isString (obj) {
-  return typeof obj === 'string'
-}
-
 export function isFunction (obj) {
   return typeof obj === 'function'
-}
-
-export function isUndefined (obj) {
-  return typeof obj === 'undefined'
 }
 
 export function eachObj (obj, iteratee, context) {
@@ -43,7 +31,7 @@ export function parseParam (resultVal, resultKey, isArr) {
   var result = []
   eachObj(resultVal, function (item, key) {
     if (isObject(item)) {
-      result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
+      result = result.concat(parseParam(item, resultKey + '[' + key + ']', Array.isArray(item)))
     } else {
       result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
     }
@@ -57,7 +45,7 @@ export function serialize (body) {
   eachObj(body, function (item, key) {
     if (item !== undefined) {
       if (isObject(item)) {
-        params = params.concat(parseParam(item, key, isArray(item)))
+        params = params.concat(parseParam(item, key, Array.isArray(item)))
       } else {
         params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
       }

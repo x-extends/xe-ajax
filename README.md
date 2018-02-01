@@ -1,6 +1,6 @@
-# XEAjax 轻量级XHR请求函数，基于 Promise 实现，支持 Mock 虚拟服务
+# XEAjax 轻量级 XHR 请求函数，基于 Promise 实现，支持 Mock 虚拟服务
 
-XEAjax 是一个不依赖于任何框架、开源的XHR请求函数，支持XHR、jsonp以及mock等常用函数。对于前后端分离开发模式，使用 ajax+mock 就非常有必要，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+。
+XEAjax 一个不依赖于任何框架、开源的 XHR 请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+，使用 babel 支持低版本浏览器。
 
 ### 直接引用 script 全局安装，XEAjax 会定义为全局变量
 ``` shell
@@ -36,8 +36,9 @@ npm install xe-ajax --save
 import { doGet, getJSON, doPost, postJSON } from 'xe-ajax'
 
 doGet ('services/user/list', {id: 1})
-getJSON ('services/user/list', {id: 1})
 doPost ('services/user/save', {id: 1})
+
+getJSON ('services/user/list', {id: 1})
 postJSON ('services/user/save', {id: 1})
 ```
 
@@ -46,15 +47,16 @@ postJSON ('services/user/save', {id: 1})
 import XEAjax from 'xe-ajax'
 
 XEAjax.doGet('services/user/list', {id: 1})
-XEAjax.getJSON ('services/user/list', {id: 1})
 XEAjax.doPost ('services/user/save', {id: 1})
+
+XEAjax.getJSON ('services/user/list', {id: 1})
 XEAjax.postJSON ('services/user/save', {id: 1})
 ```
 
 ### 混合函数
 #### 文件 ./customs.js
 ``` shell
-export function custom1 () {
+export function header1 () {
   console.log('自定义的函数')
 } 
 ```
@@ -62,48 +64,51 @@ export function custom1 () {
 ``` shell
 import Vue from 'vue'
 import XEAjax from 'xe-ajax'
-
 import customs from './customs'
 
 XEAjax.mixin(customs)
 
 // 调用自定义扩展函数
-XEAjax.custom1()
+XEAjax.header1()
 ```
 
 ## XEAjax API:
-### 'xe-ajax' 提供的便捷方法：
-### 返回 Response 对象
-* ajax( options )
+### 'xe-ajax' 提供常用便捷方法：
 * doAll (iterable)
+### fetch 响应模式,无论请求成功或失败都是完成，返回 Response 对象
+* ajax ( options )
 * doGet ( url, params, options )
 * doPost ( url, body, options )
 * doPut ( url, body, options )
 * doPatch ( url, body, options )
 * doDelete ( url, body, options )
-* jsonp ( url, params, options )
-### 返回 json 数据
+### 根据请求状态决定完成或失败，直接返回 json 数据
 * getJSON ( url, params, options )
 * postJSON ( url, body, options )
 * putJSON ( url, body, options )
 * deleteJSON ( url, body, options )
 * patchJSON ( url, body, options )
+* jsonp ( url, params, options )
 
 ### 接受三个参数：
-* url（字符串），请求地址。可被options属性覆盖。
-* params/body（可选，对象/数组），要发送的数据。可被options属性覆盖。
+* url（字符串），请求地址。可被自定义 options 属性覆盖。
+* params/body（可选，对象/数组），要发送的数据。可被自定义 options 属性覆盖。
 * options （可选，对象）参数
 
-### Response 对象
+### Response 对象说明
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| json | Function | 返回 Promise 对象，结果得到 json 数据 | 
-| test | Function | 返回 Promise 对象，结果得到 text 数据 | 
+| json | Function | 返回 Promise 对象，结果得到 json 数据,只能读取一次 | 
+| test | Function | 返回 Promise 对象，结果得到 text 数据,只能读取一次 | 
+| bodyUsed | Boolean | 内容是否已被读取 |
 | headers | Object | 返回响应头 |
 | status | Number | 返回状态码 | 
+| statusText | String | 状态 |
 | url | String | 返回请求路径 | 
+| ok | Boolean | 根据状态判断完成还是失败 |
+| redirected | Boolean | 是否重定向了 |
 
-### 参数说明
+### Request 参数说明
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
@@ -113,17 +118,17 @@ XEAjax.custom1()
 | body | Object/Array | 提交参数 |  |
 | bodyType | String | 提交参数方式，如果要以表单方式提交改为FROM_DATA | 默认JSON_DATA |
 | jsonp | String | 调用jsonp服务,属性名默认callback | 默认callback |
-| async | Boolean | 是否异步 | 默认true |
+| async | Boolean | 是否异步 | 默认true(XEAjax虽然不做异步限制，但是建议必须异步) |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
-| interceptor | Function ( request, next ) | 局部拦截器 |  |
+| cancelToken | String | 设置取消标识,用于取消 XHR 请求 |
 | transformParams | Function ( params, request ) | 用于改变URL参数 |  |
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
 | getXMLHttpRequest | Function ( request ) | 自定义 XMLHttpRequest 的函数 |  |
-| sendJSONP | Function ( script, request ) | 自定义 jsonp 请求处理函数 |  |
+| sendJSONP | Function ( script, request ) | 自定义 jsonp 请求函数 |  |
 
 ### 全局参数
 ``` shell
@@ -151,7 +156,7 @@ XEAjax.setup({
     body.startDate = XEUtils.dateToString(body.startDate, 'yyyy-MM-dd HH:mm:ss')
     return body
   },
-  bodyFormat (body, request) {
+  stringifyBody (body, request) {
     // 自定义格式化数据函数,除了GET之外都支持提交数据
     return JSON.stringify(body)
   },
@@ -164,26 +169,32 @@ XEAjax.setup({
 
 ### 示例
 ``` shell
-import { ajax, doAll, doGet, getJSON, doPost, postJSON, jsonp } from 'xe-ajax'
+import { ajax, doAll, doGet, getJSON, postJSON, jsonp } from 'xe-ajax'
 import XEUtils from 'xe-utils'
 
 // 参数调用，返回 response 对象
 ajax({
   url: 'services/user/list',
   method: 'GET',
-  params: {}
+  params: {id: 1}
 })
 ajax({
   url: 'services/user/submit',
   method: 'POST',
-  body: {}
+  body: {id: 1}
 })
 
-// 返回 response 对象
+// 返回 Response 对象,无论请求成功或失败都是完成
 doGet('services/user/list').then(response => {
-  // response.body
+  // response.ok 请求成功或失败
   // response.status
   // response.headers
+  response.json().then(data => {
+    // 获取 data
+  })
+  // response.text().then(text => {
+  //   // 获取 text
+  // })
 })
 // 直接返回请求结果
 getJSON('services/user/list').then(data => {
@@ -194,18 +205,17 @@ getJSON('services/user/list').then(data => {
       startDate: XEUtils.stringToDate(item.startDate, 'yyyy-MM-dd HH:mm:ss')
     })
   })
+}).catch(data => {
+  // data
 })
 
 // 提交数据
-doPost('services/user/save', {name: 'aaa'})
 postJSON('services/user/save', {name: 'aaa'})
 
 // 以formData方式提交数据
-doPost('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
 postJSON('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
 
 // 查询参数和数据同时提交
-doPost('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 
 // 在所有的异步操作执行完, doAll 和 Promise.all 用法一致
@@ -217,6 +227,7 @@ Promise.all(iterable1).then(datas => {
 }).catch(data => {
   // data 
 })
+
 // doAll 支持对象参数
 const iterable2 = []
 iterable2.push({url: 'services/user/list', method: 'GET'})
@@ -227,114 +238,65 @@ doAll(iterable2).then(datas => {
   // data
 })
 
-// jsonp 跨域调用
-jsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
-  // response.body = {msg: 'success'}
+// jsonp 跨域调用,jsonp只能获取数据
+jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data => {
+  // {msg: 'success'}
 }).catch(data => {
-  // response.body = {msg: 'error'}
-})
-jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}})
-ajax({
-  url: 'http://xuliangzhan.com/jsonp/user/message',
-  jsonp: 'callback'
+  // {msg: 'error'}
 })
 ```
 
-### 取消操作
-| 属性 | 类型 | 描述 |
-|------|------|-----|
-| cancel | Function () | 取消请求 |
-| resolve | Function (response) | 取消请求，承诺完成 |
-| reject | Function (response) | 取消请求，承诺失败 |
-
+### cancelXHR 取消 XHR 请求
+### 通过 Request 设置 cancelToken
 ### 示例
 ``` shell
-import { cancelable, doGet, doPost } from 'xe-ajax'
+import { cancelXHR, getJSON, doPost } from 'xe-ajax'
 
 // 中断XHR请求之前如果承诺已经完成了，则调用无效
 
-// 中断XHR请求
-const ajaxHandle = cancelable()
-doGet('services/user/list', null, {cancelable: ajaxHandle})
-ajaxHandle.cancel() // {status: 0, response: ''}
+// 取消 XHR 请求
+doGet('services/user/list', {id: 1}, {cancelToken: 'userPromise'}).then(response => {
+  // response.ok = false
+  // response.status = 0
+  response.json().then(data => {
+    // data = ''
+  })
+})
+cancelXHR('userPromise') // 如果 XHR 还没请求完成，则终止请求、如果已请求完成，则调用无效
 
-// 中断XHR请求，执行承诺完成
-const ajaxHandle2 = cancelable()
-doGet('services/user/list', null, {cancelable: ajaxHandle2})
-ajaxHandle2.resolve()
-// ajaxHandle2.resolve({msg: 'cancel2'}) // 支持自定义响应数据 {status: 200, response: {msg: 'cancel2'}}
-
-// 中断XHR请求，执行承诺失败
-const ajaxHandle3 = cancelable()
-doGet('services/user/list', null, {cancelable: ajaxHandle3})
-doPost('services/user/save', {name: 'test', password: '123456'}, {cancelable: ajaxHandle3, bodyType: 'FROM_DATA'})
-setTimeout(() => {
-  ajaxHandle3.reject()
-  // ajaxHandle3.reject({msg: 'cancel3'}) // 支持自定义响应数据 {status: 500, response: {msg: 'cancel3'}}
-}, 20)
-
+// 取消多个 XHR 请求
+getJSON('services/test/list1', {id: 1}, {cancelToken: 'testPromise'})
+getJSON('services/test/list2', {id: 1}, {cancelToken: 'testPromise'})
+cancelXHR('testPromise') // 如果 cancelToken 一样，则一起取消
 ```
 
 ### 拦截器
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 支持局部拦截器
-XEAjax.ajax({
-  url: 'services/user/list',
-  interceptor (request, next) {
-    next()
-  }
-})
+// Request 请求之前拦截器
+XEAjax.interceptors.request.use( (request, next) => {
+  // 请求之前
 
-// 请求之前拦截和请求之后拦截
-XEAjax.interceptor.use( (request, next) => {
-  // 请求之前处理
-  next( (response) => {
-    / 请求之后处理
-    return response
-  })
-})
-// 请求之前拦截
-XEAjax.interceptor.use( (request, next) => {
-  // 更改请求类型为POST
-  request.method = 'POST'
-  // 继续执行,如果不调用next则不会往下走
+  // request.method = 'POST' // 修改 method
+  // request.params.id = 1 // 修改参数
+  // request.setHeader('X-Token', 123) // 设置请求头
+
+  // 如果调用 next 则不会继续往下执行
   next()
 })
-// 请求之前拦截和请求之后拦截
-XEAjax.interceptor.use( (request, next) => {
-  // 例如，是否登录权限拦截
-  if (isLogin()) {
-    next()
+
+// Response 响应之后拦截器
+XEAjax.interceptors.response.use( (response, next) => {
+  // 请求之后
+
+  // 例如判断登录失效跳转
+  if (response.status === 403) {
+    router.replace({path: '/login'}) 
   } else {
-    location.href = 'http://xuliangzhan.com/login'
+    // 如果调用 next 则不会继续往下执行
+    next()
   }
-})
-// 请求之前拦截和请求之后拦截
-XEAjax.interceptor.use( (request, next) => {
-  // 继续执行
-  next( (response) => {
-    // 更改状态
-    response.status = 403
-    // 更改数据
-    response.body = {}
-  })
-})
-// 请求之前拦截中断请求并直接返回结果
-XEAjax.interceptor.use( (request, next) => {
-  // 继续执行,如果希望直接返回数据
-  next({response: [{id: 1}, {id: 2}], status: 200})
-})
-// 请求之前拦截中断请求并异步返回结果
-XEAjax.interceptor.use( (request, next) => {
-  // 异步操作
-  new Promise( (resolve, reject) => {
-    setTimeout(() => {
-      next({response: {text: '成功'}, status: 200})
-      // next({response: {text: '失败'}, status: 500})
-    }, 100)
-  })
 })
 ```
 
@@ -343,10 +305,11 @@ XEAjax.interceptor.use( (request, next) => {
 ``` shell
 import XEAjax from 'xe-ajax'
 import XEAjaxMock from 'xe-ajax-mock'
+
 XEAjax.use(XEAjaxMock)
 ```
 
-请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例
+Mock 详细使用请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan

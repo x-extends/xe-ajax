@@ -1,11 +1,9 @@
 import { isFunction, isFormData, isCrossOrigin, serialize } from './util'
-import { setCancelableItem } from './cancelable'
+import { setRequest } from './cancelXHR'
 
 export function XEAjaxRequest (options) {
-  Object.assign(this, {body: null, params: null}, options)
+  Object.assign(this, {url: '', body: null, params: null, cancelToken: null}, options)
   this.ABORT_RESPONSE = undefined
-  this.AFTER_SEND_CALLS = []
-  this.OPTIONS = options
   this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
   if (options && options.jsonp) {
@@ -13,7 +11,7 @@ export function XEAjaxRequest (options) {
   } else {
     this.xhr = options.getXMLHttpRequest(this)
   }
-  setCancelableItem(this)
+  setRequest(this)
 }
 
 Object.assign(XEAjaxRequest.prototype, {

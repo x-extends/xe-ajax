@@ -1,18 +1,23 @@
-import XEAjax, { setup, interceptor } from './constructor'
-import XEAjaxCancelable from './cancelable'
+import XEAjax, { setup } from './constructor'
+import { interceptors } from './interceptor'
+import { cancelXHR } from './cancelXHR'
 import { isObject } from './util'
 
-function createAjax (method, def, opts) {
-  return XEAjax(Object.assign({method: method}, def, opts))
+function createAjax (method, def, options) {
+  return XEAjax(Object.assign({method: method}, def, options))
 }
 
 // xhr response JSON
 function responseJSON (method) {
   return function () {
     return method.apply(this, arguments).then(function (response) {
-      return response.body
-    }).catch(function (response) {
-      return Promise.reject(response.body, this)
+      return new Promise(function (resolve, reject) {
+        response.json().then(function (data) {
+          (response.ok ? resolve : reject)(data)
+        }).catch(function (data) {
+          reject(data)
+        })
+      })
     })
   }
 }
@@ -62,11 +67,6 @@ export function jsonp (url, params, opts) {
   return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
 }
 
-// promise cancelable
-export function cancelable () {
-  return new XEAjaxCancelable()
-}
-
 export var getJSON = responseJSON(doGet)
 export var postJSON = responseJSON(doPost)
 export var putJSON = responseJSON(doPut)
@@ -86,7 +86,7 @@ export default {
   doDelete: doDelete,
   deleteJSON: deleteJSON,
   jsonp: jsonp,
-  cancelable: cancelable,
+  cancelXHR: cancelXHR,
   setup: setup,
-  interceptor: interceptor
+  interceptors: interceptors
 }
