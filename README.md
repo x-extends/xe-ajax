@@ -184,6 +184,9 @@ ajax({
 })
 
 // 返回 Response 对象,无论请求成功或失败都是完成
+fetchGet('services/user/list').then(response >= response.json()).then(data => {
+  // 获取 data
+})
 fetchGet('services/user/list').then(response => {
   // response.ok 请求成功或失败
   // response.status
