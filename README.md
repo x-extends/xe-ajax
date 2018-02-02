@@ -245,7 +245,7 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 })
 ```
 
-### FetchController 取消请求
+### AjaxController 取消请求
 ### 通过 Request 设置 signal
 ### 示例
 ``` shell
