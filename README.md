@@ -109,7 +109,7 @@ XEAjax.get1()
 | redirected | Boolean | 是否重定向了 |
 | type | String | 类型 |
 
-### options 参数说明
+### Request 参数说明
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
