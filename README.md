@@ -76,7 +76,7 @@ XEAjax.get1()
 * doAll (iterable)
 * ajax ( options )
 ### 'xe-ajax' 提供常用便捷方法：
-### fetch 响应模式,无论请求成功或失败都是完成，返回 Response 对象
+### fetch 响应,无论请求成功或失败都是完成，返回 Response 对象
 * fetchGet ( url, params, options )
 * fetchPost ( url, body, options )
 * fetchPut ( url, body, options )
