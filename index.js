@@ -1,5 +1,5 @@
 import XEAjax from './ajax/constructor'
-import ajax from './ajax'
+import ajaxMethods from './ajax'
 
 /**
  * 混合函数
@@ -17,7 +17,7 @@ function use (plugin) {
   plugin.install(XEAjax)
 }
 
-mixin(ajax)
+mixin(ajaxMethods)
 XEAjax.use = use
 XEAjax.mixin = mixin
 

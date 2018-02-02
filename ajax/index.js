@@ -1,7 +1,7 @@
-import XEAjax, { setup } from './constructor'
-import { interceptors } from './interceptor'
-import { cancelXHR } from './cancelXHR'
 import { isObject } from './util'
+import XEAjax, { setup } from './constructor'
+import { XEFetchController } from './fetchController'
+import { interceptors } from './interceptor'
 
 function createAjax (method, def, options) {
   return XEAjax(Object.assign({method: method}, def, options))
@@ -73,7 +73,9 @@ export var putJSON = responseJSON(fetchPut)
 export var patchJSON = responseJSON(fetchPatch)
 export var deleteJSON = responseJSON(fetchDelete)
 
-export default {
+export var AjaxController = XEFetchController
+
+var ajaxMethods = {
   doAll: doAll,
   fetchGet: fetchGet,
   getJSON: getJSON,
@@ -86,7 +88,9 @@ export default {
   fetchDelete: fetchDelete,
   deleteJSON: deleteJSON,
   jsonp: jsonp,
-  cancelXHR: cancelXHR,
   setup: setup,
-  interceptors: interceptors
+  interceptors: interceptors,
+  AjaxController: AjaxController
 }
+
+export default ajaxMethods

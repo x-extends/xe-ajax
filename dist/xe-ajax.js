@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.0
+ * xe-ajax.js v3.0.2
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -49,7 +49,7 @@
     return result
   }
 
-    // Serialize Body
+  // Serialize Body
   function serialize (body) {
     var params = []
     eachObj(body, function (item, key) {
@@ -64,8 +64,57 @@
     return params.join('&').replace(/%20/g, '+')
   }
 
+  var requestList = []
+
+  /**
+   * 索引 XHR Request 是否存在
+   * @param { XEAjaxRequest } item 对象
+   */
+  function getIndex (item) {
+    for (var index = 0, len = requestList.length; index < len; index++) {
+      if (item === requestList[index][0]) {
+        return index
+      }
+    }
+  }
+
+  /**
+   * 将可取消的 XHR Request 放入队列
+   *
+   * @param { XEAjaxRequest } request 对象
+   */
+  function setFetchRequest (request) {
+    if (request.signal) {
+      var index = getIndex(request.signal)
+      if (index === undefined) {
+        requestList.push([request.signal, [request]])
+      } else {
+        requestList[index][1].push(request)
+      }
+    }
+  }
+
+  function XEFetchController () {
+    this.signal = {}
+  }
+
+  Object.assign(XEFetchController.prototype, {
+    // 中止请求
+    abort: function () {
+      var index = getIndex(this.signal)
+      if (index !== undefined) {
+        requestList[index][1].forEach(function (request) {
+          setTimeout(function () {
+            request.abort()
+          })
+        })
+        requestList.splice(index, 1)
+      }
+    }
+  })
+
   function XEAjaxRequest (options) {
-    Object.assign(this, {url: '', body: null, params: null, cancelToken: null}, options)
+    Object.assign(this, {url: '', body: null, params: null, signal: null}, options)
     this.ABORT_RESPONSE = undefined
     this.method = String(this.method).toLocaleUpperCase()
     this.crossOrigin = isCrossOrigin(this)
@@ -74,7 +123,7 @@
     } else {
       this.xhr = options.getXMLHttpRequest(this)
     }
-    setRequest(this)
+    setFetchRequest(this)
   }
 
   Object.assign(XEAjaxRequest.prototype, {
@@ -153,7 +202,11 @@
         if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
           if (xhr.responseText) {
             body.responseText = xhr.responseText
-            body.response = JSON.parse(xhr.responseText)
+            try {
+              body.response = JSON.parse(xhr.responseText)
+            } catch (e) {
+              body.response = null
+            }
           } else {
             body.response = xhr.response
             body.responseText = JSON.stringify(xhr.response)
@@ -254,7 +307,7 @@
             resolve(data)
           })
         })
-      }).catch(function (data) {
+      })['catch'](function (data) {
         console.error(data)
       })
     })
@@ -291,53 +344,6 @@
     }
     next()
   })
-
-  var requestList = []
-
-  /**
-   * 索引 XHR Request 是否存在
-   * @param { XEAjaxRequest } item 对象
-   */
-  function getIndex (item) {
-    for (var index = 0, len = requestList.length; index < len; index++) {
-      if (item === requestList[index][0]) {
-        return index
-      }
-    }
-  }
-
-  /**
-   * 将可取消的 XHR Request 放入队列
-   *
-   * @param { XEAjaxRequest } request 对象
-   */
-  function setRequest (request) {
-    if (request.cancelToken) {
-      var index = getIndex(request.cancelToken)
-      if (index === undefined) {
-        requestList.push([request.cancelToken, [request]])
-      } else {
-        requestList[index][1].push(request)
-      }
-    }
-  }
-
-  /**
-   * 根据 cancelToken 中断 XHR 请求
-   *
-   * @param { String } cancelToken 名字
-   */
-  function cancelXHR (cancelToken) {
-    var index = getIndex(cancelToken)
-    if (index !== undefined) {
-      requestList[index][1].forEach(function (request) {
-        setTimeout(function () {
-          request.abort()
-        })
-      })
-      requestList.splice(index, 1)
-    }
-  }
 
   var global = typeof window === 'undefined' ? this : window
   var setupDefaults = {
@@ -410,7 +416,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      }).catch(function () {
+      })['catch'](function () {
         xhr.send()
       })
     })
@@ -458,7 +464,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    }).catch(function (data) {
+    })['catch'](function (data) {
       reject(data)
     })
   }
@@ -497,7 +503,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          }).catch(function (data) {
+          })['catch'](function (data) {
             reject(data)
           })
         })
@@ -556,10 +562,30 @@
   var patchJSON = responseJSON(fetchPatch)
   var deleteJSON = responseJSON(fetchDelete)
 
+  var AjaxController = XEFetchController
+
+  var ajaxMethods = {
+    doAll: doAll,
+    fetchGet: fetchGet,
+    getJSON: getJSON,
+    fetchPost: fetchPost,
+    postJSON: postJSON,
+    fetchPut: fetchPut,
+    putJSON: putJSON,
+    fetchPatch: fetchPatch,
+    patchJSON: patchJSON,
+    fetchDelete: fetchDelete,
+    deleteJSON: deleteJSON,
+    jsonp: jsonp,
+    setup: setup,
+    interceptors: interceptors,
+    AjaxController: AjaxController
+  }
+
   /**
-   * 函数扩展
+   * 混合函数
    *
-   * @param {Object} methods 扩展函数对象
+   * @param {Object} methods 扩展
    */
   function mixin (methods) {
     return Object.assign(XEAjax, methods)
@@ -572,9 +598,7 @@
     plugin.install(XEAjax)
   }
 
-  mixin({
-    doAll: doAll, fetchGet: fetchGet, getJSON: getJSON, fetchPost: fetchPost, postJSON: postJSON, fetchPut: fetchPut, putJSON: putJSON, fetchPatch: fetchPatch, patchJSON: patchJSON, fetchDelete: fetchDelete, deleteJSON: deleteJSON, jsonp: jsonp, cancelXHR: cancelXHR, setup: setup, interceptors: interceptors
-  })
+  mixin(ajaxMethods)
   XEAjax.use = use
   XEAjax.mixin = mixin
 

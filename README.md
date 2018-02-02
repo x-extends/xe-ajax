@@ -122,7 +122,6 @@ XEAjax.get1()
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
-| cancelToken | String | 设置取消标识,用于取消 XHR 请求 |
 | transformParams | Function ( params, request ) | 用于改变URL参数 |  |
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |
@@ -246,28 +245,32 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 })
 ```
 
-### cancelXHR 取消 XHR 请求
-### 通过 Request 设置 cancelToken
+### FetchController 取消请求
+### 通过 Request 设置 signal
 ### 示例
 ``` shell
-import { cancelXHR, getJSON, fetchPost } from 'xe-ajax'
+import { AjaxController, getJSON, fetchPost } from 'xe-ajax'
 
-// 中断XHR请求之前如果承诺已经完成了，则调用无效
+// 中断请求之前如果承诺已经完成了，则调用无效
 
-// 取消 XHR 请求
-fetchGet('services/user/list', {id: 1}, {cancelToken: 'userPromise'}).then(response => {
+// 取消请求
+const controller = new AjaxController()
+const signal = controller.signal
+fetchGet('services/user/list', {id: 1}, {signal}).then(response => {
   // response.ok = false
   // response.status = 0
   response.json().then(data => {
     // data = ''
   })
 })
-cancelXHR('userPromise') // 如果 XHR 还没请求完成，则终止请求、如果已请求完成，则调用无效
+controller.abort() // 如果还没请求完成，则终止请求、如果已请求完成，则调用无效
 
-// 取消多个 XHR 请求
-getJSON('services/test/list1', {id: 1}, {cancelToken: 'testPromise'})
-getJSON('services/test/list2', {id: 1}, {cancelToken: 'testPromise'})
-cancelXHR('testPromise') // 如果 cancelToken 一样，则一起取消
+// 取消多个请求
+const controller = new AjaxController()
+const signal = controller.signal
+getJSON('services/test/list1', {id: 1}, {signal})
+getJSON('services/test/list2', {id: 1}, {signal})
+controller.abort() // 如果 signal 一样，则一起取消
 ```
 
 ### 拦截器

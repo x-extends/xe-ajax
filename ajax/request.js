@@ -1,8 +1,8 @@
 import { isFunction, isFormData, isCrossOrigin, serialize } from './util'
-import { setRequest } from './cancelXHR'
+import { setFetchRequest } from './fetchController'
 
 export function XEAjaxRequest (options) {
-  Object.assign(this, {url: '', body: null, params: null, cancelToken: null}, options)
+  Object.assign(this, {url: '', body: null, params: null, signal: null}, options)
   this.ABORT_RESPONSE = undefined
   this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
@@ -11,7 +11,7 @@ export function XEAjaxRequest (options) {
   } else {
     this.xhr = options.getXMLHttpRequest(this)
   }
-  setRequest(this)
+  setFetchRequest(this)
 }
 
 Object.assign(XEAjaxRequest.prototype, {
