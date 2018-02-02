@@ -28,8 +28,10 @@ export function setFetchRequest (request) {
   }
 }
 
+export function XEFetchSignal () {}
+
 export function XEFetchController () {
-  this.signal = {}
+  this.signal = new XEFetchSignal()
 }
 
 Object.assign(XEFetchController.prototype, {

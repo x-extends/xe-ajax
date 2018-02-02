@@ -94,8 +94,10 @@
     }
   }
 
+  function XEFetchSignal () {}
+
   function XEFetchController () {
-    this.signal = {}
+    this.signal = new XEFetchSignal()
   }
 
   Object.assign(XEFetchController.prototype, {
@@ -307,7 +309,7 @@
             resolve(data)
           })
         })
-      })['catch'](function (data) {
+      }).catch(function (data) {
         console.error(data)
       })
     })
@@ -416,7 +418,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      })['catch'](function () {
+      }).catch(function () {
         xhr.send()
       })
     })
@@ -464,7 +466,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    })['catch'](function (data) {
+    }).catch(function (data) {
       reject(data)
     })
   }
@@ -503,7 +505,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          })['catch'](function (data) {
+          }).catch(function (data) {
             reject(data)
           })
         })

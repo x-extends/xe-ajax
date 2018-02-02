@@ -245,7 +245,7 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 })
 ```
 
-### AjaxController 取消请求
+### AjaxController 控制器对象，允许控制一个或多个取指令请求
 ### 通过 Request 设置 signal
 ### 示例
 ``` shell
@@ -254,8 +254,8 @@ import { AjaxController, getJSON, fetchPost } from 'xe-ajax'
 // 中断请求之前如果承诺已经完成了，则调用无效
 
 // 取消请求
-const controller = new AjaxController()
-const signal = controller.signal
+const controller = new AjaxController() // 创建一个控制器对象
+const signal = controller.signal // 获取signal
 fetchGet('services/user/list', {id: 1}, {signal}).then(response => {
   // response.ok = false
   // response.status = 0
@@ -264,13 +264,6 @@ fetchGet('services/user/list', {id: 1}, {signal}).then(response => {
   })
 })
 controller.abort() // 如果还没请求完成，则终止请求、如果已请求完成，则调用无效
-
-// 取消多个请求
-const controller = new AjaxController()
-const signal = controller.signal
-getJSON('services/test/list1', {id: 1}, {signal})
-getJSON('services/test/list2', {id: 1}, {signal})
-controller.abort() // 如果 signal 一样，则一起取消
 ```
 
 ### 拦截器
