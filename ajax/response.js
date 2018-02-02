@@ -1,4 +1,4 @@
-import XEHeader from './headers'
+import { XEHeaders } from './headers'
 
 function XEReadableStream (xhr) {
   this.locked = false
@@ -41,11 +41,12 @@ export function XEAjaxResponse (request, xhr) {
   this.body = new XEReadableStream(xhr)
   this.bodyUsed = false
   this.url = request.url
-  this.headers = new XEHeader()
+  this.headers = new XEHeaders()
   this.status = 0
   this.statusText = ''
   this.ok = false
   this.redirected = false
+  this.type = 'basic'
 
   this.json = function () {
     return this.body._getBody().then(function (body) {

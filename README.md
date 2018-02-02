@@ -1,6 +1,6 @@
-# XEAjax 轻量级 XHR 请求函数，基于 Promise 实现，支持 Mock 虚拟服务
+# XEAjax 轻量级请求函数，基于 Promise 实现，支持 Mock 虚拟服务
 
-XEAjax 一个不依赖于任何框架、开源的 XHR 请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+，使用 babel 支持低版本浏览器。
+XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+，使用 babel 支持低版本浏览器。
 
 ### 直接引用 script 全局安装，XEAjax 会定义为全局变量
 ``` shell
@@ -98,15 +98,16 @@ XEAjax.get1()
 ### Response 对象说明
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| json | Function | 返回 Promise 对象，结果得到 json 数据,只能读取一次 | 
-| test | Function | 返回 Promise 对象，结果得到 text 数据,只能读取一次 | 
+| json | Function | 返回 Promise 对象，结果得到 json 数据,只能读取一次 |
+| test | Function | 返回 Promise 对象，结果得到 text 数据,只能读取一次 |
 | bodyUsed | Boolean | 内容是否已被读取 |
 | headers | Object | 返回响应头 |
-| status | Number | 返回状态码 | 
+| status | Number | 返回状态码 |
 | statusText | String | 状态 |
-| url | String | 返回请求路径 | 
+| url | String | 返回请求路径 |
 | ok | Boolean | 根据状态判断完成还是失败 |
 | redirected | Boolean | 是否重定向了 |
+| type | String | 类型 |
 
 ### Request 参数说明
 | 参数 | 类型 | 描述 | 默认值 |

@@ -64,6 +64,40 @@
     return params.join('&').replace(/%20/g, '+')
   }
 
+  function toKey (key) {
+    return String(key).toLowerCase()
+  }
+
+  function XEHeaders () {
+    this._state = {}
+
+    this.set = function (key, value) {
+      this._state[toKey(key)] = [value]
+    }
+
+    this.get = function (key) {
+      var _key = toKey(key)
+      return this.has(_key) ? this._state[_key].join(', ') : null
+    }
+
+    this.append = function (key, value) {
+      var _key = toKey(key)
+      if (this.has(_key)) {
+        return this._state[_key].push(value)
+      } else {
+        this.set(_key, value)
+      }
+    }
+
+    this.has = function (key) {
+      return !!this._state[toKey(key)]
+    }
+
+    this['delete'] = function (key) {
+      delete this._state[toKey(key)]
+    }
+  }
+
   var requestList = []
 
   /**
@@ -113,6 +147,72 @@
         requestList.splice(index, 1)
       }
     }
+  })
+
+  /**
+   * 拦截器
+   */
+  var requestCalls = []
+  var responseCalls = []
+
+  function useInterceptors (state) {
+    return function (callback) {
+      if (state.indexOf(callback) === -1) {
+        state.push(callback)
+      }
+    }
+  }
+
+  /**
+   * 拦截器处理
+   * @param { Array } calls 调用链
+   * @param { Object } result 数据
+   */
+  function callPromises (calls, result) {
+    var thenInterceptor = Promise.resolve(result)
+    calls.forEach(function (callback) {
+      thenInterceptor = thenInterceptor.then(function (data) {
+        return new Promise(function (resolve) {
+          callback(data, function () {
+            resolve(data)
+          })
+        })
+      }).catch(function (data) {
+        console.error(data)
+      })
+    })
+    return thenInterceptor
+  }
+
+  function requestInterceptor (data) {
+    return callPromises(requestCalls, data)
+  }
+
+  function responseInterceptor (data) {
+    return callPromises(responseCalls, data)
+  }
+
+  var interceptors = {
+    request: {
+      use: useInterceptors(requestCalls)
+    },
+    response: {
+      use: useInterceptors(responseCalls)
+    }
+  }
+
+  interceptors.request.use(function (request, next) {
+    if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
+      if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
+        request.setHeader('Content-Type', 'application/json; charset=utf-8')
+      } else {
+        request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+      }
+    }
+    if (request.crossOrigin) {
+      request.setHeader('X-Requested-With', 'XMLHttpRequest')
+    }
+    next()
   })
 
   function XEAjaxRequest (options) {
@@ -231,11 +331,12 @@
     this.body = new XEReadableStream(xhr)
     this.bodyUsed = false
     this.url = request.url
-    this.headers = {}
+    this.headers = new XEHeaders()
     this.status = 0
     this.statusText = ''
     this.ok = false
     this.redirected = false
+    this.type = 'basic'
 
     this.json = function () {
       return this.body._getBody().then(function (body) {
@@ -274,78 +375,12 @@
         if (allResponseHeaders) {
           allResponseHeaders.split('\n').forEach(function (row) {
             var index = row.indexOf(':')
-            this.headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+            this.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
           }, this)
         }
       }
     }
   }
-
-  /**
-   * 拦截器
-   */
-  var requestCalls = []
-  var responseCalls = []
-
-  function useInterceptors (state) {
-    return function (callback) {
-      if (state.indexOf(callback) === -1) {
-        state.push(callback)
-      }
-    }
-  }
-
-  /**
-   * 拦截器处理
-   * @param { Array } calls 调用链
-   * @param { Object } result 数据
-   */
-  function callPromises (calls, result) {
-    var thenInterceptor = Promise.resolve(result)
-    calls.forEach(function (callback) {
-      thenInterceptor = thenInterceptor.then(function (data) {
-        return new Promise(function (resolve) {
-          callback(data, function () {
-            resolve(data)
-          })
-        })
-      }).catch(function (data) {
-        console.error(data)
-      })
-    })
-    return thenInterceptor
-  }
-
-  function requestInterceptor (data) {
-    return callPromises(requestCalls, data)
-  }
-
-  function responseInterceptor (data) {
-    return callPromises(responseCalls, data)
-  }
-
-  var interceptors = {
-    request: {
-      use: useInterceptors(requestCalls)
-    },
-    response: {
-      use: useInterceptors(responseCalls)
-    }
-  }
-
-  interceptors.request.use(function (request, next) {
-    if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
-      if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
-        request.setHeader('Content-Type', 'application/json; charset=utf-8')
-      } else {
-        request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
-      }
-    }
-    if (request.crossOrigin) {
-      request.setHeader('X-Requested-With', 'XMLHttpRequest')
-    }
-    next()
-  })
 
   var global = typeof window === 'undefined' ? this : window
   var setupDefaults = {

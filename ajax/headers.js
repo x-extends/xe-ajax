@@ -1,28 +1,34 @@
+export function toKey (key) {
+  return String(key).toLowerCase()
+}
+
 export function XEHeaders () {
   this._state = {}
 
   this.set = function (key, value) {
-    this._state[key] = [value]
+    this._state[toKey(key)] = [value]
   }
 
   this.get = function (key) {
-    return this.has(key) ? null : this._state[key].join(', ')
+    var _key = toKey(key)
+    return this.has(_key) ? this._state[_key].join(', ') : null
   }
 
   this.append = function (key, value) {
-    if (this.has(key)) {
-      return this._state[key].push(value)
+    var _key = toKey(key)
+    if (this.has(_key)) {
+      return this._state[_key].push(value)
     } else {
-      this.set(key, value)
+      this.set(_key, value)
     }
   }
 
   this.has = function (key) {
-    return this._state[key]
+    return !!this._state[toKey(key)]
   }
 
   this['delete'] = function (key) {
-    delete this._state[key]
+    delete this._state[toKey(key)]
   }
 }
 
