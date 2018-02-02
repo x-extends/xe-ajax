@@ -1,3 +1,5 @@
+import XEHeader from './headers'
+
 function XEReadableStream (xhr) {
   this.locked = false
   this._xhr = xhr
@@ -39,7 +41,7 @@ export function XEAjaxResponse (request, xhr) {
   this.body = new XEReadableStream(xhr)
   this.bodyUsed = false
   this.url = request.url
-  this.headers = {}
+  this.headers = new XEHeader()
   this.status = 0
   this.statusText = ''
   this.ok = false
@@ -82,7 +84,7 @@ export function XEAjaxResponse (request, xhr) {
       if (allResponseHeaders) {
         allResponseHeaders.split('\n').forEach(function (row) {
           var index = row.indexOf(':')
-          this.headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+          this.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
         }, this)
       }
     }
