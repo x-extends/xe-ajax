@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.4
+ * xe-ajax.js v3.0.6
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -177,7 +177,7 @@
             resolve(data)
           })
         })
-      }).catch(function (data) {
+      })['catch'](function (data) {
         console.error(data)
       })
     })
@@ -248,6 +248,10 @@
       var url = this.url
       var params = ''
       if (url) {
+        if (isFunction(this.transformParams)) {
+          // 避免空值报错，params 始终保持是对象
+          this.params = this.transformParams(this.params || {}, this)
+        }
         if (this.params && !isFormData(this.params)) {
           params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this) : serialize(this.params)
         }
@@ -268,7 +272,8 @@
         if (request.body && request.method !== 'GET') {
           try {
             if (isFunction(request.transformBody)) {
-              request.body = request.transformBody(request.body, request) || request.body
+              // 避免空值报错，body 始终保持是对象
+              request.body = request.transformBody(request.body || {}, request) || request.body
             }
             if (isFunction(request.stringifyBody)) {
               result = request.stringifyBody(request.body, request) || null
@@ -453,7 +458,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      }).catch(function () {
+      })['catch'](function () {
         xhr.send()
       })
     })
@@ -501,7 +506,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    }).catch(function (data) {
+    })['catch'](function (data) {
       reject(data)
     })
   }
@@ -540,7 +545,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          }).catch(function (data) {
+          })['catch'](function (data) {
             reject(data)
           })
         })

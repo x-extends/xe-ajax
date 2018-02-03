@@ -35,7 +35,8 @@ Object.assign(XEAjaxRequest.prototype, {
     var params = ''
     if (url) {
       if (isFunction(this.transformParams)) {
-        this.params = this.transformParams(this.params, this)
+        // 避免空值报错，params 始终保持是对象
+        this.params = this.transformParams(this.params || {}, this)
       }
       if (this.params && !isFormData(this.params)) {
         params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this.params, this) : serialize(this.params)
@@ -57,7 +58,8 @@ Object.assign(XEAjaxRequest.prototype, {
       if (request.body && request.method !== 'GET') {
         try {
           if (isFunction(request.transformBody)) {
-            request.body = request.transformBody(request.body, request) || request.body
+            // 避免空值报错，body 始终保持是对象
+            request.body = request.transformBody(request.body || {}, request) || request.body
           }
           if (isFunction(request.stringifyBody)) {
             result = request.stringifyBody(request.body, request) || null

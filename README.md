@@ -149,7 +149,7 @@ XEAjax.setup({
   },
   paramsSerializer (params, request) {
     // 自定义URL序列化函数,最终拼接在url
-    return 'id=1&name=2'
+    return 'id=123&name=2'
   }，
   transformBody (body, request) {
     // 用于在请求发送之前改变提交数据
