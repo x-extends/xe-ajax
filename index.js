@@ -1,3 +1,4 @@
+import { objectAssign } from './ajax/util'
 import XEAjax from './ajax/constructor'
 import ajaxMethods from './ajax'
 
@@ -7,7 +8,7 @@ import ajaxMethods from './ajax'
  * @param {Object} methods 扩展
  */
 function mixin (methods) {
-  return Object.assign(XEAjax, methods)
+  return objectAssign(XEAjax, methods)
 }
 
 /**

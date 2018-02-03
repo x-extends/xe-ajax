@@ -1,10 +1,10 @@
-import { isObject, serialize } from './util'
+import { isObject, serialize, objectAssign } from './util'
 import XEAjax, { setup } from './constructor'
 import { XEFetchController } from './fetchController'
 import { interceptors } from './interceptor'
 
 function createAjax (method, def, options) {
-  return XEAjax(Object.assign({method: method}, def, options))
+  return XEAjax(objectAssign({method: method}, def, options))
 }
 
 // xhr response JSON
@@ -74,6 +74,7 @@ export var patchJSON = responseJSON(fetchPatch)
 export var deleteJSON = responseJSON(fetchDelete)
 
 export var AjaxController = XEFetchController
+export var version = '3.0.7'
 
 var ajaxMethods = {
   doAll: doAll,
@@ -91,7 +92,8 @@ var ajaxMethods = {
   setup: setup,
   serialize: serialize,
   interceptors: interceptors,
-  AjaxController: AjaxController
+  AjaxController: AjaxController,
+  version: version
 }
 
 export default ajaxMethods

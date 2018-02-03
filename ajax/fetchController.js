@@ -1,3 +1,5 @@
+import { arrayEach, objectAssign } from './util'
+
 var requestList = []
 
 /**
@@ -34,12 +36,12 @@ export function XEFetchController () {
   this.signal = new XEFetchSignal()
 }
 
-Object.assign(XEFetchController.prototype, {
+objectAssign(XEFetchController.prototype, {
   // 中止请求
   abort: function () {
     var index = getIndex(this.signal)
     if (index !== undefined) {
-      requestList[index][1].forEach(function (request) {
+      arrayEach(requestList[index][1], function (request) {
         setTimeout(function () {
           request.abort()
         })

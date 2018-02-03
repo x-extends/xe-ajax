@@ -1,3 +1,4 @@
+import { objectAssign, arrayEach } from './util'
 import { XEHeaders } from './headers'
 
 function XEReadableStream (xhr) {
@@ -5,7 +6,7 @@ function XEReadableStream (xhr) {
   this._xhr = xhr
 }
 
-Object.assign(XEReadableStream.prototype, {
+objectAssign(XEReadableStream.prototype, {
   _getBody: function () {
     var that = this
     var xhr = this._xhr
@@ -83,7 +84,7 @@ export function XEAjaxResponse (request, xhr) {
     if (xhr.getAllResponseHeaders) {
       var allResponseHeaders = xhr.getAllResponseHeaders().trim()
       if (allResponseHeaders) {
-        allResponseHeaders.split('\n').forEach(function (row) {
+        arrayEach(allResponseHeaders.split('\n'), function (row) {
           var index = row.indexOf(':')
           this.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
         }, this)

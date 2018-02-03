@@ -1,7 +1,7 @@
 import XEAjaxRequest from './request'
 import XEAjaxResponse from './response'
 import { requestInterceptor, responseInterceptor } from './interceptor'
-import { isFunction, eachObj } from './util'
+import { isFunction, eachObj, objectAssign } from './util'
 
 var global = typeof window === 'undefined' ? this : window
 var setupDefaults = {
@@ -29,7 +29,7 @@ var setupDefaults = {
   */
 export function XEAjax (options) {
   return new Promise(function (resolve, reject) {
-    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(Object.assign({}, setupDefaults, {headers: Object.assign({}, setupDefaults.headers)}, options)), resolve, reject)
+    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)), resolve, reject)
   })
 }
 
@@ -68,9 +68,9 @@ function sendXHR (request, resolve, reject) {
       }
     }
     if (request.credentials === 'include') {
-      request.xhr.withCredentials = true
+      xhr.withCredentials = true
     } else if (request.credentials === 'omit') {
-      request.xhr.withCredentials = false
+      xhr.withCredentials = false
     }
     request.getBody().then(function (body) {
       xhr.send(body)
@@ -147,7 +147,7 @@ function jsonpHandle (request, xhr, resolve, reject) {
  * @param Function stringifyBody(request) 自定义转换提交数据的函数
  */
 export var setup = function setup (options) {
-  Object.assign(setupDefaults, options)
+  objectAssign(setupDefaults, options)
 }
 
 export default XEAjax

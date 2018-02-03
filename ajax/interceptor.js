@@ -1,4 +1,4 @@
-import { isFormData } from './util'
+import { isFormData, arrayEach } from './util'
 
 /**
  * 拦截器
@@ -21,7 +21,7 @@ function useInterceptors (state) {
  */
 function callPromises (calls, result) {
   var thenInterceptor = Promise.resolve(result)
-  calls.forEach(function (callback) {
+  arrayEach(calls, function (callback) {
     thenInterceptor = thenInterceptor.then(function (data) {
       return new Promise(function (resolve) {
         callback(data, function () {

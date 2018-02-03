@@ -1,8 +1,8 @@
-import { isFunction, isFormData, isCrossOrigin, serialize } from './util'
+import { isFunction, isFormData, isCrossOrigin, serialize, objectAssign } from './util'
 import { setFetchRequest } from './fetchController'
 
 export function XEAjaxRequest (options) {
-  Object.assign(this, {url: '', body: null, params: null, signal: null}, options)
+  objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
   this.ABORT_RESPONSE = undefined
   this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
@@ -14,7 +14,7 @@ export function XEAjaxRequest (options) {
   setFetchRequest(this)
 }
 
-Object.assign(XEAjaxRequest.prototype, {
+objectAssign(XEAjaxRequest.prototype, {
   abort: function (response) {
     this.xhr.abort(response)
   },

@@ -8,6 +8,10 @@
 }(this, function () {
   'use strict'
 
+  var isArray = Array.isArray || function (obj) {
+    return obj ? obj.constructor === Array : false
+  }
+
   function isFormData (obj) {
     return typeof FormData !== 'undefined' && obj instanceof FormData
   }
@@ -41,7 +45,7 @@
     var result = []
     eachObj(resultVal, function (item, key) {
       if (isObject(item)) {
-        result = result.concat(parseParam(item, resultKey + '[' + key + ']', Array.isArray(item)))
+        result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
       } else {
         result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
       }
@@ -55,13 +59,34 @@
     eachObj(body, function (item, key) {
       if (item !== undefined) {
         if (isObject(item)) {
-          params = params.concat(parseParam(item, key, Array.isArray(item)))
+          params = params.concat(parseParam(item, key, isArray(item)))
         } else {
           params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
         }
       }
     })
     return params.join('&').replace(/%20/g, '+')
+  }
+
+  var objectAssign = Object.assign || function (target) {
+    for (var source, index = 1, len = arguments.length; index < len; index++) {
+      source = arguments[index]
+      for (var key in source) {
+        if (source.hasOwnProperty(key)) {
+          target[key] = source[key]
+        }
+      }
+    }
+    return target
+  }
+
+  function arrayEach (array, callback, context) {
+    if (array.forEach) {
+      array.forEach(callback, context)
+    }
+    for (var index = 0, len = array.length || 0; index < len; index++) {
+      callback.call(context || global, array[index], index, array)
+    }
   }
 
   function toKey (key) {
@@ -134,12 +159,12 @@
     this.signal = new XEFetchSignal()
   }
 
-  Object.assign(XEFetchController.prototype, {
+  objectAssign(XEFetchController.prototype, {
     // 中止请求
     abort: function () {
       var index = getIndex(this.signal)
       if (index !== undefined) {
-        requestList[index][1].forEach(function (request) {
+        arrayEach(requestList[index][1], function (request) {
           setTimeout(function () {
             request.abort()
           })
@@ -170,14 +195,14 @@
    */
   function callPromises (calls, result) {
     var thenInterceptor = Promise.resolve(result)
-    calls.forEach(function (callback) {
+    arrayEach(calls, function (callback) {
       thenInterceptor = thenInterceptor.then(function (data) {
         return new Promise(function (resolve) {
           callback(data, function () {
             resolve(data)
           })
         })
-      })['catch'](function (data) {
+      }).catch(function (data) {
         console.error(data)
       })
     })
@@ -216,7 +241,7 @@
   })
 
   function XEAjaxRequest (options) {
-    Object.assign(this, {url: '', body: null, params: null, signal: null}, options)
+    objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
     this.ABORT_RESPONSE = undefined
     this.method = String(this.method).toLocaleUpperCase()
     this.crossOrigin = isCrossOrigin(this)
@@ -228,7 +253,7 @@
     setFetchRequest(this)
   }
 
-  Object.assign(XEAjaxRequest.prototype, {
+  objectAssign(XEAjaxRequest.prototype, {
     abort: function (response) {
       this.xhr.abort(response)
     },
@@ -253,7 +278,7 @@
           this.params = this.transformParams(this.params || {}, this)
         }
         if (this.params && !isFormData(this.params)) {
-          params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this) : serialize(this.params)
+          params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this.params, this) : serialize(this.params)
         }
         if (params) {
           url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -300,7 +325,7 @@
     this._xhr = xhr
   }
 
-  Object.assign(XEReadableStream.prototype, {
+  objectAssign(XEReadableStream.prototype, {
     _getBody: function () {
       var that = this
       var xhr = this._xhr
@@ -378,7 +403,7 @@
       if (xhr.getAllResponseHeaders) {
         var allResponseHeaders = xhr.getAllResponseHeaders().trim()
         if (allResponseHeaders) {
-          allResponseHeaders.split('\n').forEach(function (row) {
+          arrayEach(allResponseHeaders.split('\n'), function (row) {
             var index = row.indexOf(':')
             this.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
           }, this)
@@ -413,7 +438,7 @@
     */
   function XEAjax (options) {
     return new Promise(function (resolve, reject) {
-      return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(Object.assign({}, setupDefaults, {headers: Object.assign({}, setupDefaults.headers)}, options)), resolve, reject)
+      return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)), resolve, reject)
     })
   }
 
@@ -452,9 +477,9 @@
         }
       }
       if (request.credentials === 'include') {
-        request.xhr.withCredentials = true
+        xhr.withCredentials = true
       } else if (request.credentials === 'omit') {
-        request.xhr.withCredentials = false
+        xhr.withCredentials = false
       }
       request.getBody().then(function (body) {
         xhr.send(body)
@@ -506,7 +531,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    })['catch'](function (data) {
+    }).catch(function (data) {
       reject(data)
     })
   }
@@ -531,11 +556,11 @@
    * @param Function stringifyBody(request) 自定义转换提交数据的函数
    */
   var setup = function setup (options) {
-    Object.assign(setupDefaults, options)
+    objectAssign(setupDefaults, options)
   }
 
   function createAjax (method, def, options) {
-    return XEAjax(Object.assign({method: method}, def, options))
+    return XEAjax(objectAssign({method: method}, def, options))
   }
 
   // xhr response JSON
@@ -545,7 +570,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          })['catch'](function (data) {
+          }).catch(function (data) {
             reject(data)
           })
         })
@@ -605,6 +630,7 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
+  var version = '3.0.7'
 
   var ajaxMethods = {
     doAll: doAll,
@@ -622,7 +648,8 @@
     setup: setup,
     serialize: serialize,
     interceptors: interceptors,
-    AjaxController: AjaxController
+    AjaxController: AjaxController,
+    version: version
   }
 
   /**
@@ -631,7 +658,7 @@
    * @param {Object} methods 扩展
    */
   function mixin (methods) {
-    return Object.assign(XEAjax, methods)
+    return objectAssign(XEAjax, methods)
   }
 
   /**
