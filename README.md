@@ -282,7 +282,7 @@ XEAjax.interceptors.request.use( (request, next) => {
   // request.params.id = 1 // 修改参数
   // request.setHeader('X-Token', 123) // 设置请求头
 
-  // 如果调用 next 则不会继续往下执行
+  // 如果不调用 next 则不会继续往下执行
   next()
 })
 
@@ -294,7 +294,7 @@ XEAjax.interceptors.response.use( (response, next) => {
   if (response.status === 403) {
     router.replace({path: '/login'}) 
   } else {
-    // 如果调用 next 则不会继续往下执行
+    // 如果不调用 next 则不会继续往下执行
     next()
   }
 })
