@@ -249,8 +249,8 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 })
 ```
 
-### AjaxController 控制器对象，允许控制一个或多个取指令请求
-### 通过 Request 设置 signal
+### AjaxController 控制器对象，允许控制一个或多个取消指令请求
+### 通过设置 signal
 ### 示例
 ``` shell
 import { AjaxController, getJSON, fetchPost } from 'xe-ajax'

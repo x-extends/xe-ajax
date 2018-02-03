@@ -1,4 +1,4 @@
-import { isObject } from './util'
+import { isObject, serialize } from './util'
 import XEAjax, { setup } from './constructor'
 import { XEFetchController } from './fetchController'
 import { interceptors } from './interceptor'
@@ -89,6 +89,7 @@ var ajaxMethods = {
   deleteJSON: deleteJSON,
   jsonp: jsonp,
   setup: setup,
+  serialize: serialize,
   interceptors: interceptors,
   AjaxController: AjaxController
 }

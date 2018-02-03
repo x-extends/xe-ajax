@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.6
+ * xe-ajax.js v3.0.7
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -458,7 +458,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      })['catch'](function () {
+      }).catch(function () {
         xhr.send()
       })
     })
@@ -620,6 +620,7 @@
     deleteJSON: deleteJSON,
     jsonp: jsonp,
     setup: setup,
+    serialize: serialize,
     interceptors: interceptors,
     AjaxController: AjaxController
   }
