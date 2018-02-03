@@ -34,8 +34,11 @@ Object.assign(XEAjaxRequest.prototype, {
     var url = this.url
     var params = ''
     if (url) {
+      if (isFunction(this.transformParams)) {
+        this.params = this.transformParams(this.params, this)
+      }
       if (this.params && !isFormData(this.params)) {
-        params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this) : serialize(this.params)
+        params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this.params, this) : serialize(this.params)
       }
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
