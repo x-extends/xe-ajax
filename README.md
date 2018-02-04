@@ -11,7 +11,7 @@ XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、json
 <script src="./dist/xe-ajax.min.js" type="text/javascript"></script>
 
 // 全局调用
-XEAjax.getJSON ('services/user/list', {id: 1})
+XEAjax.getJSON ('/api/user/list', {id: 1})
 ```
 
 ### AMD 安装， 以 require.js 为例
@@ -26,7 +26,7 @@ require.config({
 
 // ./app,js 调用
 define(['xe-ajax'], function (XEAjax) {
-  XEAjax.getJSON ('services/user/list', {id: 1})
+  XEAjax.getJSON ('/api/user/list', {id: 1})
 })
 ```
 
@@ -39,22 +39,22 @@ npm install xe-ajax --save
 ``` shell
 import { fetchGet, getJSON, fetchPost, postJSON } from 'xe-ajax'
 
-fetchGet ('services/user/list', {id: 1})
-fetchPost ('services/user/save', {id: 1})
+fetchGet ('/api/user/list', {id: 1})
+fetchPost ('/api/user/save', {id: 1})
 
-getJSON ('services/user/list', {id: 1})
-postJSON ('services/user/save', {id: 1})
+getJSON ('/api/user/list', {id: 1})
+postJSON ('/api/user/save', {id: 1})
 ```
 
 ### 导入所有
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.fetchGet('services/user/list', {id: 1})
-XEAjax.fetchPost ('services/user/save', {id: 1})
+XEAjax.fetchGet('/api/user/list', {id: 1})
+XEAjax.fetchPost ('/api/user/save', {id: 1})
 
-XEAjax.getJSON ('services/user/list', {id: 1})
-XEAjax.postJSON ('services/user/save', {id: 1})
+XEAjax.getJSON ('/api/user/list', {id: 1})
+XEAjax.postJSON ('/api/user/save', {id: 1})
 ```
 
 ### 混合函数
@@ -179,21 +179,21 @@ import XEUtils from 'xe-utils'
 
 // 参数调用，返回 response 对象
 ajax({
-  url: 'services/user/list',
+  url: '/api/user/list',
   method: 'GET',
   params: {id: 1}
 })
 ajax({
-  url: 'services/user/submit',
+  url: '/api/user/submit',
   method: 'POST',
   body: {id: 1}
 })
 
 // 返回 Response 对象,无论请求成功或失败都是完成
-fetchGet('services/user/list').then(response >= response.json()).then(data => {
+fetchGet('/api/user/list').then(response >= response.json()).then(data => {
   // 获取 data
 })
-fetchGet('services/user/list').then(response => {
+fetchGet('/api/user/list').then(response => {
   // response.ok 请求成功或失败
   // response.status
   // response.headers
@@ -205,7 +205,7 @@ fetchGet('services/user/list').then(response => {
   // })
 })
 // 直接返回请求结果
-getJSON('services/user/list').then(data => {
+getJSON('/api/user/list').then(data => {
   // data
   // 对数据进行处理
   data.map(item => {
@@ -218,18 +218,18 @@ getJSON('services/user/list').then(data => {
 })
 
 // 提交数据
-postJSON('services/user/save', {name: 'test'})
+postJSON('/api/user/save', {name: 'test'})
 
 // 以formData方式提交数据
-postJSON('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
+postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
 
 // 查询参数和数据同时提交
-postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 
 // Promise.all 在所有异步完成之后执行
 const iterable1 = []
-iterable1.push(getJSON('services/user/list'))
-iterable1.push(getJSON('services/user/save'), {id: 1})
+iterable1.push(getJSON('/api/user/list'))
+iterable1.push(getJSON('/api/user/save'), {id: 1})
 Promise.all(iterable1).then(datas => {
   // datas 数组
 }).catch(data => {
@@ -238,8 +238,8 @@ Promise.all(iterable1).then(datas => {
 
 // doAll 在所有异步完成之后执行 支持对象参数
 const iterable2 = []
-iterable2.push({url: 'services/user/list', method: 'GET'})
-iterable2.push(postJSON('services/user/save', {id: 1}))
+iterable2.push({url: '/api/user/list', method: 'GET'})
+iterable2.push(postJSON('/api/user/save', {id: 1}))
 doAll(iterable2).then(datas => {
   // datas 数组
 }).catch(data => {
@@ -262,7 +262,7 @@ import { AjaxController, getJSON, fetchPost } from 'xe-ajax'
 
 const controller = new AjaxController() // 创建一个控制器对象
 const signal = controller.signal // 获取signal
-fetchGet('services/user/list', {id: 1}, {signal}).then(response => {
+fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
   // response.ok = false
   // response.status = 0
   response.json().then(data => {
