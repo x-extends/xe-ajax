@@ -315,10 +315,10 @@ import XEAjax from 'xe-ajax'
 import XEAjaxMock from 'xe-ajax-mock'
 
 XEAjax.use(XEAjaxMock)
-// ...更多详细说明请查看 Mock 插件文档
 ```
 
-XEAjax+Mock 项目例子请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例
+XEAjax+Mock 项目例子请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例<br/>
+更多详细说明请查看 [Mock插件文档](https://github.com/xuliangzhan/xe-ajax-mock)
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
