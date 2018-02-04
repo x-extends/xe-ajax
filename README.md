@@ -133,7 +133,6 @@ XEAjax.get1()
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
 | getXMLHttpRequest | Function ( request ) | 自定义 XMLHttpRequest 的函数 |  |
-| sendJSONP | Function ( script, request ) | 自定义 jsonp 请求函数 |  |
 
 ### 全局参数
 ``` shell
