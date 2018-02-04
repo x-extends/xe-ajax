@@ -1,6 +1,6 @@
-import { objectAssign } from './ajax/util'
-import XEAjax from './ajax/constructor'
-import ajaxMethods from './ajax'
+import { objectAssign } from './src/util'
+import XEAjax from './src/constructor'
+import ajaxMethods from './src'
 
 /**
  * 混合函数
@@ -22,5 +22,5 @@ mixin(ajaxMethods)
 XEAjax.use = use
 XEAjax.mixin = mixin
 
-export * from './ajax'
+export * from './src'
 export default XEAjax
