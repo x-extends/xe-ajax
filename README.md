@@ -104,8 +104,9 @@ XEAjax.get1()
 |------|------|-----|
 | json | Function | 返回 Promise 对象，结果得到 json 数据,只能读取一次 |
 | test | Function | 返回 Promise 对象，结果得到 text 数据,只能读取一次 |
+| body | ReadableStream | 数据流 |
 | bodyUsed | Boolean | 内容是否已被读取 |
-| headers | Object | 返回响应头 |
+| headers | Headers | 返回响应头 |
 | status | Number | 返回状态码 |
 | statusText | String | 状态 |
 | url | String | 返回请求路径 |
@@ -113,7 +114,7 @@ XEAjax.get1()
 | redirected | Boolean | 是否重定向了 |
 | type | String | 类型 |
 
-### Request 参数说明
+### options 参数说明
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
@@ -139,6 +140,7 @@ XEAjax.get1()
 import XEAjax from 'xe-ajax'
 import XEUtils from 'xe-utils'
 
+// 完整的全局参数示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'JSON_DATA',
@@ -217,7 +219,7 @@ getJSON('services/user/list').then(data => {
 })
 
 // 提交数据
-postJSON('services/user/save', {name: 'aaa'})
+postJSON('services/user/save', {name: 'test'})
 
 // 以formData方式提交数据
 postJSON('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
@@ -225,7 +227,7 @@ postJSON('services/user/save', {name: 'test', password: '123456'}, {bodyType: 'F
 // 查询参数和数据同时提交
 postJSON('services/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 
-// 在所有的异步操作执行完, doAll 和 Promise.all 用法一致
+// Promise.all 在所有异步完成之后执行
 const iterable1 = []
 iterable1.push(getJSON('services/user/list'))
 iterable1.push(getJSON('services/user/save'), {id: 1})
@@ -235,7 +237,7 @@ Promise.all(iterable1).then(datas => {
   // data 
 })
 
-// doAll 支持对象参数
+// doAll 在所有异步完成之后执行 支持对象参数
 const iterable2 = []
 iterable2.push({url: 'services/user/list', method: 'GET'})
 iterable2.push(postJSON('services/user/save', {id: 1}))
@@ -245,7 +247,7 @@ doAll(iterable2).then(datas => {
   // data
 })
 
-// jsonp 跨域调用,jsonp只能获取数据
+// jsonp 跨域调用,请求完成或失败,jsonp只能获取数据
 jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data => {
   // {msg: 'success'}
 }).catch(data => {
@@ -259,9 +261,6 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 ``` shell
 import { AjaxController, getJSON, fetchPost } from 'xe-ajax'
 
-// 中断请求之前如果承诺已经完成了，则调用无效
-
-// 取消请求
 const controller = new AjaxController() // 创建一个控制器对象
 const signal = controller.signal // 获取signal
 fetchGet('services/user/list', {id: 1}, {signal}).then(response => {
@@ -271,7 +270,12 @@ fetchGet('services/user/list', {id: 1}, {signal}).then(response => {
     // data = ''
   })
 })
-controller.abort() // 如果还没请求完成，则终止请求、如果已请求完成，则调用无效
+let isCancel = true
+setTimeout(() => {
+  if (isCancel) {
+    controller.abort() // 如果还没请求完成，则终止请求、如果已请求完成，则调用无效
+  }
+}, 10)
 ```
 
 ### 拦截器
@@ -280,7 +284,7 @@ import XEAjax from 'xe-ajax'
 
 // Request 请求之前拦截器
 XEAjax.interceptors.request.use( (request, next) => {
-  // 请求之前
+  // 请求之前拦截器,一般用于统一的权限拦截、设置头、参数处理等...
 
   // request.method = 'POST' // 修改 method
   // request.params.id = 1 // 修改参数
@@ -292,9 +296,9 @@ XEAjax.interceptors.request.use( (request, next) => {
 
 // Response 响应之后拦截器
 XEAjax.interceptors.response.use( (response, next) => {
-  // 请求之后
+  // 响应之后拦截器,可以用于响应之后校验session是否失效做处理、统一的错误消息提示处理等...
 
-  // 例如判断登录失效跳转
+  // 例子: 判断登录失效跳转
   if (response.status === 403) {
     router.replace({path: '/login'}) 
   } else {
@@ -311,9 +315,10 @@ import XEAjax from 'xe-ajax'
 import XEAjaxMock from 'xe-ajax-mock'
 
 XEAjax.use(XEAjaxMock)
+// ...更多详细说明请查看 Mock 插件文档
 ```
 
-Mock 详细使用请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例
+XEAjax+Mock 项目例子请参考 [mock-demo](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/mock-demo) 示例
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
