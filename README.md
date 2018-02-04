@@ -1,6 +1,10 @@
 # XEAjax 轻量级请求函数，基于 Promise 实现，支持 Mock 虚拟服务
 
-XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API，基于ES6 Promise实现，运行环境 ES5+，使用 babel 支持低版本浏览器。
+XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性及完善的API
+
+### 兼容性
+任何支持 Promise 的环境都能运行，低版本浏览器使用 babel 转码
+IE8+、Edge、Chrome、Firefox、Opera、Safari等...
 
 ### 直接引用 script 全局安装，XEAjax 会定义为全局变量
 ``` shell
