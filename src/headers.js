@@ -1,3 +1,5 @@
+import { objectAssign, eachObj } from './util'
+
 export function toKey (key) {
   return String(key).toLowerCase()
 }
@@ -31,5 +33,13 @@ export function XEHeaders () {
     delete this._state[toKey(key)]
   }
 }
+
+objectAssign(XEHeaders.prototype, {
+  forEach: function (callback, context) {
+    eachObj(this._state, function (value, key, state) {
+      callback.call(context, value.join(', '), state)
+    })
+  }
+})
 
 export default XEHeaders

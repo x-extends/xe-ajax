@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.8
+ * xe-ajax.js v3.0.9
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -123,6 +123,14 @@
     }
   }
 
+  objectAssign(XEHeaders.prototype, {
+    forEach: function (callback, context) {
+      eachObj(this._state, function (value, key, state) {
+        callback.call(context, value.join(', '), state)
+      })
+    }
+  })
+
   var requestList = []
 
   /**
@@ -202,7 +210,7 @@
             resolve(data)
           })
         })
-      }).catch(function (data) {
+      })['catch'](function (data) {
         console.error(data)
       })
     })
@@ -417,7 +425,7 @@
     method: 'GET',
     baseURL: location.origin,
     async: true,
-    credentials: true,
+    credentials: 'same-origin',
     bodyType: 'JSON_DATA',
     headers: {
       Accept: 'application/json, text/plain, */*;'
@@ -483,7 +491,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      }).catch(function () {
+      })['catch'](function () {
         xhr.send()
       })
     })
@@ -531,7 +539,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    }).catch(function (data) {
+    })['catch'](function (data) {
       reject(data)
     })
   }
@@ -550,10 +558,12 @@
    * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param Number timeout 设置超时
    * @param Object headers 请求头
-   * @param Function transformParams(request) 用于改变URL参数
-   * @param Function paramsSerializer(request) 自定义URL序列化函数
-   * @param Function transformBody(request) 用于改变提交数据
-   * @param Function stringifyBody(request) 自定义转换提交数据的函数
+   * @param Function transformParams(params, request) 用于改变URL参数
+   * @param Function paramsSerializer(params, request) 自定义URL序列化函数
+   * @param Function transformBody(body, request) 用于改变提交数据
+   * @param Function stringifyBody(body, request) 自定义转换提交数据的函数
+   * @param Function getXMLHttpRequest() 自定义 XMLHttpRequest 的函数
+   * @param Function getPromiseStatus(response) 自定义请求成功判断条件
    */
   var setup = function setup (options) {
     objectAssign(setupDefaults, options)
@@ -570,7 +580,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          }).catch(function (data) {
+          })['catch'](function (data) {
             reject(data)
           })
         })
@@ -630,7 +640,7 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.0.8'
+  var version = '3.0.9'
 
   var ajaxMethods = {
     doAll: doAll,

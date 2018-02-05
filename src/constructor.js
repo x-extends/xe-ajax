@@ -8,7 +8,7 @@ var setupDefaults = {
   method: 'GET',
   baseURL: location.origin,
   async: true,
-  credentials: true,
+  credentials: 'same-origin',
   bodyType: 'JSON_DATA',
   headers: {
     Accept: 'application/json, text/plain, */*;'
@@ -17,7 +17,7 @@ var setupDefaults = {
     return new XMLHttpRequest()
   },
   getPromiseStatus: function (response) {
-    return (response.status >= 200 && response.status < 300) || response.status === 304
+    return response.status >= 200 && response.status < 300
   }
 }
 
@@ -141,10 +141,12 @@ function jsonpHandle (request, xhr, resolve, reject) {
  * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param Number timeout 设置超时
  * @param Object headers 请求头
- * @param Function transformParams(request) 用于改变URL参数
- * @param Function paramsSerializer(request) 自定义URL序列化函数
- * @param Function transformBody(request) 用于改变提交数据
- * @param Function stringifyBody(request) 自定义转换提交数据的函数
+ * @param Function transformParams(params, request) 用于改变URL参数
+ * @param Function paramsSerializer(params, request) 自定义URL序列化函数
+ * @param Function transformBody(body, request) 用于改变提交数据
+ * @param Function stringifyBody(body, request) 自定义转换提交数据的函数
+ * @param Function getXMLHttpRequest() 自定义 XMLHttpRequest 的函数
+ * @param Function getPromiseStatus(response) 自定义请求成功判断条件
  */
 export var setup = function setup (options) {
   objectAssign(setupDefaults, options)

@@ -52,6 +52,7 @@ export var interceptors = {
   }
 }
 
+// 默认拦截器
 interceptors.request.use(function (request, next) {
   if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
     if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
