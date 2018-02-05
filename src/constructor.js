@@ -41,7 +41,7 @@ export function XEAjax (options) {
  * @param { Promise.reject } reject 失败
  */
 function sendEnd (request, xhr, resolve, reject) {
-  responseInterceptor(new XEAjaxResponse(request, xhr)).then(function (response) {
+  responseInterceptor(request, new XEAjaxResponse(request, xhr)).then(function (response) {
     resolve(response)
   })
 }

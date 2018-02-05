@@ -73,8 +73,9 @@ export var objectAssign = Object.assign || function (target) {
 export function arrayEach (array, callback, context) {
   if (array.forEach) {
     array.forEach(callback, context)
-  }
-  for (var index = 0, len = array.length || 0; index < len; index++) {
-    callback.call(context || global, array[index], index, array)
+  } else {
+    for (var index = 0, len = array.length || 0; index < len; index++) {
+      callback.call(context || global, array[index], index, array)
+    }
   }
 }

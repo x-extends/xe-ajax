@@ -83,9 +83,10 @@
   function arrayEach (array, callback, context) {
     if (array.forEach) {
       array.forEach(callback, context)
-    }
-    for (var index = 0, len = array.length || 0; index < len; index++) {
-      callback.call(context || global, array[index], index, array)
+    } else {
+      for (var index = 0, len = array.length || 0; index < len; index++) {
+        callback.call(context || global, array[index], index, array)
+      }
     }
   }
 
@@ -183,57 +184,97 @@
   })
 
   /**
-   * 拦截器
+   * 拦截器队列
    */
-  var requestCalls = []
-  var responseCalls = []
+  const state = {request: [], response: []}
 
-  function useInterceptors (state) {
+  function useInterceptors (calls) {
     return function (callback) {
-      if (state.indexOf(callback) === -1) {
-        state.push(callback)
+      if (calls.indexOf(callback) === -1) {
+        calls.push(callback)
       }
     }
   }
 
+  function ResponseXHR (result) {
+    try {
+      var responseText = JSON.stringify(result.body)
+    } catch (e) {
+      responseText = ''
+    }
+    this.status = result.status
+    this.responseHeaders = result.headers
+    this.response = responseText
+    this.responseText = responseText
+  }
+
+  objectAssign(ResponseXHR.prototype, {
+    getAllResponseHeaders: function () {
+      var result = ''
+      var responseHeader = this.responseHeaders
+      if (responseHeader) {
+        for (var key in responseHeader) {
+          if (responseHeader.hasOwnProperty(key)) {
+            result += key + ': ' + responseHeader[key] + '\n'
+          }
+        }
+      }
+      return result
+    }
+  })
+
   /**
-   * 拦截器处理
-   * @param { Array } calls 调用链
-   * @param { Object } result 数据
+   * Request 拦截器
    */
-  function callPromises (calls, result) {
-    var thenInterceptor = Promise.resolve(result)
-    arrayEach(calls, function (callback) {
-      thenInterceptor = thenInterceptor.then(function (data) {
+  function requestInterceptor (data) {
+    var thenInterceptor = Promise.resolve(data)
+    arrayEach(state.request, function (callback) {
+      thenInterceptor = thenInterceptor.then(function (request) {
         return new Promise(function (resolve) {
-          callback(data, function () {
-            resolve(data)
+          callback(request, function () {
+            resolve(request)
           })
         })
-      })['catch'](function (data) {
-        console.error(data)
+      }).catch(function (request) {
+        console.error(request)
       })
     })
     return thenInterceptor
   }
 
-  function requestInterceptor (data) {
-    return callPromises(requestCalls, data)
-  }
-
-  function responseInterceptor (data) {
-    return callPromises(responseCalls, data)
+  /**
+   * Response 拦截器
+   */
+  function responseInterceptor (request, data) {
+    var thenInterceptor = Promise.resolve(data)
+    arrayEach(state.response, function (callback) {
+      thenInterceptor = thenInterceptor.then(function (response) {
+        return new Promise(function (resolve) {
+          callback(response, function (result) {
+            if (result && result.constructor !== XEAjaxResponse) {
+              resolve(new XEAjaxResponse(request, new ResponseXHR(result)))
+            } else {
+              resolve(response)
+            }
+          })
+        })
+      }).catch(function (response) {
+        console.error(response)
+      })
+    })
+    return thenInterceptor
   }
 
   var interceptors = {
     request: {
-      use: useInterceptors(requestCalls)
+      use: useInterceptors(state.request)
     },
     response: {
-      use: useInterceptors(responseCalls)
+      use: useInterceptors(state.response)
     }
   }
 
+  // 默认拦截器
   interceptors.request.use(function (request, next) {
     if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
       if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
@@ -434,7 +475,7 @@
       return new XMLHttpRequest()
     },
     getPromiseStatus: function (response) {
-      return (response.status >= 200 && response.status < 300) || response.status === 304
+      return response.status >= 200 && response.status < 300
     }
   }
 
@@ -458,7 +499,7 @@
    * @param { Promise.reject } reject 失败
    */
   function sendEnd (request, xhr, resolve, reject) {
-    responseInterceptor(new XEAjaxResponse(request, xhr)).then(function (response) {
+    responseInterceptor(request, new XEAjaxResponse(request, xhr)).then(function (response) {
       resolve(response)
     })
   }
@@ -491,7 +532,7 @@
       }
       request.getBody().then(function (body) {
         xhr.send(body)
-      })['catch'](function () {
+      }).catch(function () {
         xhr.send()
       })
     })
@@ -539,7 +580,7 @@
     }
     response.json().then(function (data) {
       (response.ok ? resolve : reject)(data)
-    })['catch'](function (data) {
+    }).catch(function (data) {
       reject(data)
     })
   }
@@ -580,7 +621,7 @@
         return new Promise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          })['catch'](function (data) {
+          }).catch(function (data) {
             reject(data)
           })
         })

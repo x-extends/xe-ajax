@@ -289,7 +289,7 @@ XEAjax.interceptors.request.use( (request, next) => {
   // request.params.id = 1 // 修改参数
   // request.setHeader('X-Token', 123) // 设置请求头
 
-  // 如果不调用 next 则不会继续往下执行
+  // 调用 next(),继续执行下一个拦截器
   next()
 })
 
@@ -301,9 +301,17 @@ XEAjax.interceptors.response.use( (response, next) => {
   if (response.status === 403) {
     router.replace({path: '/login'}) 
   } else {
-    // 如果不调用 next 则不会继续往下执行
+    // 调用 next(),继续执行下一个拦截器
     next()
   }
+})
+
+// Response 支持重置响应数据
+XEAjax.interceptors.response.use( (response, next) => {
+
+  // 响应格式: {status: 200, body: {}, headers: {}}
+  // 重置响应数据并继续执行下一个拦截器
+  next({status: 200, body: {name: 'test', id: 123}})
 })
 ```
 
