@@ -134,12 +134,12 @@ XEAjax.get1()
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
 | getXMLHttpRequest | Function ( request ) | 自定义 XMLHttpRequest 的函数 |  |
 
-### 全局参数
+### 全局参数设置
 ``` shell
 import XEAjax from 'xe-ajax'
 import XEUtils from 'xe-utils'
 
-// 完整的全局参数示例
+// 示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'JSON_DATA',
@@ -164,10 +164,6 @@ XEAjax.setup({
   stringifyBody (body, request) {
     // 自定义格式化数据函数,除了GET之外都支持提交数据
     return JSON.stringify(body)
-  },
-  getXMLHttpRequest () {
-    // 自定义获取 xhr 函数
-    return new XMLHttpRequest()
   }
 })
 ```
@@ -178,16 +174,8 @@ import { ajax, doAll, fetchGet, getJSON, postJSON, jsonp } from 'xe-ajax'
 import XEUtils from 'xe-utils'
 
 // 参数调用，返回 response 对象
-ajax({
-  url: '/api/user/list',
-  method: 'GET',
-  params: {id: 1}
-})
-ajax({
-  url: '/api/user/submit',
-  method: 'POST',
-  body: {id: 1}
-})
+ajax({url: '/api/user/list', method: 'GET', params: {id: 1}})
+ajax({url: '/api/user/submit', method: 'POST', body: {id: 1}})
 
 // 返回 Response 对象,无论请求成功或失败都是完成
 fetchGet('/api/user/list').then(response >= response.json()).then(data => {
@@ -266,7 +254,7 @@ fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
   // response.ok = false
   // response.status = 0
   response.json().then(data => {
-    // data = ''
+    // 获取 data 数据
   })
 })
 let isCancel = true
@@ -306,13 +294,16 @@ XEAjax.interceptors.response.use( (response, next) => {
   }
 })
 
-// Response 支持重置响应数据
+// 支持重置响应数据
 XEAjax.interceptors.response.use( (response, next) => {
   // 响应之后拦截器,可以用于响应之后对所有返回的数据进行统一的处理...
+  // 格式: {status: 200, body: {}, headers: {}}
 
-  // 响应格式: {status: 200, body: {}, headers: {}}
-  // 重置响应数据并继续执行下一个拦截器
-  next({status: 200, body: {name: 'test', id: 123}})
+  // 例如，对所有请求结果进行处理，返回统一的结构
+  response.json().then(data => {
+    // 重置响应数据并继续执行下一个拦截器
+    next({status: 200, body: {result: data}})
+  })
 })
 ```
 
