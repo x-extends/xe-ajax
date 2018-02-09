@@ -118,7 +118,7 @@ XEAjax.get1()
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
-| baseURL | String | 基础路径 |  |
+| baseURL | String | 基础路径 | 默认上下文路径 |
 | method | String | 请求方法 | 默认GET |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
@@ -181,6 +181,7 @@ ajax({url: '/api/user/submit', method: 'POST', body: {id: 1}})
 fetchGet('/api/user/list').then(response >= response.json()).then(data => {
   // 获取 data
 })
+
 fetchGet('/api/user/list').then(response => {
   // response.ok 请求成功或失败
   // response.status
@@ -192,6 +193,7 @@ fetchGet('/api/user/list').then(response => {
   //   // 获取 text
   // })
 })
+
 // 直接返回请求结果
 getJSON('/api/user/list').then(data => {
   // data
@@ -228,11 +230,7 @@ Promise.all(iterable1).then(datas => {
 const iterable2 = []
 iterable2.push({url: '/api/user/list', method: 'GET'})
 iterable2.push(postJSON('/api/user/save', {id: 1}))
-doAll(iterable2).then(datas => {
-  // datas 数组
-}).catch(data => {
-  // data
-})
+doAll(iterable2)
 
 // jsonp 跨域调用,请求完成或失败,jsonp只能获取数据
 jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data => {
