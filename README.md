@@ -122,7 +122,7 @@ XEAjax.get1()
 | method | String | 请求方法 | 默认GET |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式，如果要以表单方式提交改为FROM_DATA | 默认JSON_DATA |
+| bodyType | String | 提交参数方式，如果要以表单方式提交改为FORM_DATA | 默认JSON_DATA |
 | jsonp | String | 调用jsonp服务,属性名默认callback | 默认callback |
 | async | Boolean | 是否异步 | 默认true(XEAjax虽然不做异步限制，但是建议必须异步) |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
@@ -209,7 +209,7 @@ getJSON('/api/user/list').then(data => {
 postJSON('/api/user/save', {name: 'test'})
 
 // 以formData方式提交数据
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FROM_DATA'})
+postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 
 // 查询参数和数据同时提交
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})

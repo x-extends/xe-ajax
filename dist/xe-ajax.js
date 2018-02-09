@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.9
+ * xe-ajax.js v3.0.10
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -354,7 +354,7 @@
             } else {
               if (isFormData(request.body)) {
                 result = request.body
-              } else if (String(request.bodyType).toLocaleUpperCase() === 'FROM_DATA') {
+              } else if (String(request.bodyType).toLocaleUpperCase() === 'FORM_DATA') {
                 result = serialize(request.body)
               } else {
                 result = JSON.stringify(request.body)
@@ -593,7 +593,7 @@
    * @param String method 请求方法(默认GET)
    * @param Object params 请求参数
    * @param Object body 提交参数
-   * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FROM_DATA:以form data方式提交数据]
+   * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
    * @param String jsonp 调用jsonp服务,回调属性默认callback
    * @param Boolean async 异步/同步(默认true)
    * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
@@ -681,7 +681,7 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.0.9'
+  var version = '3.0.10'
 
   var ajaxMethods = {
     doAll: doAll,

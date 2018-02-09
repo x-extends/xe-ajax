@@ -135,7 +135,7 @@ function jsonpHandle (request, xhr, resolve, reject) {
  * @param String method 请求方法(默认GET)
  * @param Object params 请求参数
  * @param Object body 提交参数
- * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FROM_DATA:以form data方式提交数据]
+ * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
  * @param String jsonp 调用jsonp服务,回调属性默认callback
  * @param Boolean async 异步/同步(默认true)
  * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
