@@ -142,7 +142,7 @@ import XEUtils from 'xe-utils'
 // 示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
-  bodyType: 'JSON_DATA',
+  bodyType: 'FORM_DATA',
   credentials: 'include',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
