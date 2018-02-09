@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.10
+ * xe-ajax.js v3.0.11
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -31,6 +31,25 @@
 
   function isFunction (obj) {
     return typeof obj === 'function'
+  }
+
+  function getBaseURL () {
+    var pathname = location.pathname
+    var lastIndex = lastIndexOf(pathname, '/') + 1
+    return location.origin + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
+  }
+
+  function lastIndexOf (str, val) {
+    if (isFunction(str.lastIndexOf)) {
+      return str.lastIndexOf(val)
+    } else {
+      for (var len = str.length - 1; len >= 0; len--) {
+        if (val === str[len]) {
+          return len
+        };
+      }
+    }
+    return -1
   }
 
   function eachObj (obj, iteratee, context) {
@@ -464,7 +483,7 @@
   var global = typeof window === 'undefined' ? this : window
   var setupDefaults = {
     method: 'GET',
-    baseURL: location.origin,
+    baseURL: getBaseURL(),
     async: true,
     credentials: 'same-origin',
     bodyType: 'JSON_DATA',
@@ -681,7 +700,7 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.0.10'
+  var version = '3.0.11'
 
   var ajaxMethods = {
     doAll: doAll,

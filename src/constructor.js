@@ -1,12 +1,12 @@
 import XEAjaxRequest from './request'
 import XEAjaxResponse from './response'
 import { requestInterceptor, responseInterceptor } from './interceptor'
-import { isFunction, eachObj, objectAssign } from './util'
+import { isFunction, eachObj, objectAssign, getBaseURL } from './util'
 
 var global = typeof window === 'undefined' ? this : window
 var setupDefaults = {
   method: 'GET',
-  baseURL: location.origin,
+  baseURL: getBaseURL(),
   async: true,
   credentials: 'same-origin',
   bodyType: 'JSON_DATA',
