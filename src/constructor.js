@@ -28,9 +28,12 @@ var setupDefaults = {
   * @return Promise
   */
 export function XEAjax (options) {
+  var opts = {context: XEAjax.context}
+  XEAjax.context = null
+  objectAssign(opts, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
   return new Promise(function (resolve, reject) {
-    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)), resolve, reject)
-  })
+    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
+  }, opts.context)
 }
 
 /**

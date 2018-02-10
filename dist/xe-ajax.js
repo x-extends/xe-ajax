@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.12
+ * xe-ajax.js v3.0.13
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -7,6 +7,8 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global.XEAjax = factory())
 }(this, function () {
   'use strict'
+
+  var Promise = window.Promise
 
   var isArray = Array.isArray || function (obj) {
     return obj ? obj.constructor === Array : false
@@ -245,17 +247,17 @@
   /**
    * Request 拦截器
    */
-  function requestInterceptor (data) {
-    var thenInterceptor = Promise.resolve(data)
+  function requestInterceptor (request) {
+    var thenInterceptor = Promise.resolve(request, request.context)
     arrayEach(state.request, function (callback) {
-      thenInterceptor = thenInterceptor.then(function (request) {
+      thenInterceptor = thenInterceptor.then(function (req) {
         return new Promise(function (resolve) {
-          callback(request, function () {
-            resolve(request)
+          callback(req, function () {
+            resolve(req)
           })
-        })
-      }).catch(function (request) {
-        console.error(request)
+        }, request.context)
+      }).catch(function (req) {
+        console.error(req)
       })
     })
     return thenInterceptor
@@ -264,21 +266,21 @@
   /**
    * Response 拦截器
    */
-  function responseInterceptor (request, data) {
-    var thenInterceptor = Promise.resolve(data)
+  function responseInterceptor (request, response) {
+    var thenInterceptor = Promise.resolve(response, request.context)
     arrayEach(state.response, function (callback) {
-      thenInterceptor = thenInterceptor.then(function (response) {
+      thenInterceptor = thenInterceptor.then(function (resp) {
         return new Promise(function (resolve) {
-          callback(response, function (result) {
+          callback(resp, function (result) {
             if (result && result.constructor !== XEAjaxResponse) {
               resolve(new XEAjaxResponse(request, new ResponseXHR(result)))
             } else {
-              resolve(response)
+              resolve(resp)
             }
           })
-        })
-      }).catch(function (response) {
-        console.error(response)
+        }, request.context)
+      }).catch(function (resp) {
+        console.error(resp)
       })
     })
     return thenInterceptor
@@ -384,19 +386,21 @@
           }
         }
         resolve(result)
-      })
+      }, request.context)
     }
   })
 
-  function XEReadableStream (xhr) {
+  function XEReadableStream (xhr, request) {
     this.locked = false
     this._xhr = xhr
+    this._request = request
   }
 
   objectAssign(XEReadableStream.prototype, {
     _getBody: function () {
       var that = this
       var xhr = this._xhr
+      var request = this._request
       return new Promise(function (resolve, reject) {
         var body = {responseText: '', response: xhr}
         if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
@@ -420,13 +424,13 @@
           that.locked = true
           resolve(body)
         }
-      })
+      }, request.context)
     }
   })
 
   function XEAjaxResponse (request, xhr) {
     var that = this
-    this.body = new XEReadableStream(xhr)
+    this.body = new XEReadableStream(xhr, request)
     this.bodyUsed = false
     this.url = request.url
     this.headers = new XEHeaders()
@@ -505,9 +509,12 @@
     * @return Promise
     */
   function XEAjax (options) {
+    var opts = {context: XEAjax.context}
+    XEAjax.context = null
+    objectAssign(opts, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
     return new Promise(function (resolve, reject) {
-      return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)), resolve, reject)
-    })
+      return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
+    }, opts.context)
   }
 
   /**
@@ -643,7 +650,7 @@
           }).catch(function (data) {
             reject(data)
           })
-        })
+        }, this)
       })
     }
   }
@@ -660,7 +667,7 @@
         return ajax(item)
       }
       return item
-    }))
+    }), arguments[1])
   }
 
   // Http Request Method GET
@@ -700,10 +707,11 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.0.12'
+  var version = '3.0.13'
 
   var ajaxMethods = {
     doAll: doAll,
+    ajax: ajax,
     fetchGet: fetchGet,
     getJSON: getJSON,
     fetchPost: fetchPost,
@@ -741,6 +749,11 @@
   mixin(ajaxMethods)
   XEAjax.use = use
   XEAjax.mixin = mixin
+
+  // 非 ES6 Module 环境中支持重写 Promise 函数
+  XEAjax.$p = function (ctor) {
+    Promise = ctor
+  }
 
   return XEAjax
 }))

@@ -17,7 +17,7 @@ function responseJSON (method) {
         }).catch(function (data) {
           reject(data)
         })
-      })
+      }, this)
     })
   }
 }
@@ -34,7 +34,7 @@ export function doAll (iterable) {
       return ajax(item)
     }
     return item
-  }))
+  }), arguments[1])
 }
 
 // Http Request Method GET
@@ -74,10 +74,11 @@ export var patchJSON = responseJSON(fetchPatch)
 export var deleteJSON = responseJSON(fetchDelete)
 
 export var AjaxController = XEFetchController
-export var version = '3.0.12'
+export var version = '3.0.13'
 
 var ajaxMethods = {
   doAll: doAll,
+  ajax: ajax,
   fetchGet: fetchGet,
   getJSON: getJSON,
   fetchPost: fetchPost,

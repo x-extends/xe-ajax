@@ -77,7 +77,7 @@ objectAssign(XEAjaxRequest.prototype, {
         }
       }
       resolve(result)
-    })
+    }, request.context)
   }
 })
 

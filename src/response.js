@@ -1,15 +1,17 @@
 import { objectAssign, arrayEach } from './util'
 import { XEHeaders } from './headers'
 
-function XEReadableStream (xhr) {
+function XEReadableStream (xhr, request) {
   this.locked = false
   this._xhr = xhr
+  this._request = request
 }
 
 objectAssign(XEReadableStream.prototype, {
   _getBody: function () {
     var that = this
     var xhr = this._xhr
+    var request = this._request
     return new Promise(function (resolve, reject) {
       var body = {responseText: '', response: xhr}
       if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
@@ -33,13 +35,13 @@ objectAssign(XEReadableStream.prototype, {
         that.locked = true
         resolve(body)
       }
-    })
+    }, request.context)
   }
 })
 
 export function XEAjaxResponse (request, xhr) {
   var that = this
-  this.body = new XEReadableStream(xhr)
+  this.body = new XEReadableStream(xhr, request)
   this.bodyUsed = false
   this.url = request.url
   this.headers = new XEHeaders()

@@ -44,17 +44,17 @@ objectAssign(ResponseXHR.prototype, {
 /**
  * Request 拦截器
  */
-export function requestInterceptor (data) {
-  var thenInterceptor = Promise.resolve(data)
+export function requestInterceptor (request) {
+  var thenInterceptor = Promise.resolve(request, request.context)
   arrayEach(state.request, function (callback) {
-    thenInterceptor = thenInterceptor.then(function (request) {
+    thenInterceptor = thenInterceptor.then(function (req) {
       return new Promise(function (resolve) {
-        callback(request, function () {
-          resolve(request)
+        callback(req, function () {
+          resolve(req)
         })
-      })
-    }).catch(function (request) {
-      console.error(request)
+      }, request.context)
+    }).catch(function (req) {
+      console.error(req)
     })
   })
   return thenInterceptor
@@ -63,21 +63,21 @@ export function requestInterceptor (data) {
 /**
  * Response 拦截器
  */
-export function responseInterceptor (request, data) {
-  var thenInterceptor = Promise.resolve(data)
+export function responseInterceptor (request, response) {
+  var thenInterceptor = Promise.resolve(response, request.context)
   arrayEach(state.response, function (callback) {
-    thenInterceptor = thenInterceptor.then(function (response) {
+    thenInterceptor = thenInterceptor.then(function (resp) {
       return new Promise(function (resolve) {
-        callback(response, function (result) {
+        callback(resp, function (result) {
           if (result && result.constructor !== XEAjaxResponse) {
             resolve(new XEAjaxResponse(request, new ResponseXHR(result)))
           } else {
-            resolve(response)
+            resolve(resp)
           }
         })
-      })
-    }).catch(function (response) {
-      console.error(response)
+      }, request.context)
+    }).catch(function (resp) {
+      console.error(resp)
     })
   })
   return thenInterceptor
