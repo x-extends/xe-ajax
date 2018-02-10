@@ -11,11 +11,12 @@ XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、json
 
 ### CDN 安装，XEAjax 会定义为全局变量
 #### cdnjs 获取最新版本
-你可以在 [xe-ajax](https://cdn.jsdelivr.net/npm/xe-ajax/) 浏览 npm 包的源代码。
+你可以在 [xe-ajax](https://cdn.jsdelivr.net/npm/xe-ajax/) 浏览已发布的所有 npm 包的源代码。
 ``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.0.15/dist/xe-ajax.js" type="text/javascript"></script>
 ```
 #### unpkg 获取最新版本
+你可以在 [xe-ajax](https://unpkg.com/xe-ajax@3.0.15/) 浏览已发布的所有 npm 包的源代码。
 ``` shell
 <script src="https://unpkg.com/xe-ajax@3.0.15/dist/xe-ajax.js" type="text/javascript"></script>
 ```
