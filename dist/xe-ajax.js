@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.14
+ * xe-ajax.js v3.0.15
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -353,10 +353,10 @@
         if (params) {
           url += (url.indexOf('?') === -1 ? '?' : '&') + params
         }
-        if (/\w+:\/{2}.*/.test(url)) {
-          return url
+        if (url.indexOf('/') === 0) {
+          return location.origin + url
         }
-        return this.baseURL.replace(/\/$/, '') + '/' + url.replace(/^\//, '')
+        return this.baseURL.replace(/\/$/, '') + '/' + url
       }
       return url
     },
@@ -707,7 +707,7 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.0.14'
+  var version = '3.0.15'
 
   var ajaxMethods = {
     doAll: doAll,

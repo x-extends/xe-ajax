@@ -47,7 +47,10 @@ objectAssign(XEAjaxRequest.prototype, {
       if (/\w+:\/{2}.*/.test(url)) {
         return url
       }
-      return this.baseURL.replace(/\/$/, '') + '/' + url.replace(/^\//, '')
+      if (url.indexOf('/') === 0) {
+        return location.origin + url
+      }
+      return this.baseURL.replace(/\/$/, '') + '/' + url
     }
     return url
   },
