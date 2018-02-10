@@ -1,5 +1,8 @@
 # XEAjax 轻量级请求函数，基于 Promise 实现，支持 Mock 虚拟服务
 
+[![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
+[![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
+
 XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、jsonp以及mock等常用函数，其特点是高易用性、高扩展性、向后兼容 fetch 及完善的API
 
 ### 兼容性
