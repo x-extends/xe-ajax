@@ -9,11 +9,18 @@ XEAjax 一个不依赖于任何框架、开源的请求函数，支持XHR、json
 任何支持 Promise 的环境都能运行，低版本浏览器使用 babel 转码<br/>
 支持 IE8+、Edge、Chrome、Firefox、Opera、Safari等...
 
-### 直接引用 script 全局安装，XEAjax 会定义为全局变量
+### CDN 安装，XEAjax 会定义为全局变量
+#### cdnjs
+你可以在 [xe-ajax](https://cdn.jsdelivr.net/npm/xe-ajax/) 浏览 npm 包的源代码。
 ``` shell
-<script src="./dist/xe-ajax.min.js" type="text/javascript"></script>
-
-// 全局调用
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.0.15/dist/xe-ajax.js" type="text/javascript"></script>
+```
+#### unpkg
+``` shell
+<script src="https://unpkg.com/xe-ajax@3.0.15/dist/xe-ajax.js" type="text/javascript"></script>
+```
+#### 全局调用
+``` shell
 XEAjax.getJSON('/api/user/list', {id: 1})
 ```
 
