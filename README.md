@@ -271,7 +271,7 @@ setTimeout(() => {
 import XEAjax from 'xe-ajax'
 
 // Request 请求之前拦截器
-XEAjax.interceptors.request.use(\(request, next) => {
+XEAjax.interceptors.request.use((request, next) => {
   // 请求之前拦截器,一般用于统一的权限拦截、设置头、参数处理等...
 
   // request.method = 'POST' // 修改 method
@@ -283,7 +283,7 @@ XEAjax.interceptors.request.use(\(request, next) => {
 })
 
 // Response 响应之后拦截器
-XEAjax.interceptors.response.use(\(response, next) => {
+XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后校验session是否失效做处理、统一的错误消息提示处理等...
 
   // 例子: 判断登录失效跳转
@@ -296,7 +296,7 @@ XEAjax.interceptors.response.use(\(response, next) => {
 })
 
 // 支持重置响应数据
-XEAjax.interceptors.response.use(\(response, next) => {
+XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后对所有返回的数据进行统一的处理...
   // 格式: {status: 200, body: {}, headers: {}}
 
