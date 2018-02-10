@@ -42,7 +42,7 @@ export function lastIndexOf (str, val) {
   return -1
 }
 
-export function eachObj (obj, iteratee, context) {
+export function objectEach (obj, iteratee, context) {
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
       iteratee.call(context, obj[key], key, obj)
@@ -52,7 +52,7 @@ export function eachObj (obj, iteratee, context) {
 
 export function parseParam (resultVal, resultKey, isArr) {
   var result = []
-  eachObj(resultVal, function (item, key) {
+  objectEach(resultVal, function (item, key) {
     if (isObject(item)) {
       result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
     } else {
@@ -65,7 +65,7 @@ export function parseParam (resultVal, resultKey, isArr) {
 // Serialize Body
 export function serialize (body) {
   var params = []
-  eachObj(body, function (item, key) {
+  objectEach(body, function (item, key) {
     if (item !== undefined) {
       if (isObject(item)) {
         params = params.concat(parseParam(item, key, isArray(item)))

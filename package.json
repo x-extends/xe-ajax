@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.0.13",
+  "version": "3.0.14",
   "description": "轻量级请求函数，基于 Promise 实现，支持 Mock 虚拟服务",
   "main": "index.js",
   "scripts": {

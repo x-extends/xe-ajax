@@ -1,4 +1,4 @@
-import { objectAssign, eachObj } from './util'
+import { objectAssign, objectEach } from './util'
 
 export function toKey (key) {
   return String(key).toLowerCase()
@@ -36,7 +36,7 @@ export function XEHeaders () {
 
 objectAssign(XEHeaders.prototype, {
   forEach: function (callback, context) {
-    eachObj(this._state, function (value, key, state) {
+    objectEach(this._state, function (value, key, state) {
       callback.call(context, value.join(', '), state)
     })
   }

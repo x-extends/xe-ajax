@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.0.13
+ * xe-ajax.js v3.0.14
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -54,7 +54,7 @@
     return -1
   }
 
-  function eachObj (obj, iteratee, context) {
+  function objectEach (obj, iteratee, context) {
     for (var key in obj) {
       if (obj.hasOwnProperty(key)) {
         iteratee.call(context, obj[key], key, obj)
@@ -64,7 +64,7 @@
 
   function parseParam (resultVal, resultKey, isArr) {
     var result = []
-    eachObj(resultVal, function (item, key) {
+    objectEach(resultVal, function (item, key) {
       if (isObject(item)) {
         result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
       } else {
@@ -77,7 +77,7 @@
   // Serialize Body
   function serialize (body) {
     var params = []
-    eachObj(body, function (item, key) {
+    objectEach(body, function (item, key) {
       if (item !== undefined) {
         if (isObject(item)) {
           params = params.concat(parseParam(item, key, isArray(item)))
@@ -147,7 +147,7 @@
 
   objectAssign(XEHeaders.prototype, {
     forEach: function (callback, context) {
-      eachObj(this._state, function (value, key, state) {
+      objectEach(this._state, function (value, key, state) {
         callback.call(context, value.join(', '), state)
       })
     }
@@ -543,7 +543,7 @@
       if (request.timeout && !isNaN(request.timeout)) {
         xhr.timeout = request.timeout
       }
-      eachObj(request.headers, function (value, name) {
+      objectEach(request.headers, function (value, name) {
         xhr.setRequestHeader(name, value)
       })
       xhr.onreadystatechange = function () {
@@ -707,7 +707,7 @@
   var deleteJSON = responseJSON(fetchDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.0.13'
+  var version = '3.0.14'
 
   var ajaxMethods = {
     doAll: doAll,
@@ -736,7 +736,13 @@
    * @param {Object} methods 扩展
    */
   function mixin (methods) {
-    return objectAssign(XEAjax, methods)
+    objectEach(methods, function (fn, name) {
+      XEAjax[name] = isFunction(fn) ? function () {
+        var result = fn.apply(XEAjax.context, arguments)
+        XEAjax.context = null
+        return result
+      } : fn
+    })
   }
 
   /**

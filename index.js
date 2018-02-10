@@ -1,4 +1,4 @@
-import { objectAssign } from './src/util'
+import { objectEach, isFunction } from './src/util'
 import XEAjax from './src/constructor'
 import ajaxMethods from './src'
 
@@ -8,7 +8,13 @@ import ajaxMethods from './src'
  * @param {Object} methods 扩展
  */
 function mixin (methods) {
-  return objectAssign(XEAjax, methods)
+  objectEach(methods, function (fn, name) {
+    XEAjax[name] = isFunction(fn) ? function () {
+      var result = fn.apply(XEAjax.context, arguments)
+      XEAjax.context = null
+      return result
+    } : fn
+  })
 }
 
 /**
