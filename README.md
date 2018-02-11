@@ -217,7 +217,7 @@ getJSON('/api/user/list').then(data => {
 // 提交数据
 postJSON('/api/user/save', {name: 'test'})
 
-// 以formData方式提交数据
+// 以 formData 方式提交数据
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 
 // 查询参数和数据同时提交
@@ -239,7 +239,7 @@ iterable2.push({url: '/api/user/list', method: 'GET'})
 iterable2.push(postJSON('/api/user/save', {id: 1}))
 doAll(iterable2)
 
-// jsonp 跨域调用,请求完成或失败,jsonp只能获取数据
+// jsonp 调用方式,请求完成或失败,jsonp 只能获取响应数据
 jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data => {
   // {msg: 'success'}
 }).catch(data => {
@@ -253,20 +253,17 @@ jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data 
 ``` shell
 import { AjaxController, getJSON, fetchPost } from 'xe-ajax'
 
-const controller = new AjaxController() // 创建一个控制器对象
-const signal = controller.signal // 获取signal
-fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
-  // response.ok = false
-  // response.status = 0
-  response.json().then(data => {
-    // 获取 data 数据
-  })
+// 创建一个控制器对象
+const controller = new AjaxController()
+// 获取signal
+const signal = controller.signal
+// 给请求加入控制器 signal
+getJSON('/api/user/list', {id: 1}, {signal}).then(data => {
+  // data
 })
-let isCancel = true
 setTimeout(() => {
-  if (isCancel) {
-    controller.abort() // 如果还没请求完成，则终止请求、如果已请求完成，则调用无效
-  }
+  // 终止请求
+  controller.abort()
 }, 10)
 ```
 
