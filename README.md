@@ -152,7 +152,7 @@ XEAjax.setup({
   bodyType: 'FORM_DATA',
   credentials: 'include',
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Accept': 'application/json, text/plain, \*/\*;'
   },
   transformParams (params, request) {
     // 用于在请求发送之前改变URL参数
