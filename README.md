@@ -223,6 +223,13 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_
 // 查询参数和数据同时提交
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 
+// 相互依赖的嵌套请求
+getJSON('/api/user/info').then(data => {
+  return getJSON('/api/user/details', {id: data.id})
+}).then(data => {
+  // data 响应结果
+})
+
 // Promise.all 在所有异步完成之后执行
 const iterable1 = []
 iterable1.push(getJSON('/api/user/list'))
