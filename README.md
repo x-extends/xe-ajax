@@ -190,9 +190,9 @@ fetchGet('/api/user/list').then(response >= response.json()).then(data => {
 })
 
 fetchGet('/api/user/list').then(response => {
-  // response.ok 请求成功或失败
-  // response.status
-  // response.headers
+  // response.ok 获取请求成功或失败
+  // response.status 获取状态
+  // response.headers 获取请求头 Headers 对象
   response.json().then(data => {
     // 获取 data
   })
