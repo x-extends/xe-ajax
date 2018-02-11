@@ -134,13 +134,13 @@ function jsonpHandle (request, xhr, resolve, reject) {
  * Request 对象
  *
  * @param String url 请求地址
- * @param String baseURL 基础路径
+ * @param String baseURL 基础路径，默认上下文路径
  * @param String method 请求方法(默认GET)
- * @param Object params 请求参数
+ * @param Object params 请求参数，序列化后会拼接在url
  * @param Object body 提交参数
  * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
  * @param String jsonp 调用jsonp服务,回调属性默认callback
- * @param Boolean async 异步/同步(默认true)
+ * @param Boolean async 异步/同步(XEAjax虽然不做异步限制，但是建议必须异步)
  * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param Number timeout 设置超时
  * @param Object headers 请求头
