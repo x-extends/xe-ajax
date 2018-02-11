@@ -233,7 +233,7 @@ Promise.all(iterable1).then(datas => {
   // data 
 })
 
-// doAll 在所有异步完成之后执行 支持对象参数
+// doAll 在所有异步完成之后执行 支持对象参数, 用法和 Promise.all 一致
 const iterable2 = []
 iterable2.push({url: '/api/user/list', method: 'GET'})
 iterable2.push(postJSON('/api/user/save', {id: 1}))
