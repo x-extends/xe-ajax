@@ -307,7 +307,7 @@ XEAjax.interceptors.response.use((response, next) => {
   // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
     // 重置响应数据并继续执行下一个拦截器
-    next({status: response.status, body: {result: data}})
+    next({status: response.status, body: {status: response.status === 200 ? 'success' : 'error', result: data}})
   })
 })
 ```
