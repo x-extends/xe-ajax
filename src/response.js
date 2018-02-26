@@ -12,7 +12,8 @@ objectAssign(XEReadableStream.prototype, {
     var that = this
     var xhr = this._xhr
     var request = this._request
-    return new Promise(function (resolve, reject) {
+    var XEPromise = request.$Promise
+    return new XEPromise(function (resolve, reject) {
       var body = {responseText: '', response: xhr}
       if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
         if (xhr.responseText) {
@@ -35,7 +36,7 @@ objectAssign(XEReadableStream.prototype, {
         that.locked = true
         resolve(body)
       }
-    }, request.context)
+    }, request.$context)
   }
 })
 

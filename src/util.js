@@ -98,3 +98,7 @@ export function arrayEach (array, callback, context) {
     }
   }
 }
+
+export function clearXEAjaxContext (XEAjax) {
+  XEAjax.$context = XEAjax.$Promise = null
+}

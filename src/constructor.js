@@ -13,9 +13,6 @@ var setupDefaults = {
   headers: {
     Accept: 'application/json, text/plain, */*;'
   },
-  getXMLHttpRequest: function () {
-    return new XMLHttpRequest()
-  },
   getPromiseStatus: function (response) {
     return response.status >= 200 && response.status < 300
   }
@@ -28,12 +25,11 @@ var setupDefaults = {
   * @return Promise
   */
 export function XEAjax (options) {
-  var opts = {context: XEAjax.context}
-  XEAjax.context = null
-  objectAssign(opts, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
-  return new Promise(function (resolve, reject) {
-    return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
-  }, opts.context)
+  var opts = objectAssign({$Promise: Promise}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
+  var XEPromise = opts.$Promise
+  return new XEPromise(function (resolve, reject) {
+    return (opts.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
+  }, opts.$context)
 }
 
 /**

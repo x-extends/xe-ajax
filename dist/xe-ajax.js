@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.1.0
+ * xe-ajax.js v3.1.1
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -8,7 +8,9 @@
 }(this, function () {
   'use strict'
 
-  var Promise = window.Promise
+  /**
+   * util headers fetchCont interceptor XEAjaxRequest XEAjaxResponse const index
+   */
 
   var isArray = Array.isArray || function (obj) {
     return obj ? obj.constructor === Array : false
@@ -109,6 +111,10 @@
         callback.call(context || global, array[index], index, array)
       }
     }
+  }
+
+  function clearXEAjaxContext (XEAjax) {
+    XEAjax.$context = XEAjax.$Promise = null
   }
 
   function toKey (key) {
@@ -248,14 +254,15 @@
    * Request 拦截器
    */
   function requestInterceptor (request) {
-    var thenInterceptor = Promise.resolve(request, request.context)
+    var XEPromise = request.$Promise
+    var thenInterceptor = XEPromise.resolve(request, request.$context)
     arrayEach(state.request, function (callback) {
       thenInterceptor = thenInterceptor.then(function (req) {
-        return new Promise(function (resolve) {
+        return new XEPromise(function (resolve) {
           callback(req, function () {
             resolve(req)
           })
-        }, request.context)
+        }, request.$context)
       }).catch(function (req) {
         console.error(req)
       })
@@ -267,10 +274,11 @@
    * Response 拦截器
    */
   function responseInterceptor (request, response) {
-    var thenInterceptor = Promise.resolve(response, request.context)
+    var XEPromise = request.$Promise
+    var thenInterceptor = XEPromise.resolve(response, request.$context)
     arrayEach(state.response, function (callback) {
       thenInterceptor = thenInterceptor.then(function (resp) {
-        return new Promise(function (resolve) {
+        return new XEPromise(function (resolve) {
           callback(resp, function (result) {
             if (result && result.constructor !== XEAjaxResponse) {
               resolve(new XEAjaxResponse(request, new ResponseXHR(result)))
@@ -278,7 +286,7 @@
               resolve(resp)
             }
           })
-        }, request.context)
+        }, request.$context)
       }).catch(function (resp) {
         console.error(resp)
       })
@@ -315,10 +323,10 @@
     this.ABORT_RESPONSE = undefined
     this.method = String(this.method).toLocaleUpperCase()
     this.crossOrigin = isCrossOrigin(this)
-    if (options && options.jsonp) {
+    if (this.jsonp) {
       this.script = document.createElement('script')
     } else {
-      this.xhr = options.getXMLHttpRequest(this)
+      this.xhr = isFunction(this.getXMLHttpRequest) ? this.getXMLHttpRequest(this) : new XMLHttpRequest()
     }
     setFetchRequest(this)
   }
@@ -353,6 +361,9 @@
         if (params) {
           url += (url.indexOf('?') === -1 ? '?' : '&') + params
         }
+        if (/\w+:\/{2}.*/.test(url)) {
+          return url
+        }
         if (url.indexOf('/') === 0) {
           return location.origin + url
         }
@@ -362,7 +373,8 @@
     },
     getBody: function () {
       var request = this
-      return new Promise(function (resolve, reject) {
+      var XEPromise = request.$Promise
+      return new XEPromise(function (resolve, reject) {
         var result = null
         if (request.body && request.method !== 'GET') {
           try {
@@ -386,7 +398,7 @@
           }
         }
         resolve(result)
-      }, request.context)
+      }, request.$context)
     }
   })
 
@@ -401,7 +413,8 @@
       var that = this
       var xhr = this._xhr
       var request = this._request
-      return new Promise(function (resolve, reject) {
+      var XEPromise = request.$Promise
+      return new XEPromise(function (resolve, reject) {
         var body = {responseText: '', response: xhr}
         if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
           if (xhr.responseText) {
@@ -424,7 +437,7 @@
           that.locked = true
           resolve(body)
         }
-      }, request.context)
+      }, request.$context)
     }
   })
 
@@ -494,9 +507,6 @@
     headers: {
       Accept: 'application/json, text/plain, */*;'
     },
-    getXMLHttpRequest: function () {
-      return new XMLHttpRequest()
-    },
     getPromiseStatus: function (response) {
       return response.status >= 200 && response.status < 300
     }
@@ -509,12 +519,11 @@
     * @return Promise
     */
   function XEAjax (options) {
-    var opts = {context: XEAjax.context}
-    XEAjax.context = null
-    objectAssign(opts, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
-    return new Promise(function (resolve, reject) {
-      return (options && options.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
-    }, opts.context)
+    var opts = objectAssign({$Promise: Promise}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
+    var XEPromise = opts.$Promise
+    return new XEPromise(function (resolve, reject) {
+      return (opts.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
+    }, opts.$context)
   }
 
   /**
@@ -615,13 +624,13 @@
    * Request 对象
    *
    * @param String url 请求地址
-   * @param String baseURL 基础路径
+   * @param String baseURL 基础路径，默认上下文路径
    * @param String method 请求方法(默认GET)
-   * @param Object params 请求参数
+   * @param Object params 请求参数，序列化后会拼接在url
    * @param Object body 提交参数
    * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
    * @param String jsonp 调用jsonp服务,回调属性默认callback
-   * @param Boolean async 异步/同步(默认true)
+   * @param Boolean async 异步/同步(XEAjax虽然不做异步限制，但是建议必须异步)
    * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param Number timeout 设置超时
    * @param Object headers 请求头
@@ -636,15 +645,25 @@
     objectAssign(setupDefaults, options)
   }
 
-  function createAjax (method, def, options) {
-    return XEAjax(objectAssign({method: method}, def, options))
+  function getOptions (method, def, options) {
+    var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise || Promise}, def, options)
+    clearXEAjaxContext(XEAjax)
+    return opts
+  }
+
+  function responseResult (method) {
+    return function () {
+      return ajax(method.apply(this, arguments))
+    }
   }
 
   // xhr response JSON
   function responseJSON (method) {
     return function () {
-      return method.apply(this, arguments).then(function (response) {
-        return new Promise(function (resolve, reject) {
+      var opts = method.apply(this, arguments)
+      var XEPromise = opts.$Promise
+      return ajax(opts).then(function (response) {
+        return new XEPromise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
           }).catch(function (data) {
@@ -660,54 +679,62 @@
 
   // Http Request All
   function doAll (iterable) {
-    return Promise.all(iterable.map(function (item) {
-      if (item instanceof Promise) {
+    var XEPromise = XEAjax.$Promise || Promise
+    var context = XEAjax.$context
+    clearXEAjaxContext(XEAjax)
+    return XEPromise.all(iterable.map(function (item) {
+      if (item instanceof XEPromise) {
         return item
       } else if (item && isObject(item)) {
-        return ajax(item)
+        return ajax(objectAssign({$context: context, $Promise: XEPromise}, item))
       }
       return item
-    }), arguments[1])
+    }), context)
   }
 
   // Http Request Method GET
-  function fetchGet (url, params, opts) {
-    return createAjax('GET', isObject(url) ? {} : {url: url, params: params}, opts)
+  function doGet (url, params, opts) {
+    return getOptions('GET', isObject(url) ? {} : {url: url, params: params}, opts)
   }
 
   // Http Request Method POST
-  function fetchPost (url, body, opts) {
-    return createAjax('POST', isObject(url) ? {} : {url: url, body: body}, opts)
+  function doPost (url, body, opts) {
+    return getOptions('POST', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method PUT
-  function fetchPut (url, body, opts) {
-    return createAjax('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
+  function doPut (url, body, opts) {
+    return getOptions('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method PATCH
-  function fetchPatch (url, body, opts) {
-    return createAjax('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
+  function doPatch (url, body, opts) {
+    return getOptions('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method DELETE
-  function fetchDelete (url, body, opts) {
-    return createAjax('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
+  function doDelete (url, body, opts) {
+    return getOptions('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method jsonp
   function jsonp (url, params, opts) {
-    return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
+    return XEAjax(getOptions('GET', {url: url, params: params, jsonp: 'callback'}, opts))
   }
 
-  var getJSON = responseJSON(fetchGet)
-  var postJSON = responseJSON(fetchPost)
-  var putJSON = responseJSON(fetchPut)
-  var patchJSON = responseJSON(fetchPatch)
-  var deleteJSON = responseJSON(fetchDelete)
+  var fetchGet = responseResult(doGet)
+  var fetchPost = responseResult(doPost)
+  var fetchPut = responseResult(doPut)
+  var fetchPatch = responseResult(doPatch)
+  var fetchDelete = responseResult(doDelete)
+  var getJSON = responseJSON(doGet)
+  var postJSON = responseJSON(doPost)
+  var putJSON = responseJSON(doPut)
+  var patchJSON = responseJSON(doPatch)
+  var deleteJSON = responseJSON(doDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.1.0'
+  var version = '3.1.1'
 
   var ajaxMethods = {
     doAll: doAll,
@@ -738,8 +765,8 @@
   function mixin (methods) {
     objectEach(methods, function (fn, name) {
       XEAjax[name] = isFunction(fn) ? function () {
-        var result = fn.apply(XEAjax.context, arguments)
-        XEAjax.context = null
+        var result = fn.apply(XEAjax.$context, arguments)
+        clearXEAjaxContext(XEAjax)
         return result
       } : fn
     })
@@ -755,11 +782,6 @@
   mixin(ajaxMethods)
   XEAjax.use = use
   XEAjax.mixin = mixin
-
-  // 非 ES6 Module 环境中支持重写 Promise 函数
-  XEAjax.$p = function (ctor) {
-    Promise = ctor
-  }
 
   return XEAjax
 }))

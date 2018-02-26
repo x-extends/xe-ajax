@@ -1,4 +1,4 @@
-import { objectEach, isFunction } from './src/util'
+import { objectEach, isFunction, clearXEAjaxContext } from './src/util'
 import XEAjax from './src/constructor'
 import ajaxMethods from './src'
 
@@ -10,8 +10,8 @@ import ajaxMethods from './src'
 function mixin (methods) {
   objectEach(methods, function (fn, name) {
     XEAjax[name] = isFunction(fn) ? function () {
-      var result = fn.apply(XEAjax.context, arguments)
-      XEAjax.context = null
+      var result = fn.apply(XEAjax.$context, arguments)
+      clearXEAjaxContext(XEAjax)
       return result
     } : fn
   })

@@ -45,14 +45,15 @@ objectAssign(ResponseXHR.prototype, {
  * Request 拦截器
  */
 export function requestInterceptor (request) {
-  var thenInterceptor = Promise.resolve(request, request.context)
+  var XEPromise = request.$Promise
+  var thenInterceptor = XEPromise.resolve(request, request.$context)
   arrayEach(state.request, function (callback) {
     thenInterceptor = thenInterceptor.then(function (req) {
-      return new Promise(function (resolve) {
+      return new XEPromise(function (resolve) {
         callback(req, function () {
           resolve(req)
         })
-      }, request.context)
+      }, request.$context)
     }).catch(function (req) {
       console.error(req)
     })
@@ -64,10 +65,11 @@ export function requestInterceptor (request) {
  * Response 拦截器
  */
 export function responseInterceptor (request, response) {
-  var thenInterceptor = Promise.resolve(response, request.context)
+  var XEPromise = request.$Promise
+  var thenInterceptor = XEPromise.resolve(response, request.$context)
   arrayEach(state.response, function (callback) {
     thenInterceptor = thenInterceptor.then(function (resp) {
-      return new Promise(function (resolve) {
+      return new XEPromise(function (resolve) {
         callback(resp, function (result) {
           if (result && result.constructor !== XEAjaxResponse) {
             resolve(new XEAjaxResponse(request, new ResponseXHR(result)))
@@ -75,7 +77,7 @@ export function responseInterceptor (request, response) {
             resolve(resp)
           }
         })
-      }, request.context)
+      }, request.$context)
     }).catch(function (resp) {
       console.error(resp)
     })

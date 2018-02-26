@@ -6,10 +6,10 @@ export function XEAjaxRequest (options) {
   this.ABORT_RESPONSE = undefined
   this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
-  if (options && options.jsonp) {
+  if (this.jsonp) {
     this.script = document.createElement('script')
   } else {
-    this.xhr = options.getXMLHttpRequest(this)
+    this.xhr = isFunction(this.getXMLHttpRequest) ? this.getXMLHttpRequest(this) : new XMLHttpRequest()
   }
   setFetchRequest(this)
 }
@@ -56,7 +56,8 @@ objectAssign(XEAjaxRequest.prototype, {
   },
   getBody: function () {
     var request = this
-    return new Promise(function (resolve, reject) {
+    var XEPromise = request.$Promise
+    return new XEPromise(function (resolve, reject) {
       var result = null
       if (request.body && request.method !== 'GET') {
         try {
@@ -80,7 +81,7 @@ objectAssign(XEAjaxRequest.prototype, {
         }
       }
       resolve(result)
-    }, request.context)
+    }, request.$context)
   }
 })
 

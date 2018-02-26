@@ -1,17 +1,27 @@
-import { isObject, serialize, objectAssign } from './util'
+import { isObject, serialize, objectAssign, clearXEAjaxContext } from './util'
 import XEAjax, { setup } from './constructor'
 import { XEFetchController } from './fetchController'
 import { interceptors } from './interceptor'
 
-function createAjax (method, def, options) {
-  return XEAjax(objectAssign({method: method}, def, options))
+function getOptions (method, def, options) {
+  var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise || Promise}, def, options)
+  clearXEAjaxContext(XEAjax)
+  return opts
+}
+
+function responseResult (method) {
+  return function () {
+    return ajax(method.apply(this, arguments))
+  }
 }
 
 // xhr response JSON
 function responseJSON (method) {
   return function () {
-    return method.apply(this, arguments).then(function (response) {
-      return new Promise(function (resolve, reject) {
+    var opts = method.apply(this, arguments)
+    var XEPromise = opts.$Promise
+    return ajax(opts).then(function (response) {
+      return new XEPromise(function (resolve, reject) {
         response.json().then(function (data) {
           (response.ok ? resolve : reject)(data)
         }).catch(function (data) {
@@ -27,54 +37,62 @@ export var ajax = XEAjax
 
 // Http Request All
 export function doAll (iterable) {
-  return Promise.all(iterable.map(function (item) {
-    if (item instanceof Promise) {
+  var XEPromise = XEAjax.$Promise || Promise
+  var context = XEAjax.$context
+  clearXEAjaxContext(XEAjax)
+  return XEPromise.all(iterable.map(function (item) {
+    if (item instanceof XEPromise) {
       return item
     } else if (item && isObject(item)) {
-      return ajax(item)
+      return ajax(objectAssign({$context: context, $Promise: XEPromise}, item))
     }
     return item
-  }), arguments[1])
+  }), context)
 }
 
 // Http Request Method GET
-export function fetchGet (url, params, opts) {
-  return createAjax('GET', isObject(url) ? {} : {url: url, params: params}, opts)
+function doGet (url, params, opts) {
+  return getOptions('GET', isObject(url) ? {} : {url: url, params: params}, opts)
 }
 
 // Http Request Method POST
-export function fetchPost (url, body, opts) {
-  return createAjax('POST', isObject(url) ? {} : {url: url, body: body}, opts)
+function doPost (url, body, opts) {
+  return getOptions('POST', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method PUT
-export function fetchPut (url, body, opts) {
-  return createAjax('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
+function doPut (url, body, opts) {
+  return getOptions('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method PATCH
-export function fetchPatch (url, body, opts) {
-  return createAjax('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
+function doPatch (url, body, opts) {
+  return getOptions('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method DELETE
-export function fetchDelete (url, body, opts) {
-  return createAjax('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
+function doDelete (url, body, opts) {
+  return getOptions('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method jsonp
 export function jsonp (url, params, opts) {
-  return createAjax('GET', {url: url, params: params, jsonp: 'callback'}, opts)
+  return XEAjax(getOptions('GET', {url: url, params: params, jsonp: 'callback'}, opts))
 }
 
-export var getJSON = responseJSON(fetchGet)
-export var postJSON = responseJSON(fetchPost)
-export var putJSON = responseJSON(fetchPut)
-export var patchJSON = responseJSON(fetchPatch)
-export var deleteJSON = responseJSON(fetchDelete)
+export var fetchGet = responseResult(doGet)
+export var fetchPost = responseResult(doPost)
+export var fetchPut = responseResult(doPut)
+export var fetchPatch = responseResult(doPatch)
+export var fetchDelete = responseResult(doDelete)
+export var getJSON = responseJSON(doGet)
+export var postJSON = responseJSON(doPost)
+export var putJSON = responseJSON(doPut)
+export var patchJSON = responseJSON(doPatch)
+export var deleteJSON = responseJSON(doDelete)
 
 export var AjaxController = XEFetchController
-export var version = '3.1.0'
+export var version = '3.1.1'
 
 var ajaxMethods = {
   doAll: doAll,

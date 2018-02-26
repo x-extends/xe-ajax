@@ -14,11 +14,11 @@ XEAjax 一个不依赖于任何框架、开源的请求函数，支持xhr、json
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
 #### cdnjs 获取最新版本, [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包的源代码
 ``` shell
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.0/dist/xe-ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.1/dist/xe-ajax.js"></script>
 ```
-#### unpkg 获取最新版本, [点击浏览](https://unpkg.com/xe-ajax@3.1.0/)已发布的所有 npm 包的源代码
+#### unpkg 获取最新版本, [点击浏览](https://unpkg.com/xe-ajax@3.1.1/)已发布的所有 npm 包的源代码
 ``` shell
-<script src="https://unpkg.com/xe-ajax@3.1.0/dist/xe-ajax.js"></script>
+<script src="https://unpkg.com/xe-ajax@3.1.1/dist/xe-ajax.js"></script>
 ```
 
 ### AMD 安装， 以 require.js 为例
@@ -223,7 +223,7 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_
 // 查询参数和数据同时提交
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 
-// 相互依赖的嵌套请求
+// 相互依赖的嵌套请求(项目中应该避免这种情况)
 getJSON('/api/user/info').then(data => {
   return getJSON('/api/user/details', {id: data.id})
 }).then(data => {
@@ -240,10 +240,10 @@ Promise.all(iterable1).then(datas => {
   // data 
 })
 
-// doAll 在所有异步完成之后执行 支持对象参数, 用法和 Promise.all 一致
+// doAll 使用对象参数，在所有异步完成之后执行, 用法和 Promise.all 一致
 const iterable2 = []
 iterable2.push({url: '/api/user/list', method: 'GET'})
-iterable2.push(postJSON('/api/user/save', {id: 1}))
+iterable2.push({url: '/api/user/save', body: {id: 1}, method: 'POST'})
 doAll(iterable2)
 
 // jsonp 调用方式,请求完成或失败,jsonp 只能获取响应数据
