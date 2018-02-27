@@ -213,7 +213,7 @@
   /**
    * 拦截器队列
    */
-  const state = {request: [], response: []}
+  var state = {request: [], response: []}
 
   function useInterceptors (calls) {
     return function (callback) {
