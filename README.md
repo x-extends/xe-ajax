@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-XEAjax 一个不依赖于任何框架、开源的请求函数，支持xhr、jsonp以及mock，其特点是高易用性、高扩展性、基于 Promise API、向后兼容 fetch 及完善的API
+XEAjax 一个开源且不依赖于任何框架、基于 Promise API 的请求函数，支持xhr、jsonp以及mock，其特点是高易用性、高扩展性、及兼容性。
 
 ### 兼容性
 任何支持 Promise 的环境都能运行，低版本浏览器使用 polyfill<br/>
@@ -37,7 +37,7 @@ define(['xe-ajax'], function (XEAjax) {
 })
 ```
 
-### ES6 Module 安装方式
+### ES6 Module 安装方式（推荐）
 ``` shell
 npm install xe-ajax --save
 ```
