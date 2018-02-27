@@ -1,6 +1,6 @@
 import { objectEach, isFunction, clearXEAjaxContext } from './src/util'
 import XEAjax from './src/constructor'
-import ajaxMethods from './src'
+import ajaxMethods, { AjaxController } from './src'
 
 /**
  * 混合函数
@@ -27,6 +27,7 @@ function use (plugin) {
 mixin(ajaxMethods)
 XEAjax.use = use
 XEAjax.mixin = mixin
+XEAjax.AjaxController = AjaxController
 
 export * from './src'
 export default XEAjax

@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.1.1
+ * xe-ajax.js v3.1.2
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -37,10 +37,14 @@
     return typeof obj === 'function'
   }
 
+  function getLocatOrigin () {
+    return location.origin || (location.protocol + '//' + location.host)
+  }
+
   function getBaseURL () {
     var pathname = location.pathname
     var lastIndex = lastIndexOf(pathname, '/') + 1
-    return location.origin + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
+    return getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
   }
 
   function lastIndexOf (str, val) {
@@ -365,7 +369,7 @@
           return url
         }
         if (url.indexOf('/') === 0) {
-          return location.origin + url
+          return getLocatOrigin() + url
         }
         return this.baseURL.replace(/\/$/, '') + '/' + url
       }
@@ -734,7 +738,7 @@
   var deleteJSON = responseJSON(doDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.1.1'
+  var version = '3.1.2'
 
   var ajaxMethods = {
     doAll: doAll,
@@ -753,7 +757,6 @@
     setup: setup,
     serialize: serialize,
     interceptors: interceptors,
-    AjaxController: AjaxController,
     version: version
   }
 
@@ -782,6 +785,7 @@
   mixin(ajaxMethods)
   XEAjax.use = use
   XEAjax.mixin = mixin
+  XEAjax.AjaxController = AjaxController
 
   return XEAjax
 }))

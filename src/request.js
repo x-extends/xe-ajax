@@ -1,4 +1,4 @@
-import { isFunction, isFormData, isCrossOrigin, serialize, objectAssign } from './util'
+import { isFunction, isFormData, isCrossOrigin, serialize, objectAssign, getLocatOrigin } from './util'
 import { setFetchRequest } from './fetchController'
 
 export function XEAjaxRequest (options) {
@@ -48,7 +48,7 @@ objectAssign(XEAjaxRequest.prototype, {
         return url
       }
       if (url.indexOf('/') === 0) {
-        return location.origin + url
+        return getLocatOrigin() + url
       }
       return this.baseURL.replace(/\/$/, '') + '/' + url
     }

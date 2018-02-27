@@ -65,14 +65,19 @@ function doPut (url, body, opts) {
   return getOptions('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
+// Http Request Method DELETE
+function doDelete (url, body, opts) {
+  return getOptions('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
+}
+
 // Http Request Method PATCH
 function doPatch (url, body, opts) {
   return getOptions('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
-// Http Request Method DELETE
-function doDelete (url, body, opts) {
-  return getOptions('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
+// Http Request Method GET
+function doHead (url, body, opts) {
+  return getOptions('HEAD', isObject(url) ? {} : {url: url, body: body}, opts)
 }
 
 // Http Request Method jsonp
@@ -80,11 +85,13 @@ export function jsonp (url, params, opts) {
   return XEAjax(getOptions('GET', {url: url, params: params, jsonp: 'callback'}, opts))
 }
 
+export var fetchHead = responseResult(doHead)
 export var fetchGet = responseResult(doGet)
 export var fetchPost = responseResult(doPost)
 export var fetchPut = responseResult(doPut)
 export var fetchPatch = responseResult(doPatch)
 export var fetchDelete = responseResult(doDelete)
+export var headJSON = responseJSON(doHead)
 export var getJSON = responseJSON(doGet)
 export var postJSON = responseJSON(doPost)
 export var putJSON = responseJSON(doPut)
@@ -92,26 +99,27 @@ export var patchJSON = responseJSON(doPatch)
 export var deleteJSON = responseJSON(doDelete)
 
 export var AjaxController = XEFetchController
-export var version = '3.1.1'
+export var version = '3.1.2'
 
 var ajaxMethods = {
   doAll: doAll,
   ajax: ajax,
   fetchGet: fetchGet,
-  getJSON: getJSON,
   fetchPost: fetchPost,
-  postJSON: postJSON,
   fetchPut: fetchPut,
-  putJSON: putJSON,
-  fetchPatch: fetchPatch,
-  patchJSON: patchJSON,
   fetchDelete: fetchDelete,
+  fetchPatch: fetchPatch,
+  fetchHead: fetchHead,
+  getJSON: getJSON,
+  postJSON: postJSON,
+  putJSON: putJSON,
   deleteJSON: deleteJSON,
+  patchJSON: patchJSON,
+  headJSON: headJSON,
   jsonp: jsonp,
   setup: setup,
   serialize: serialize,
   interceptors: interceptors,
-  AjaxController: AjaxController,
   version: version
 }
 

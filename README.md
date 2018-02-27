@@ -14,11 +14,11 @@ XEAjax 一个不依赖于任何框架、开源的请求函数，支持xhr、json
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
 #### cdnjs 获取最新版本, [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包的源代码
 ``` shell
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.1/dist/xe-ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.2/dist/xe-ajax.js"></script>
 ```
-#### unpkg 获取最新版本, [点击浏览](https://unpkg.com/xe-ajax@3.1.1/)已发布的所有 npm 包的源代码
+#### unpkg 获取最新版本, [点击浏览](https://unpkg.com/xe-ajax@3.1.2/)已发布的所有 npm 包的源代码
 ``` shell
-<script src="https://unpkg.com/xe-ajax@3.1.1/dist/xe-ajax.js"></script>
+<script src="https://unpkg.com/xe-ajax@3.1.2/dist/xe-ajax.js"></script>
 ```
 
 ### AMD 安装， 以 require.js 为例
@@ -91,15 +91,17 @@ XEAjax.get1()
 * fetchGet ( url, params, options )
 * fetchPost ( url, body, options )
 * fetchPut ( url, body, options )
-* fetchPatch ( url, body, options )
 * fetchDelete ( url, body, options )
+* fetchPatch ( url, body, options )
+* fetchHead ( url, body, options )
 ### 根据请求状态决定完成或失败，直接返回 json 数据
+* jsonp ( url, params, options )
 * getJSON ( url, params, options )
 * postJSON ( url, body, options )
 * putJSON ( url, body, options )
 * deleteJSON ( url, body, options )
 * patchJSON ( url, body, options )
-* jsonp ( url, params, options )
+* headJSON ( url, body, options )
 
 ### 接受三个参数：
 * url（字符串），请求地址。可被自定义 options 属性覆盖。
