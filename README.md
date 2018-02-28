@@ -331,6 +331,7 @@ import XEAjaxMock from 'xe-ajax-mock'
 XEAjax.use(XEAjaxMock)
 ```
 
+ES6 + Vue + ElementUI + XEAjax + Mock 项目例子1 请参考 [vue-element1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-element1) 示例<br/>
 ES6 + Vue + XEAjax + Mock 项目例子1 请参考 [vue-mock1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock1) 示例<br/>
 RequireJS + Vue + XEAjax + Mock 项目例子2 请参考 [vue-mock2](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock2) 示例<br/>
 RequireJS + Vue + VXEAjax + Mock 项目例子3 请参考 [vue-mock3](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock3) 示例<br/>
