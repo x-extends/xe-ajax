@@ -6,11 +6,11 @@
 XEAjax 一个开源且不依赖于任何框架、基于 Promise API 的请求函数，支持xhr、jsonp以及mock，其特点是高易用性、高扩展性、及兼容性。
 
 ## 兼容性
-任何支持 Promise 的环境都能运行，低版本浏览器使用 polyfill<br/>
+任何支持 Promise 的环境都能运行，低版本浏览器使用 polyfill  
 支持 IE8+、Edge、Chrome、Firefox、Opera、Safari等...
 
 ## CDN 安装
-使用 script 方式安装，XEAjax 会定义为全局变量<br/>
+使用 script 方式安装，XEAjax 会定义为全局变量  
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
 ### cdnjs 获取最新版本
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
@@ -374,10 +374,10 @@ XEAjax.get1()
 ## Mock 虚拟服务
 支持常用 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等插件..
 
-ES6 + Vue + ElementUI + XEAjax + Mock 项目例子1 请参考 [vue-element1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-element1) 示例<br/>
-ES6 + Vue + XEAjax + Mock 项目例子1 请参考 [vue-mock1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock1) 示例<br/>
-RequireJS + Vue + XEAjax + Mock 项目例子2 请参考 [vue-mock2](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock2) 示例<br/>
-RequireJS + Vue + VXEAjax + Mock 项目例子3 请参考 [vue-mock3](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock3) 示例<br/>
+ES6 + Vue + ElementUI + XEAjax + Mock 项目例子1 请参考 [vue-element1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-element1) 示例  
+ES6 + Vue + XEAjax + Mock 项目例子1 请参考 [vue-mock1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock1) 示例  
+RequireJS + Vue + XEAjax + Mock 项目例子2 请参考 [vue-mock2](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock2) 示例  
+RequireJS + Vue + VXEAjax + Mock 项目例子3 请参考 [vue-mock3](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock3) 示例  
 更多详细说明请查看 [Mock插件文档](https://github.com/xuliangzhan/xe-ajax-mock)
 
 ## License
