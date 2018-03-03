@@ -99,7 +99,7 @@ export var patchJSON = responseJSON(doPatch)
 export var deleteJSON = responseJSON(doDelete)
 
 export var AjaxController = XEFetchController
-export var version = '3.1.2'
+export var version = '3.1.3'
 
 var ajaxMethods = {
   doAll: doAll,

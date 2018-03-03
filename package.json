@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "基于 Promise API 的请求函数，支持 Mock 虚拟服务",
   "main": "index.js",
   "scripts": {
@@ -12,10 +12,10 @@
   },
   "keywords": [
     "ajax",
-    "vue-ajax",
-    "xe-ajax",
     "vxe-ajax",
-    "xeajax"
+    "xe-ajax",
+    "xhr",
+    "fetch"
   ],
   "author": {
     "name": "Xu Liangzhan",
