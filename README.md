@@ -24,7 +24,7 @@ XEAjax 一个开源且不依赖于任何框架、基于 Promise API 的请求函
 ```
 
 ## AMD 安装
-### require.js 示例
+### require.js 安装示例
 ``` shell
 // require 配置
 require.config({
