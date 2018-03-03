@@ -290,7 +290,7 @@ import XEAjax from 'xe-ajax'
 
 // 请求之前拦截器
 XEAjax.interceptors.request.use((request, next) => {
-  // 请求之前拦截器,一般用于统一的权限拦截、设置头、参数处理等...
+  // 请求之前拦截器,可以用于统一的权限拦截、设置头、参数等处理...
 
   // request.method = 'POST' // 修改 method
   // request.params.id = 1 // 修改参数
@@ -324,7 +324,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
   // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
-    let body = {
+    const body = {
       status: response.status === 200 ? 'success' : 'error', 
       result: data
     }
