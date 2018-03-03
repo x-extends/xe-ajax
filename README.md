@@ -33,11 +33,6 @@ require.config({
     'xe-ajax': './dist/xe-ajax.min'
   }
 })
-
-// ./app,js 调用
-define(['xe-ajax'], function (XEAjax) {
-  XEAjax.getJSON('/api/user/list', {id: 1})
-})
 ```
 
 ## ES6 Module 安装（推荐）
@@ -86,7 +81,7 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 * headJSON ( url, body, options )
 
 ### 入参说明
-* url（必须，字符串） 请求地址，可被自定义 options 属性覆盖
+* url（字符串） 请求地址，可被自定义 options 属性覆盖
 * params/body（可选，对象/数组） 要发送的数据，可被自定义 options 属性覆盖
 * options （可选，对象） 参数
 
@@ -211,8 +206,8 @@ getJSON('/api/user/list').then(data => {
 // 提交数据
 postJSON('/api/user/save', {name: 'test'})
 
-// 以 formData 方式提交数据
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+// json 方式提交数据
+postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
 
 // form 方式提交数据
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
@@ -260,6 +255,30 @@ getJSON('/api/user/info').then(data => {
   return getJSON('/api/user/details', {id: data.id})
 }).then(data => {
   // data
+})
+```
+### AMD 使用方式
+``` shell
+define([
+  'xe-ajax'
+], function (XEAjax) {
+
+  XEAjax.fetchGet('/api/user/list').then(response => {
+    // response.ok 获取请求成功或失败
+    response.text().then(text => {
+      // 获取 text
+    })
+  })
+
+  XEAjax.getJSON('/api/user/list').then(data => {
+    // 请求成功
+  }).catch(data => {
+    // 请求失败
+  })
+
+  XEAjax.fetchPost('/api/user/save', {name: 'test'})
+  XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
+  XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 })
 ```
 
