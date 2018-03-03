@@ -6,7 +6,7 @@
 XEAjax 一个开源且不依赖于任何框架、基于 Promise API 的请求函数，支持xhr、jsonp以及mock，其特点是高易用性、高扩展性、及兼容性。
 
 ## 兼容性
-任何支持 Promise 的环境都能运行，低版本浏览器使用 polyfill  
+基于 Promise 实现，低版本浏览器使用 promise.js 或 polyfill  
 支持 IE8+、Edge、Chrome、Firefox、Opera、Safari等...
 
 ## CDN 安装
