@@ -336,7 +336,7 @@ XEAjax.interceptors.response.use((response, next) => {
   }
 })
 
-// 支持重置响应数据 
+// 支持重置响应数据
 XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后对所有返回的数据进行统一的处理...
   // 格式: {status: 200, body: {}, headers: {}}
