@@ -3,8 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-XEAjax 一个开源且不依赖于任何框架，基于 Promise API 的请求函数；  
-支持 xhr、jsonp 以及 mock，更高效、简洁的 API 调用、可扩展、及兼容性。
+XEAjax 一个开源且不依赖于任何框架，基于 Promise API 的请求函数；支持 xhr、jsonp 以及 mock，更高效、简洁的 API 调用、可扩展、及兼容性。
 
 ## 兼容性
 基于 Promise 实现，低版本浏览器使用 promise.js 或 polyfill  
@@ -337,7 +336,7 @@ XEAjax.interceptors.response.use((response, next) => {
   }
 })
 
-// 支持重置响应数据
+// 支持重置响应数据 
 XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后对所有返回的数据进行统一的处理...
   // 格式: {status: 200, body: {}, headers: {}}
