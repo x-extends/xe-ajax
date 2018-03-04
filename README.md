@@ -108,15 +108,15 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 ### Response 对象说明
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| json | Function | 返回 Promise 对象，结果得到 json 数据,只能读取一次 |
-| test | Function | 返回 Promise 对象，结果得到 text 数据,只能读取一次 |
+| json | Function | 获取 json 数据 |
+| test | Function | 获取 text 数据 |
 | body | ReadableStream | 数据流 |
 | bodyUsed | Boolean | 内容是否已被读取 |
-| headers | Headers | 返回响应头 |
-| status | Number | 返回状态码 |
-| statusText | String | 状态 |
+| headers | Headers | 响应头 |
+| status | Number | 状态码 |
+| statusText | String | 状态信息 |
 | url | String | 返回请求路径 |
-| ok | Boolean | 根据状态判断完成还是失败 |
+| ok | Boolean | 请求完成还是失败 |
 | redirected | Boolean | 是否重定向了 |
 | type | String | 类型 |
 
@@ -147,14 +147,14 @@ XEAjax.setup({
     return body
   },
   stringifyBody (body, request) {
-    // 自定义格式化数据函数,除了GET之外都支持提交数据
+    // 自定义格式化提交数据函数
     return JSON.stringify(body)
   }
 })
 ```
 
 ## 示例
-### 调用，响应 response 对象
+### 响应 response 方式调用
 ``` shell
 import { fetchGet, fetchPost } from 'xe-ajax'
 
@@ -185,7 +185,7 @@ fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM
 // 查询参数和数据同时提交
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-### 调用，响应 json 对象
+### 响应 json 方式调用
 ``` shell
 import { ajax, getJSON, postJSON, jsonp } from 'xe-ajax'
 
