@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.1.5
+ * xe-ajax.js v3.1.6
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -755,7 +755,7 @@
   var deleteJSON = responseJSON(doDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.1.5'
+  var version = '3.1.6'
 
   var ajaxMethods = {
     doAll: doAll,
