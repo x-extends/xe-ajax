@@ -4,7 +4,7 @@ import { XEFetchController } from './fetchController'
 import { interceptors } from './interceptor'
 
 function getOptions (method, def, options) {
-  var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise || Promise}, def, options)
+  var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
   clearXEAjaxContext(XEAjax)
   return opts
 }
@@ -19,7 +19,7 @@ function responseResult (method) {
 function responseJSON (method) {
   return function () {
     var opts = method.apply(this, arguments)
-    var XEPromise = opts.$Promise
+    var XEPromise = opts.$Promise || Promise
     return ajax(opts).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         response.json().then(function (data) {
@@ -99,7 +99,7 @@ export var patchJSON = responseJSON(doPatch)
 export var deleteJSON = responseJSON(doDelete)
 
 export var AjaxController = XEFetchController
-export var version = '3.1.3'
+export var version = '3.1.4'
 
 var ajaxMethods = {
   doAll: doAll,

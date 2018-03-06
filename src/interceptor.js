@@ -45,7 +45,7 @@ objectAssign(ResponseXHR.prototype, {
  * Request 拦截器
  */
 export function requestInterceptor (request) {
-  var XEPromise = request.$Promise
+  var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(request, request.$context)
   arrayEach(state.request, function (callback) {
     thenInterceptor = thenInterceptor.then(function (req) {
@@ -65,7 +65,7 @@ export function requestInterceptor (request) {
  * Response 拦截器
  */
 export function responseInterceptor (request, response) {
-  var XEPromise = request.$Promise
+  var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(response, request.$context)
   arrayEach(state.response, function (callback) {
     thenInterceptor = thenInterceptor.then(function (resp) {

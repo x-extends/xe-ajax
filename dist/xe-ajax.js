@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.1.3
+ * xe-ajax.js v3.1.4
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -9,7 +9,7 @@
   'use strict'
 
   /**
-   * util headers fetchCont interceptor XEAjaxRequest XEAjaxResponse const index
+   * util headers fetchController interceptor request response constructor index
    */
 
   var isArray = Array.isArray || function (obj) {
@@ -258,7 +258,7 @@
    * Request 拦截器
    */
   function requestInterceptor (request) {
-    var XEPromise = request.$Promise
+    var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(request, request.$context)
     arrayEach(state.request, function (callback) {
       thenInterceptor = thenInterceptor.then(function (req) {
@@ -278,7 +278,7 @@
    * Response 拦截器
    */
   function responseInterceptor (request, response) {
-    var XEPromise = request.$Promise
+    var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(response, request.$context)
     arrayEach(state.response, function (callback) {
       thenInterceptor = thenInterceptor.then(function (resp) {
@@ -377,7 +377,7 @@
     },
     getBody: function () {
       var request = this
-      var XEPromise = request.$Promise
+      var XEPromise = request.$Promise || Promise
       return new XEPromise(function (resolve, reject) {
         var result = null
         if (request.body && request.method !== 'GET') {
@@ -417,7 +417,7 @@
       var that = this
       var xhr = this._xhr
       var request = this._request
-      var XEPromise = request.$Promise
+      var XEPromise = request.$Promise || Promise
       return new XEPromise(function (resolve, reject) {
         var body = {responseText: '', response: xhr}
         if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
@@ -447,45 +447,47 @@
 
   function XEAjaxResponse (request, xhr) {
     var that = this
-    this.body = new XEReadableStream(xhr, request)
-    this.bodyUsed = false
-    this.url = request.url
-    this.headers = new XEHeaders()
-    this.status = 0
-    this.statusText = ''
-    this.ok = false
-    this.redirected = false
-    this.type = 'basic'
+    var $resp = {}
+
+    $resp.body = new XEReadableStream(xhr, request)
+    $resp.bodyUsed = false
+    $resp.url = request.url
+    $resp.headers = new XEHeaders()
+    $resp.status = 0
+    $resp.statusText = ''
+    $resp.ok = false
+    $resp.redirected = false
+    $resp.type = 'basic'
 
     this.json = function () {
       return this.body._getBody().then(function (body) {
-        that.bodyUsed = true
+        $resp.bodyUsed = true
         return body.response
       })
     }
 
     this.text = function () {
-      return this.body._getBody().then(function (body) {
-        that.bodyUsed = true
+      return $resp.body._getBody().then(function (body) {
+        $resp.bodyUsed = true
         return body.responseText
       })
     }
 
     // xhr handle
     if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
-      this.status = xhr.status
-      this.redirected = this.status === 302
-      this.ok = request.getPromiseStatus(this)
+      $resp.status = xhr.status
+      $resp.redirected = $resp.status === 302
+      $resp.ok = request.getPromiseStatus(this)
 
       // if no content
-      if (this.status === 1223 || this.status === 204) {
-        this.statusText = 'No Content'
-      } else if (this.status === 304) {
+      if ($resp.status === 1223 || $resp.status === 204) {
+        $resp.statusText = 'No Content'
+      } else if ($resp.status === 304) {
         // if not modified
-        this.statusText = 'Not Modified'
+        $resp.statusText = 'Not Modified'
       } else {
         // statusText
-        this.statusText = (xhr.statusText || this.statusText).trim()
+        $resp.statusText = (xhr.statusText || $resp.statusText).trim()
       }
 
       // parse headers
@@ -494,11 +496,19 @@
         if (allResponseHeaders) {
           arrayEach(allResponseHeaders.split('\n'), function (row) {
             var index = row.indexOf(':')
-            this.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
-          }, this)
+            $resp.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
+          })
         }
       }
     }
+
+    arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+      Object.defineProperty(that, name, {
+        get: function () {
+          return $resp[name]
+        }
+      })
+    })
   }
 
   var global = typeof window === 'undefined' ? this : window
@@ -523,8 +533,8 @@
     * @return Promise
     */
   function XEAjax (options) {
-    var opts = objectAssign({$Promise: Promise}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
-    var XEPromise = opts.$Promise
+    var opts = objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
+    var XEPromise = opts.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       return (opts.jsonp ? sendJSONP : sendXHR)(new XEAjaxRequest(opts), resolve, reject)
     }, opts.$context)
@@ -650,7 +660,7 @@
   }
 
   function getOptions (method, def, options) {
-    var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise || Promise}, def, options)
+    var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
     clearXEAjaxContext(XEAjax)
     return opts
   }
@@ -665,7 +675,7 @@
   function responseJSON (method) {
     return function () {
       var opts = method.apply(this, arguments)
-      var XEPromise = opts.$Promise
+      var XEPromise = opts.$Promise || Promise
       return ajax(opts).then(function (response) {
         return new XEPromise(function (resolve, reject) {
           response.json().then(function (data) {
@@ -711,14 +721,19 @@
     return getOptions('PUT', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
+  // Http Request Method DELETE
+  function doDelete (url, body, opts) {
+    return getOptions('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
+  }
+
   // Http Request Method PATCH
   function doPatch (url, body, opts) {
     return getOptions('PATCH', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
-  // Http Request Method DELETE
-  function doDelete (url, body, opts) {
-    return getOptions('DELETE', isObject(url) ? {} : {url: url, body: body}, opts)
+  // Http Request Method GET
+  function doHead (url, body, opts) {
+    return getOptions('HEAD', isObject(url) ? {} : {url: url, body: body}, opts)
   }
 
   // Http Request Method jsonp
@@ -726,11 +741,13 @@
     return XEAjax(getOptions('GET', {url: url, params: params, jsonp: 'callback'}, opts))
   }
 
+  var fetchHead = responseResult(doHead)
   var fetchGet = responseResult(doGet)
   var fetchPost = responseResult(doPost)
   var fetchPut = responseResult(doPut)
   var fetchPatch = responseResult(doPatch)
   var fetchDelete = responseResult(doDelete)
+  var headJSON = responseJSON(doHead)
   var getJSON = responseJSON(doGet)
   var postJSON = responseJSON(doPost)
   var putJSON = responseJSON(doPut)
@@ -738,21 +755,23 @@
   var deleteJSON = responseJSON(doDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.1.3'
+  var version = '3.1.4'
 
   var ajaxMethods = {
     doAll: doAll,
     ajax: ajax,
     fetchGet: fetchGet,
-    getJSON: getJSON,
     fetchPost: fetchPost,
-    postJSON: postJSON,
     fetchPut: fetchPut,
-    putJSON: putJSON,
-    fetchPatch: fetchPatch,
-    patchJSON: patchJSON,
     fetchDelete: fetchDelete,
+    fetchPatch: fetchPatch,
+    fetchHead: fetchHead,
+    getJSON: getJSON,
+    postJSON: postJSON,
+    putJSON: putJSON,
     deleteJSON: deleteJSON,
+    patchJSON: patchJSON,
+    headJSON: headJSON,
     jsonp: jsonp,
     setup: setup,
     serialize: serialize,

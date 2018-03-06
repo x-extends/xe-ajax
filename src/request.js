@@ -56,7 +56,7 @@ objectAssign(XEAjaxRequest.prototype, {
   },
   getBody: function () {
     var request = this
-    var XEPromise = request.$Promise
+    var XEPromise = request.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       var result = null
       if (request.body && request.method !== 'GET') {

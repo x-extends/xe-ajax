@@ -15,12 +15,12 @@ XEAjax 一个开源且不依赖于任何框架，基于 Promise API 的请求函
 ### cdnjs 获取最新版本
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
 ``` shell
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.3/dist/xe-ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.4/dist/xe-ajax.js"></script>
 ```
 ### unpkg 获取最新版本
-[点击浏览](https://unpkg.com/xe-ajax@3.1.3/)已发布的所有 npm 包源码
+[点击浏览](https://unpkg.com/xe-ajax@3.1.4/)已发布的所有 npm 包源码
 ``` shell
-<script src="https://unpkg.com/xe-ajax@3.1.3/dist/xe-ajax.js"></script>
+<script src="https://unpkg.com/xe-ajax@3.1.4/dist/xe-ajax.js"></script>
 ```
 
 ## AMD 安装
@@ -372,13 +372,13 @@ XEAjax.get1()
 ```
 
 ## Mock 虚拟服务
-支持常用 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等插件..
+支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等插件..
 
-ES6 + Vue + ElementUI + XEAjax + Mock 项目例子1 请参考 [vue-element1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-element1) 示例  
-ES6 + Vue + XEAjax + Mock 项目例子1 请参考 [vue-mock1](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock1) 示例  
-RequireJS + Vue + XEAjax + Mock 项目例子2 请参考 [vue-mock2](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock2) 示例  
-RequireJS + Vue + VXEAjax + Mock 项目例子3 请参考 [vue-mock3](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock3) 示例  
-更多详细说明请查看 [Mock插件文档](https://github.com/xuliangzhan/xe-ajax-mock)
+ES6、Vue、VueRouter、VueI18n、ElementUI、VXEAjax、Mock 项目 [点击查看](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-element1)  
+ES6、Vue、VueRouter、VueI18n、ElementUI、XEAjax、Mock 项目 [点击查看](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-element1)  
+ES6、Vue、VueRouter、VueI18n、XEAjax、Mock 项目 [点击查看](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock1)  
+RequireJS、Vue、VueRouter、VueI18n、XEAjax、Mock 项目 [点击查看](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock2)  
+RequireJS、Vue、VueRouter、VueI18n、VXEAjax、Mock 项目 [点击查看](https://github.com/xuliangzhan/xe-ajax-mock/tree/master/examples/vue-mock3)
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan

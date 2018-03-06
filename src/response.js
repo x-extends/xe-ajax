@@ -12,7 +12,7 @@ objectAssign(XEReadableStream.prototype, {
     var that = this
     var xhr = this._xhr
     var request = this._request
-    var XEPromise = request.$Promise
+    var XEPromise = request.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       var body = {responseText: '', response: xhr}
       if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
@@ -42,45 +42,47 @@ objectAssign(XEReadableStream.prototype, {
 
 export function XEAjaxResponse (request, xhr) {
   var that = this
-  this.body = new XEReadableStream(xhr, request)
-  this.bodyUsed = false
-  this.url = request.url
-  this.headers = new XEHeaders()
-  this.status = 0
-  this.statusText = ''
-  this.ok = false
-  this.redirected = false
-  this.type = 'basic'
+  var $resp = {}
+
+  $resp.body = new XEReadableStream(xhr, request)
+  $resp.bodyUsed = false
+  $resp.url = request.url
+  $resp.headers = new XEHeaders()
+  $resp.status = 0
+  $resp.statusText = ''
+  $resp.ok = false
+  $resp.redirected = false
+  $resp.type = 'basic'
 
   this.json = function () {
     return this.body._getBody().then(function (body) {
-      that.bodyUsed = true
+      $resp.bodyUsed = true
       return body.response
     })
   }
 
   this.text = function () {
-    return this.body._getBody().then(function (body) {
-      that.bodyUsed = true
+    return $resp.body._getBody().then(function (body) {
+      $resp.bodyUsed = true
       return body.responseText
     })
   }
 
   // xhr handle
   if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
-    this.status = xhr.status
-    this.redirected = this.status === 302
-    this.ok = request.getPromiseStatus(this)
+    $resp.status = xhr.status
+    $resp.redirected = $resp.status === 302
+    $resp.ok = request.getPromiseStatus(this)
 
     // if no content
-    if (this.status === 1223 || this.status === 204) {
-      this.statusText = 'No Content'
-    } else if (this.status === 304) {
+    if ($resp.status === 1223 || $resp.status === 204) {
+      $resp.statusText = 'No Content'
+    } else if ($resp.status === 304) {
       // if not modified
-      this.statusText = 'Not Modified'
+      $resp.statusText = 'Not Modified'
     } else {
       // statusText
-      this.statusText = (xhr.statusText || this.statusText).trim()
+      $resp.statusText = (xhr.statusText || $resp.statusText).trim()
     }
 
     // parse headers
@@ -89,11 +91,19 @@ export function XEAjaxResponse (request, xhr) {
       if (allResponseHeaders) {
         arrayEach(allResponseHeaders.split('\n'), function (row) {
           var index = row.indexOf(':')
-          this.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
-        }, this)
+          $resp.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
+        })
       }
     }
   }
+
+  arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+    Object.defineProperty(that, name, {
+      get: function () {
+        return $resp[name]
+      }
+    })
+  })
 }
 
 export default XEAjaxResponse
