@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.1.4
+ * xe-ajax.js v3.1.5
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -459,6 +459,14 @@
     $resp.redirected = false
     $resp.type = 'basic'
 
+    arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+      Object.defineProperty(that, name, {
+        get: function () {
+          return $resp[name]
+        }
+      })
+    })
+
     this.json = function () {
       return this.body._getBody().then(function (body) {
         $resp.bodyUsed = true
@@ -501,14 +509,6 @@
         }
       }
     }
-
-    arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
-      Object.defineProperty(that, name, {
-        get: function () {
-          return $resp[name]
-        }
-      })
-    })
   }
 
   var global = typeof window === 'undefined' ? this : window
@@ -755,7 +755,7 @@
   var deleteJSON = responseJSON(doDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.1.4'
+  var version = '3.1.5'
 
   var ajaxMethods = {
     doAll: doAll,

@@ -54,6 +54,14 @@ export function XEAjaxResponse (request, xhr) {
   $resp.redirected = false
   $resp.type = 'basic'
 
+  arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+    Object.defineProperty(that, name, {
+      get: function () {
+        return $resp[name]
+      }
+    })
+  })
+
   this.json = function () {
     return this.body._getBody().then(function (body) {
       $resp.bodyUsed = true
@@ -96,14 +104,6 @@ export function XEAjaxResponse (request, xhr) {
       }
     }
   }
-
-  arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
-    Object.defineProperty(that, name, {
-      get: function () {
-        return $resp[name]
-      }
-    })
-  })
 }
 
 export default XEAjaxResponse
