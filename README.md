@@ -154,6 +154,20 @@ XEAjax.setup({
 ```
 
 ## 示例
+### 请求调用
+``` shell
+import { ajax } from 'xe-ajax'
+
+ajax({
+  url: '/api/user/list', 
+  method: 'GET', 
+  params: {id: 1}
+}).then(response => {
+  // response
+}).catch(response => {
+  // response
+})
+```
 ### 响应 response 方式调用
 ``` shell
 import { fetchGet, fetchPost } from 'xe-ajax'
@@ -187,14 +201,7 @@ fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}
 ```
 ### 响应 json 方式调用
 ``` shell
-import { ajax, getJSON, postJSON, jsonp } from 'xe-ajax'
-
-// 参数调用
-ajax({
-  url: '/api/user/list', 
-  method: 'GET', 
-  params: {id: 1}
-})
+import { getJSON, postJSON, jsonp } from 'xe-ajax'
 
 // 直接返回请求结果
 getJSON('/api/user/list').then(data => {
