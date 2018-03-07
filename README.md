@@ -320,7 +320,7 @@ XEAjax.interceptors.request.use((request, next) => {
 
   // request.method = 'POST' // 修改 method
   // request.params.id = 1 // 修改参数
-  // request.setHeader('X-Token', 123) // 设置请求头
+  // request.headers.set('X-Token', 123) // 设置请求头
 
   // 调用 next(),继续执行下一个拦截器
   next()
