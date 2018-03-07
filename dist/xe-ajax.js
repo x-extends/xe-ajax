@@ -196,9 +196,15 @@
       }, this)
     }
 
-    objectEach(heads, function (value, key) {
-      this.set(key, value)
-    }, this)
+    if (heads instanceof XEHeaders) {
+      heads.forEach(function (value, key) {
+        this.set(key, value)
+      }, this)
+    } else {
+      objectEach(heads, function (value, key) {
+        this.set(key, value)
+      }, this)
+    }
   }
 
   var requestList = []

@@ -75,9 +75,15 @@ export var XEHeaders = typeof Headers === 'function' ? Headers : function (heads
     }, this)
   }
 
-  objectEach(heads, function (value, key) {
-    this.set(key, value)
-  }, this)
+  if (heads instanceof XEHeaders) {
+    heads.forEach(function (value, key) {
+      this.set(key, value)
+    }, this)
+  } else {
+    objectEach(heads, function (value, key) {
+      this.set(key, value)
+    }, this)
+  }
 }
 
 export default XEHeaders
