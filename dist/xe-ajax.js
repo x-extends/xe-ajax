@@ -1,5 +1,5 @@
 /*!
- * xe-ajax.js v3.1.6
+ * xe-ajax.js v3.1.7
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  */
@@ -125,43 +125,81 @@
     return String(key).toLowerCase()
   }
 
-  function XEHeaders () {
-    this._state = {}
+  function getObjectIterators (obj, getIndex) {
+    var result = []
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        var value = obj[key]
+        result.push([key, value.join(', '), [key, value.join(', ')]][getIndex])
+      }
+    }
+    return result
+  }
+
+  function getIteratorResult (iterator, value) {
+    var done = iterator.$index++ >= iterator.$list.length
+    return {done: done, value: done ? undefined : value}
+  }
+
+  function XEIterator (list) {
+    this.$index = 0
+    this.$list = list
+    this.next = function () {
+      return getIteratorResult(this, this.$list[this.$index])
+    }
+  }
+
+  var XEHeaders = typeof Headers === 'function' ? Headers : function (heads) {
+    var $state = {}
 
     this.set = function (key, value) {
-      this._state[toKey(key)] = [value]
+      $state[toKey(key)] = [value]
     }
 
     this.get = function (key) {
       var _key = toKey(key)
-      return this.has(_key) ? this._state[_key].join(', ') : null
+      return this.has(_key) ? $state[_key].join(', ') : null
     }
 
     this.append = function (key, value) {
       var _key = toKey(key)
       if (this.has(_key)) {
-        return this._state[_key].push(value)
+        return $state[_key].push(value)
       } else {
         this.set(_key, value)
       }
     }
 
     this.has = function (key) {
-      return !!this._state[toKey(key)]
+      return !!$state[toKey(key)]
+    }
+
+    this.keys = function () {
+      return new XEIterator(getObjectIterators($state, 0))
+    }
+
+    this.values = function () {
+      return new XEIterator(getObjectIterators($state, 1))
+    }
+
+    this.entries = function () {
+      return new XEIterator(getObjectIterators($state, 2))
     }
 
     this['delete'] = function (key) {
-      delete this._state[toKey(key)]
+      delete $state[toKey(key)]
     }
-  }
 
-  objectAssign(XEHeaders.prototype, {
-    forEach: function (callback, context) {
-      objectEach(this._state, function (value, key, state) {
-        callback.call(context, value.join(', '), state)
-      })
+    this.forEach = function (callback, context) {
+      objectEach($state, function (value, key, state) {
+        callback.call(context, value.join(', '), key, this)
+      }, this)
     }
-  })
+
+    objectEach(heads, function (value, key) {
+      this.set(key, value)
+    }, this)
+  }
 
   var requestList = []
 
@@ -311,20 +349,20 @@
   interceptors.request.use(function (request, next) {
     if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
       if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
-        request.setHeader('Content-Type', 'application/json; charset=utf-8')
+        request.headers.set('Content-Type', 'application/json; charset=utf-8')
       } else {
-        request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+        request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
       }
     }
     if (request.crossOrigin) {
-      request.setHeader('X-Requested-With', 'XMLHttpRequest')
+      request.headers.set('X-Requested-With', 'XMLHttpRequest')
     }
     next()
   })
 
   function XEAjaxRequest (options) {
     objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
-    this.ABORT_RESPONSE = undefined
+    this.headers = new XEHeaders(options.headers)
     this.method = String(this.method).toLocaleUpperCase()
     this.crossOrigin = isCrossOrigin(this)
     if (this.jsonp) {
@@ -338,18 +376,6 @@
   objectAssign(XEAjaxRequest.prototype, {
     abort: function (response) {
       this.xhr.abort(response)
-    },
-    setHeader: function (name, value) {
-      this.headers[name] = value
-    },
-    getHeader: function () {
-      return this.headers[name]
-    },
-    deleteHeader: function (name) {
-      delete this.headers[name]
-    },
-    clearHeader: function () {
-      this.headers = {}
     },
     getUrl: function () {
       var url = this.url
@@ -566,7 +592,7 @@
       if (request.timeout && !isNaN(request.timeout)) {
         xhr.timeout = request.timeout
       }
-      objectEach(request.headers, function (value, name) {
+      request.headers.forEach(function (value, name) {
         xhr.setRequestHeader(name, value)
       })
       xhr.onreadystatechange = function () {
@@ -755,7 +781,7 @@
   var deleteJSON = responseJSON(doDelete)
 
   var AjaxController = XEFetchController
-  var version = '3.1.6'
+  var version = '3.1.7'
 
   var ajaxMethods = {
     doAll: doAll,

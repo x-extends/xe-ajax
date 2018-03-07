@@ -1,9 +1,10 @@
 import { isFunction, isFormData, isCrossOrigin, serialize, objectAssign, getLocatOrigin } from './util'
+import { XEHeaders } from './headers'
 import { setFetchRequest } from './fetchController'
 
 export function XEAjaxRequest (options) {
   objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
-  this.ABORT_RESPONSE = undefined
+  this.headers = new XEHeaders(options.headers)
   this.method = String(this.method).toLocaleUpperCase()
   this.crossOrigin = isCrossOrigin(this)
   if (this.jsonp) {
@@ -17,18 +18,6 @@ export function XEAjaxRequest (options) {
 objectAssign(XEAjaxRequest.prototype, {
   abort: function (response) {
     this.xhr.abort(response)
-  },
-  setHeader: function (name, value) {
-    this.headers[name] = value
-  },
-  getHeader: function () {
-    return this.headers[name]
-  },
-  deleteHeader: function (name) {
-    delete this.headers[name]
-  },
-  clearHeader: function () {
-    this.headers = {}
   },
   getUrl: function () {
     var url = this.url

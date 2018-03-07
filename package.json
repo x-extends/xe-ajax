@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.1.6",
+  "version": "3.1.7",
   "description": "基于 Promise API 的请求函数，支持 Mock 虚拟服务",
   "main": "index.js",
   "scripts": {

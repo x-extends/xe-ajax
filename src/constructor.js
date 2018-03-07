@@ -1,7 +1,7 @@
 import XEAjaxRequest from './request'
 import XEAjaxResponse from './response'
 import { requestInterceptor, responseInterceptor } from './interceptor'
-import { isFunction, objectEach, objectAssign, getBaseURL } from './util'
+import { isFunction, objectAssign, getBaseURL } from './util'
 
 var global = typeof window === 'undefined' ? this : window
 var setupDefaults = {
@@ -58,7 +58,7 @@ function sendXHR (request, resolve, reject) {
     if (request.timeout && !isNaN(request.timeout)) {
       xhr.timeout = request.timeout
     }
-    objectEach(request.headers, function (value, name) {
+    request.headers.forEach(function (value, name) {
       xhr.setRequestHeader(name, value)
     })
     xhr.onreadystatechange = function () {

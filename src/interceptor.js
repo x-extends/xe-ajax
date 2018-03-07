@@ -98,13 +98,13 @@ export var interceptors = {
 interceptors.request.use(function (request, next) {
   if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
     if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
-      request.setHeader('Content-Type', 'application/json; charset=utf-8')
+      request.headers.set('Content-Type', 'application/json; charset=utf-8')
     } else {
-      request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+      request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
     }
   }
   if (request.crossOrigin) {
-    request.setHeader('X-Requested-With', 'XMLHttpRequest')
+    request.headers.set('X-Requested-With', 'XMLHttpRequest')
   }
   next()
 })

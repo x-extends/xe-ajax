@@ -1,45 +1,83 @@
-import { objectAssign, objectEach } from './util'
+import { objectEach } from './util'
 
-export function toKey (key) {
+function toKey (key) {
   return String(key).toLowerCase()
 }
 
-export function XEHeaders () {
-  this._state = {}
+function getObjectIterators (obj, getIndex) {
+  var result = []
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      var value = obj[key]
+      result.push([key, value.join(', '), [key, value.join(', ')]][getIndex])
+    }
+  }
+  return result
+}
+
+function getIteratorResult (iterator, value) {
+  var done = iterator.$index++ >= iterator.$list.length
+  return {done: done, value: done ? undefined : value}
+}
+
+function XEIterator (list) {
+  this.$index = 0
+  this.$list = list
+  this.next = function () {
+    return getIteratorResult(this, this.$list[this.$index])
+  }
+}
+
+export var XEHeaders = typeof Headers === 'function' ? Headers : function (heads) {
+  var $state = {}
 
   this.set = function (key, value) {
-    this._state[toKey(key)] = [value]
+    $state[toKey(key)] = [value]
   }
 
   this.get = function (key) {
     var _key = toKey(key)
-    return this.has(_key) ? this._state[_key].join(', ') : null
+    return this.has(_key) ? $state[_key].join(', ') : null
   }
 
   this.append = function (key, value) {
     var _key = toKey(key)
     if (this.has(_key)) {
-      return this._state[_key].push(value)
+      return $state[_key].push(value)
     } else {
       this.set(_key, value)
     }
   }
 
   this.has = function (key) {
-    return !!this._state[toKey(key)]
+    return !!$state[toKey(key)]
+  }
+
+  this.keys = function () {
+    return new XEIterator(getObjectIterators($state, 0))
+  }
+
+  this.values = function () {
+    return new XEIterator(getObjectIterators($state, 1))
+  }
+
+  this.entries = function () {
+    return new XEIterator(getObjectIterators($state, 2))
   }
 
   this['delete'] = function (key) {
-    delete this._state[toKey(key)]
+    delete $state[toKey(key)]
   }
-}
 
-objectAssign(XEHeaders.prototype, {
-  forEach: function (callback, context) {
-    objectEach(this._state, function (value, key, state) {
-      callback.call(context, value.join(', '), state)
-    })
+  this.forEach = function (callback, context) {
+    objectEach($state, function (value, key, state) {
+      callback.call(context, value.join(', '), key, this)
+    }, this)
   }
-})
+
+  objectEach(heads, function (value, key) {
+    this.set(key, value)
+  }, this)
+}
 
 export default XEHeaders
