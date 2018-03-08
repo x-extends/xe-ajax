@@ -786,7 +786,7 @@
   var patchJSON = responseJSON(doPatch)
   var deleteJSON = responseJSON(doDelete)
 
-  var AjaxController = XEFetchController
+  var AbortController = XEFetchController
   var version = '3.1.7'
 
   var ajaxMethods = {
@@ -836,7 +836,7 @@
   mixin(ajaxMethods)
   XEAjax.use = use
   XEAjax.mixin = mixin
-  XEAjax.AjaxController = AjaxController
+  XEAjax.AbortController = AbortController
 
   return XEAjax
 }))

@@ -289,13 +289,13 @@ define([
 ```
 
 ## 取消请求
-### AjaxController 控制器对象
+### AbortController 控制器对象
 允许控制一个或多个取消指令请求
 ``` shell
-import { AjaxController, getJSON, fetchPost } from 'xe-ajax'
+import { AbortController, getJSON, fetchPost } from 'xe-ajax'
 
 // 创建一个控制器对象
-const controller = new AjaxController()
+const controller = new AbortController()
 // 获取signal
 const signal = controller.signal
 // 给请求加入控制器 signal
