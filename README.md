@@ -226,6 +226,12 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}}
 ``` shell
 import { jsonp } from 'xe-ajax'
 
+fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(response => {
+  response.json().then(data => {
+    // 获取 data
+  })
+})
+
 jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data => {
   // 请求成功
 }).catch(data => {
@@ -261,7 +267,7 @@ import { getJSON } from 'xe-ajax'
 getJSON('/api/user/info').then(data => {
   return getJSON('/api/user/details', {id: data.id})
 }).then(data => {
-  // data
+  // 获取 data
 })
 ```
 ### AMD 使用方式
