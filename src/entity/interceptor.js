@@ -1,5 +1,5 @@
-import { isFormData, arrayEach, objectAssign } from './util'
-import XEAjaxResponse from './response'
+import { isFormData, arrayEach } from '../core/utils'
+import { XEResponse, ResponseXHR } from '../entity/response'
 
 /**
  * 拦截器队列
@@ -13,33 +13,6 @@ function useInterceptors (calls) {
     }
   }
 }
-
-function ResponseXHR (result) {
-  try {
-    var responseText = JSON.stringify(result.body)
-  } catch (e) {
-    responseText = ''
-  }
-  this.status = result.status
-  this.responseHeaders = result.headers
-  this.response = responseText
-  this.responseText = responseText
-}
-
-objectAssign(ResponseXHR.prototype, {
-  getAllResponseHeaders: function () {
-    var result = ''
-    var responseHeader = this.responseHeaders
-    if (responseHeader) {
-      for (var key in responseHeader) {
-        if (responseHeader.hasOwnProperty(key)) {
-          result += key + ': ' + responseHeader[key] + '\n'
-        }
-      }
-    }
-    return result
-  }
-})
 
 /**
  * Request 拦截器
@@ -71,8 +44,8 @@ export function responseInterceptor (request, response) {
     thenInterceptor = thenInterceptor.then(function (resp) {
       return new XEPromise(function (resolve) {
         callback(resp, function (result) {
-          if (result && result.constructor !== XEAjaxResponse) {
-            resolve(new XEAjaxResponse(request, new ResponseXHR(result)))
+          if (result && result.constructor !== XEResponse) {
+            resolve(new XEResponse(request, new ResponseXHR(result)))
           } else {
             resolve(resp)
           }
@@ -96,11 +69,10 @@ export var interceptors = {
 
 // 默认拦截器
 interceptors.request.use(function (request, next) {
-  if (!isFormData(request.method === 'GET' ? request.params : request.body)) {
-    if (request.method !== 'GET' && String(request.bodyType).toLocaleUpperCase() === 'JSON_DATA') {
+  request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    if (!isFormData(request.body) && request.bodyType === 'JSON_DATA') {
       request.headers.set('Content-Type', 'application/json; charset=utf-8')
-    } else {
-      request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
     }
   }
   if (request.crossOrigin) {

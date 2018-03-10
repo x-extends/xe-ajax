@@ -1,6 +1,10 @@
-import { objectEach, isFunction, clearXEAjaxContext } from './src/util'
-import XEAjax from './src/constructor'
-import ajaxMethods, { AbortController } from './src'
+import { serialize, objectEach, isFunction, clearXEAjaxContext, objectAssign } from './src/core/utils'
+import { XEAbortController } from './src/entity/abort'
+import { XEAjax, setup } from './src/core/ajax'
+import { interceptors } from './src/entity/interceptor'
+import { exportMethods } from './src/core/methods'
+
+export var AbortController = XEAbortController
 
 /**
  * 混合函数
@@ -22,12 +26,21 @@ function mixin (methods) {
  */
 function use (plugin) {
   plugin.install(XEAjax)
+  console.info('[' + XEAjax.$name + '] Ready. Detected ' + plugin.$name + ' v' + plugin.version)
 }
 
-mixin(ajaxMethods)
-XEAjax.use = use
-XEAjax.mixin = mixin
-XEAjax.AbortController = AbortController
+objectAssign(XEAjax, {
+  use: use,
+  setup: setup,
+  mixin: mixin,
+  AbortController: AbortController,
+  serialize: serialize,
+  interceptors: interceptors,
+  version: '3.2.0',
+  $name: 'XEAjax'
+})
 
-export * from './src'
+mixin(exportMethods)
+
+export * from './src/core'
 export default XEAjax

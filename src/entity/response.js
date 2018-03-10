@@ -1,5 +1,53 @@
-import { objectAssign, arrayEach } from './util'
-import { XEHeaders } from './headers'
+import { isString, objectAssign, arrayEach } from '../core/utils'
+import { XEHeaders } from '../entity/headers'
+import { responseInterceptor } from '../entity/interceptor'
+
+function getResponse (request, result) {
+  if (result) {
+    if (typeof Response === 'undefined') {
+      if (result.constructor === XEResponse) {
+        return result
+      }
+    } else if (result.constructor === Response || result.constructor === XEResponse) {
+      return result
+    }
+  }
+  return new XEResponse(request, new ResponseXHR(result))
+}
+
+export function responseComplete (request, result, complete) {
+  request.$complete = true
+  responseInterceptor(request, getResponse(request, result)).then(function (response) {
+    complete(response)
+  })
+}
+
+export function ResponseXHR (result) {
+  try {
+    var responseText = isString(result.body) ? result.body : JSON.stringify(result.body)
+  } catch (e) {
+    responseText = ''
+  }
+  this.status = result.status
+  this.responseHeaders = result.headers
+  this.response = responseText
+  this.responseText = responseText
+}
+
+objectAssign(ResponseXHR.prototype, {
+  getAllResponseHeaders: function () {
+    var result = ''
+    var responseHeader = this.responseHeaders
+    if (responseHeader) {
+      for (var key in responseHeader) {
+        if (responseHeader.hasOwnProperty(key)) {
+          result += key + ': ' + responseHeader[key] + '\n'
+        }
+      }
+    }
+    return result
+  }
+})
 
 function XEReadableStream (xhr, request) {
   this.locked = false
@@ -21,7 +69,7 @@ objectAssign(XEReadableStream.prototype, {
           try {
             body.response = JSON.parse(xhr.responseText)
           } catch (e) {
-            body.response = null
+            reject(new TypeError(e))
           }
         } else {
           body.response = xhr.response
@@ -40,7 +88,7 @@ objectAssign(XEReadableStream.prototype, {
   }
 })
 
-export function XEAjaxResponse (request, xhr) {
+export function XEResponse (request, xhr) {
   var that = this
   var $resp = {}
 
@@ -80,7 +128,7 @@ export function XEAjaxResponse (request, xhr) {
   if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
     $resp.status = xhr.status
     $resp.redirected = $resp.status === 302
-    $resp.ok = request.getPromiseStatus(this)
+    $resp.ok = request.validateStatus(this)
 
     // if no content
     if ($resp.status === 1223 || $resp.status === 204) {
@@ -88,6 +136,9 @@ export function XEAjaxResponse (request, xhr) {
     } else if ($resp.status === 304) {
       // if not modified
       $resp.statusText = 'Not Modified'
+    } else if ($resp.status === 404) {
+      // if not found
+      $resp.statusText = 'Not Found'
     } else {
       // statusText
       $resp.statusText = (xhr.statusText || $resp.statusText).trim()
@@ -105,5 +156,3 @@ export function XEAjaxResponse (request, xhr) {
     }
   }
 }
-
-export default XEAjaxResponse

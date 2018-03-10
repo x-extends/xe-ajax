@@ -15,6 +15,10 @@ export function isCrossOrigin (request) {
   return false
 }
 
+export function isString (obj) {
+  return typeof obj === 'string'
+}
+
 export function isObject (obj) {
   return obj && typeof obj === 'object'
 }
@@ -98,7 +102,7 @@ export function arrayEach (array, callback, context) {
     array.forEach(callback, context)
   } else {
     for (var index = 0, len = array.length || 0; index < len; index++) {
-      callback.call(context || global, array[index], index, array)
+      callback.call(context, array[index], index, array)
     }
   }
 }

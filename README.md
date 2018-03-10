@@ -15,12 +15,12 @@ XEAjax 一个开源且不依赖于任何框架，基于 Promise API 的请求函
 ### cdnjs 获取最新版本
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
 ``` shell
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.1.7/dist/xe-ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.2.0/dist/xe-ajax.js"></script>
 ```
 ### unpkg 获取最新版本
-[点击浏览](https://unpkg.com/xe-ajax@3.1.7/)已发布的所有 npm 包源码
+[点击浏览](https://unpkg.com/xe-ajax@3.2.0/)已发布的所有 npm 包源码
 ``` shell
-<script src="https://unpkg.com/xe-ajax@3.1.7/dist/xe-ajax.js"></script>
+<script src="https://unpkg.com/xe-ajax@3.2.0/dist/xe-ajax.js"></script>
 ```
 
 ## AMD 安装
@@ -65,20 +65,21 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 * doAll (iterable)
 * ajax ( options )
 * 
+* fetchJsonp ( url, params, options )
+* fetchHead ( url, params, options )
 * fetchGet ( url, params, options )
 * fetchPost ( url, body, options )
 * fetchPut ( url, body, options )
 * fetchDelete ( url, body, options )
 * fetchPatch ( url, body, options )
-* fetchHead ( url, body, options )
 * 
 * jsonp ( url, params, options )
+* headJSON ( url, params, options )
 * getJSON ( url, params, options )
 * postJSON ( url, body, options )
 * putJSON ( url, body, options )
 * deleteJSON ( url, body, options )
 * patchJSON ( url, body, options )
-* headJSON ( url, body, options )
 
 ### 入参说明
 * url（字符串） 请求地址，可被自定义 options 属性覆盖
@@ -102,7 +103,7 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
-| getXMLHttpRequest | Function ( request ) | 自定义 XMLHttpRequest 的函数 |  |
+| validateStatus | Function ( response ) | 校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
 ### Response 对象说明
 | 属性 | 类型 | 描述 |
@@ -153,7 +154,7 @@ XEAjax.setup({
 ```
 
 ## 示例
-### 请求调用
+### 完整参数调用
 ``` shell
 import { ajax } from 'xe-ajax'
 
@@ -362,8 +363,10 @@ XEAjax.interceptors.response.use((response, next) => {
 ## 混合函数
 ### 文件 ./customs.js
 ``` shell
-export function get1 () {
-  console.log('自定义的函数')
+import XEAjax from 'xe-ajax'
+
+export function getText () {
+  return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
 } 
 ```
 ### 示例 ./main.js
@@ -374,7 +377,7 @@ import customs from './customs'
 XEAjax.mixin(customs)
 
 // 调用自定义扩展函数
-XEAjax.get1()
+XEAjax.getText()
 ```
 
 ## Mock 虚拟服务

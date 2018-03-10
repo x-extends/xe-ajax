@@ -1,4 +1,4 @@
-import { objectEach } from './util'
+import { objectEach } from '../core/utils'
 
 function toKey (key) {
   return String(key).toLowerCase()
@@ -85,5 +85,3 @@ export var XEHeaders = typeof Headers === 'function' ? Headers : function (heads
     }, this)
   }
 }
-
-export default XEHeaders
