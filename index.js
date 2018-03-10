@@ -1,6 +1,6 @@
 import { serialize, objectEach, isFunction, clearXEAjaxContext, objectAssign } from './src/core/utils'
 import { XEAbortController } from './src/entity/abort'
-import { XEAjax, setup } from './src/core/ajax'
+import { XEAjax, setupDefaults, setup } from './src/core/ajax'
 import { interceptors } from './src/entity/interceptor'
 import { exportMethods } from './src/core/methods'
 
@@ -26,7 +26,9 @@ function mixin (methods) {
  */
 function use (plugin) {
   plugin.install(XEAjax)
-  console.info('[' + XEAjax.$name + '] Ready. Detected ' + plugin.$name + ' v' + plugin.version)
+  if (setupDefaults.log) {
+    console.info('[' + XEAjax.$name + '] Ready. Detected ' + plugin.$name + ' v' + plugin.version)
+  }
 }
 
 objectAssign(XEAjax, {
