@@ -103,7 +103,7 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
-| validateStatus | Function ( response ) | 校验请求是否成功 | response.status >= 200 && response.status < 300 |
+| validateStatus | Function ( response ) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
 ### Response 对象说明
 | 属性 | 类型 | 描述 |

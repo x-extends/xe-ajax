@@ -738,7 +738,7 @@
  * @param Function paramsSerializer(params, request) 自定义URL序列化函数
  * @param Function transformBody(body, request) 用于改变提交数据
  * @param Function stringifyBody(body, request) 自定义转换提交数据的函数
- * @param Function validateStatus(response) 自定义 请求成功判断条件
+ * @param Function validateStatus(response) 自定义校验请求是否成功
  * 高级扩展
  * @param Function $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
  * @param Function $fetch 自定义 fetch 请求函数
