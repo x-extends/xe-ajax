@@ -1,13 +1,13 @@
 /**
- * xe-ajax.js v3.2.0
+ * xe-ajax.js v3.2.1
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
  */
 (function (global, factory) {
   typeof s === 'object' && typeof module !== 'undefined' ? module.s = factory()
-	: typeof define === 'function' && define.amd ? define(factory)
-	: (global.XEAjax = factory())
+    : typeof define === 'function' && define.amd ? define(factory)
+      : (global.XEAjax = factory())
 }(this, function () {
   'use strict'
 
@@ -83,7 +83,7 @@
     return result
   }
 
-// Serialize Body
+  // Serialize Body
   function serialize (body) {
     var params = []
     objectEach(body, function (item, key) {
@@ -141,7 +141,7 @@
 
   function getIteratorResult (iterator, value) {
     var done = iterator.$index++ >= iterator.$list.length
-    return {done: done, value: done ? undefined : value}
+    return { done: done, value: done ? undefined : value }
   }
 
   function XEIterator (list) {
@@ -212,10 +212,10 @@
 
   var requestList = []
 
-/**
- * 索引 XHR Request 是否存在
- * @param { XERequest } item 对象
- */
+  /**
+   * 索引 XHR Request 是否存在
+   * @param { XERequest } item 对象
+   */
   function getIndex (item) {
     for (var index = 0, len = requestList.length; index < len; index++) {
       if (item === requestList[index][0]) {
@@ -225,7 +225,7 @@
   }
 
   function XEAbortSignal () {
-    var $signal = {aborted: false}
+    var $signal = { aborted: false }
     Object.defineProperty(this, 'aborted', {
       get: function () {
         return $signal.aborted
@@ -234,7 +234,7 @@
   }
 
   objectAssign(XEAbortSignal.prototype, {
-  // 将 Request 注入控制器
+    // 将 Request 注入控制器
     install: function (request) {
       if (request.signal) {
         var index = getIndex(request.signal)
@@ -252,7 +252,7 @@
   }
 
   objectAssign(XEAbortController.prototype, {
-  // 中止请求
+    // 中止请求
     abort: function () {
       var index = getIndex(this.signal)
       if (index !== undefined) {
@@ -266,10 +266,10 @@
     }
   })
 
-/**
- * 拦截器队列
- */
-  var state = {request: [], response: []}
+  /**
+   * 拦截器队列
+   */
+  var state = { request: [], response: [] }
 
   function useInterceptors (calls) {
     return function (callback) {
@@ -279,9 +279,9 @@
     }
   }
 
-/**
- * Request 拦截器
- */
+  /**
+   * Request 拦截器
+   */
   function requestInterceptor (request) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(request, request.$context)
@@ -299,9 +299,9 @@
     return thenInterceptor
   }
 
-/**
- * Response 拦截器
- */
+  /**
+   * Response 拦截器
+   */
   function responseInterceptor (request, response) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(response, request.$context)
@@ -332,7 +332,7 @@
     }
   }
 
-// 默认拦截器
+  // 默认拦截器
   interceptors.request.use(function (request, next) {
     if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
       request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
@@ -347,7 +347,7 @@
   })
 
   function XERequest (options) {
-    objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
+    objectAssign(this, { url: '', body: null, params: null, signal: null }, options)
     this.headers = new XEHeaders(options.headers)
     this.method = String(this.method).toLocaleUpperCase()
     this.bodyType = String(this.bodyType).toLocaleUpperCase()
@@ -366,7 +366,7 @@
       var params = ''
       if (url) {
         if (isFunction(this.transformParams)) {
-        // 避免空值报错，params 始终保持是对象
+          // 避免空值报错，params 始终保持是对象
           this.params = this.transformParams(this.params || {}, this)
         }
         if (this.params && !isFormData(this.params)) {
@@ -393,7 +393,7 @@
         if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
           try {
             if (isFunction(request.transformBody)) {
-            // 避免空值报错，body 始终保持是对象
+              // 避免空值报错，body 始终保持是对象
               request.body = request.transformBody(request.body || {}, request) || request.body
             }
             if (isFunction(request.stringifyBody)) {
@@ -476,7 +476,7 @@
       var request = this._request
       var XEPromise = request.$Promise || Promise
       return new XEPromise(function (resolve, reject) {
-        var body = {responseText: '', response: xhr}
+        var body = { responseText: '', response: xhr }
         if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
           if (xhr.responseText) {
             body.responseText = xhr.responseText
@@ -538,27 +538,27 @@
       })
     }
 
-  // xhr handle
+    // xhr handle
     if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
       $resp.status = xhr.status
       $resp.redirected = $resp.status === 302
       $resp.ok = request.validateStatus(this)
 
-    // if no content
+      // if no content
       if ($resp.status === 1223 || $resp.status === 204) {
         $resp.statusText = 'No Content'
       } else if ($resp.status === 304) {
-      // if not modified
+        // if not modified
         $resp.statusText = 'Not Modified'
       } else if ($resp.status === 404) {
-      // if not found
+        // if not found
         $resp.statusText = 'Not Found'
       } else {
-      // statusText
+        // statusText
         $resp.statusText = (xhr.statusText || $resp.statusText).trim()
       }
 
-    // parse headers
+      // parse headers
       if (xhr.getAllResponseHeaders) {
         var allResponseHeaders = xhr.getAllResponseHeaders().trim()
         if (allResponseHeaders) {
@@ -571,12 +571,12 @@
     }
   }
 
-/**
- * fetch 异步请求
- * @param { XHR } xhr 请求
- * @param { Promise.resolve } resolve 成功 Promise
- * @param { Promise.reject } reject 失败 Promise
- */
+  /**
+   * fetch 异步请求
+   * @param { XHR } xhr 请求
+   * @param { Promise.resolve } resolve 成功 Promise
+   * @param { Promise.reject } reject 失败 Promise
+   */
   function fetchRequest (request, resolve, reject) {
     requestInterceptor(request).then(function () {
       if (!request.signal && typeof fetch === 'function') {
@@ -591,7 +591,7 @@
           }
           if (request.timeout) {
             setTimeout(function () {
-              responseComplete(request, {status: 0, body: ''}, resolve)
+              responseComplete(request, { status: 0, body: '' }, resolve)
             }, request.timeout)
           }
           $fetch(request.getUrl(), options).then(function (resp) {
@@ -607,7 +607,7 @@
         xhr.open(request.method, request.getUrl(), true)
         if (request.timeout) {
           setTimeout(function () {
-            responseComplete(request, {status: 0, body: ''}, resolve)
+            responseComplete(request, { status: 0, body: '' }, resolve)
           }, request.timeout)
         }
         request.headers.forEach(function (value, name) {
@@ -635,13 +635,13 @@
   var jsonpIndex = 0
   var $global = typeof window === 'undefined' ? this : window
 
-/**
- * jsonp 请求结果处理
- * @param { XERequest } request 对象
- * @param { XHR } xhr 请求
- * @param { resolve } resolve 成功 Promise
- * @param { reject } reject 失败 Promise
- */
+  /**
+   * jsonp 请求结果处理
+   * @param { XERequest } request 对象
+   * @param { XHR } xhr 请求
+   * @param { resolve } resolve 成功 Promise
+   * @param { reject } reject 失败 Promise
+   */
   function jsonpHandle (request, xhr, resolve, reject) {
     if (request.script.parentNode === document.body) {
       document.body.removeChild(request.script)
@@ -650,9 +650,9 @@
     responseComplete(request, xhr, resolve)
   }
 
-/**
- * jsonp 异步请求
- */
+  /**
+   * jsonp 异步请求
+   */
   function sendJSONP (request, resolve, reject) {
     request.script = document.createElement('script')
     requestInterceptor(request).then(function () {
@@ -671,15 +671,15 @@
       } else {
         var url = request.getUrl()
         $global[request.jsonpCallback] = function (body) {
-          jsonpHandle(request, {status: 200, body: body}, resolve, reject)
+          jsonpHandle(request, { status: 200, body: body }, resolve, reject)
         }
         script.type = 'text/javascript'
         script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
         script.onerror = function (evnt) {
-          jsonpHandle(request, {status: 500, body: ''}, resolve, reject)
+          jsonpHandle(request, { status: 500, body: '' }, resolve, reject)
         }
         script.onabort = function (evnt) {
-          jsonpHandle(request, {status: 500, body: ''}, resolve, reject)
+          jsonpHandle(request, { status: 500, body: '' }, resolve, reject)
         }
         if (request.timeout) {
           setTimeout(function () {
@@ -705,53 +705,53 @@
     }
   }
 
-/**
-  * 支持 xhr、fetch、jsonp
-  *
-  * @param Object options 请求参数
-  * @return Promise
-  */
+  /**
+    * 支持 xhr、fetch、jsonp
+    *
+    * @param Object options 请求参数
+    * @return Promise
+    */
   function XEAjax (options) {
-    var opts = objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
+    var opts = objectAssign({}, setupDefaults, { headers: objectAssign({}, setupDefaults.headers) }, options)
     var XEPromise = opts.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       return (opts.jsonp ? sendJSONP : fetchRequest)(new XERequest(opts), resolve, reject)
     }, opts.$context)
   }
 
-/**
- * Request 对象
- *
- * 参数
- * @param String url 请求地址
- * @param String baseURL 基础路径，默认上下文路径
- * @param String method 请求方法(默认GET)
- * @param Object params 请求参数，序列化后会拼接在url
- * @param Object body 提交参数
- * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
- * @param String jsonp 调用jsonp服务,回调属性默认callback
- * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
- * @param Number timeout 设置超时
- * @param Object headers 请求头
- * @param Boolean log 控制台输出日志
- * @param Function transformParams(params, request) 用于改变URL参数
- * @param Function paramsSerializer(params, request) 自定义URL序列化函数
- * @param Function transformBody(body, request) 用于改变提交数据
- * @param Function stringifyBody(body, request) 自定义转换提交数据的函数
- * @param Function validateStatus(response) 自定义校验请求是否成功
- * 高级扩展
- * @param Function $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
- * @param Function $fetch 自定义 fetch 请求函数
- * @param Function $jsonp 自定义 jsonp 处理函数
- * @param Function $Promise 自定义 Promise 函数
- * @param Function $context 自定义上下文
- */
+  /**
+   * Request 对象
+   *
+   * 参数
+   * @param String url 请求地址
+   * @param String baseURL 基础路径，默认上下文路径
+   * @param String method 请求方法(默认GET)
+   * @param Object params 请求参数，序列化后会拼接在url
+   * @param Object body 提交参数
+   * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
+   * @param String jsonp 调用jsonp服务,回调属性默认callback
+   * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
+   * @param Number timeout 设置超时
+   * @param Object headers 请求头
+   * @param Boolean log 控制台输出日志
+   * @param Function transformParams(params, request) 用于改变URL参数
+   * @param Function paramsSerializer(params, request) 自定义URL序列化函数
+   * @param Function transformBody(body, request) 用于改变提交数据
+   * @param Function stringifyBody(body, request) 自定义转换提交数据的函数
+   * @param Function validateStatus(response) 自定义校验请求是否成功
+   * 高级扩展
+   * @param Function $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
+   * @param Function $fetch 自定义 fetch 请求函数
+   * @param Function $jsonp 自定义 jsonp 处理函数
+   * @param Function $Promise 自定义 Promise 函数
+   * @param Function $context 自定义上下文
+   */
   var setup = function setup (options) {
     objectAssign(setupDefaults, options)
   }
 
   function getOptions (method, def, options) {
-    var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
+    var opts = objectAssign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
     clearXEAjaxContext(XEAjax)
     return opts
   }
@@ -762,7 +762,7 @@
     }
   }
 
-// xhr response JSON
+  // xhr response JSON
   function responseJSON (method) {
     return function () {
       var opts = method.apply(this, arguments)
@@ -779,10 +779,10 @@
     }
   }
 
-// Http Request
+  // Http Request
   var ajax = XEAjax
 
-// Http Request All
+  // Http Request All
   function doAll (iterable) {
     var XEPromise = XEAjax.$Promise || Promise
     var context = XEAjax.$context
@@ -791,7 +791,7 @@
       if (item instanceof XEPromise) {
         return item
       } else if (item && isObject(item)) {
-        return ajax(objectAssign({$context: context, $Promise: XEPromise}, item))
+        return ajax(objectAssign({ $context: context, $Promise: XEPromise }, item))
       }
       return item
     }), context)
@@ -799,18 +799,18 @@
 
   function requestFn (method, defs) {
     return function (url, params, opts) {
-      return getOptions(method, isObject(url) ? url : objectAssign({url: url, params: params}, defs), opts)
+      return getOptions(method, isObject(url) ? url : objectAssign({ url: url, params: params }, defs), opts)
     }
   }
 
   var requests = {
     HEAD: requestFn('HEAD'),
     GET: requestFn('GET'),
-    JSONP: requestFn('GET', {jsonp: 'callback'})
+    JSONP: requestFn('GET', { jsonp: 'callback' })
   }
   arrayEach(['POST', 'PUT', 'DELETE', 'PATCH'], function (method) {
     requests[method] = function (url, body, opts) {
-      return getOptions(method, isObject(url) ? url : {url: url, body: body}, opts)
+      return getOptions(method, isObject(url) ? url : { url: url, body: body }, opts)
     }
   })
 
@@ -851,11 +851,11 @@
 
   var AbortController = XEAbortController
 
-/**
- * 混合函数
- *
- * @param {Object} methods 扩展
- */
+  /**
+   * 混合函数
+   *
+   * @param {Object} methods 扩展
+   */
   function mixin (methods) {
     objectEach(methods, function (fn, name) {
       XEAjax[name] = isFunction(fn) ? function () {
@@ -866,9 +866,9 @@
     })
   }
 
-/**
- * 安装插件
- */
+  /**
+   * 安装插件
+   */
   function use (plugin) {
     plugin.install(XEAjax)
     if (setupDefaults.log) {
@@ -883,7 +883,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.0',
+    version: '3.2.1',
     $name: 'XEAjax'
   })
 

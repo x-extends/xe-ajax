@@ -15,12 +15,12 @@ XEAjax 一个开源且不依赖于任何框架的异步请求函数；支持 xhr
 ### cdnjs 获取最新版本
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
 ``` shell
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax@3.2.0/dist/xe-ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 ### unpkg 获取最新版本
-[点击浏览](https://unpkg.com/xe-ajax@3.2.0/)已发布的所有 npm 包源码
+[点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
 ``` shell
-<script src="https://unpkg.com/xe-ajax@3.2.0/dist/xe-ajax.js"></script>
+<script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 ## AMD 安装

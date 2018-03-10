@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "XEAjax 异步请求函数，支持 xhr、fetch、jsonp 以及 mock，更高效简洁的 API",
   "main": "index.js",
   "scripts": {
