@@ -290,7 +290,11 @@ define([
   })
 
   XEAjax.fetchPost('/api/user/save', {name: 'test'})
+
+  // json 方式提交数据
   XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
+
+  // form 方式提交数据
   XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 })
 ```
