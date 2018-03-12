@@ -16,13 +16,14 @@ export function fetchRequest (request, resolve, reject) {
         var options = {
           _request: request,
           method: request.method,
+          cache: request.cache,
           credentials: request.credentials,
           body: body,
           headers: request.headers
         }
         if (request.timeout) {
           setTimeout(function () {
-            responseComplete(request, {status: 0, body: ''}, resolve)
+            responseComplete(request, {status: 0, body: null}, resolve)
           }, request.timeout)
         }
         $fetch(request.getUrl(), options).then(function (resp) {
@@ -38,7 +39,7 @@ export function fetchRequest (request, resolve, reject) {
       xhr.open(request.method, request.getUrl(), true)
       if (request.timeout) {
         setTimeout(function () {
-          responseComplete(request, {status: 0, body: ''}, resolve)
+          responseComplete(request, {status: 0, body: null}, resolve)
         }, request.timeout)
       }
       request.headers.forEach(function (value, name) {
@@ -54,10 +55,13 @@ export function fetchRequest (request, resolve, reject) {
       } else if (request.credentials === 'omit') {
         xhr.withCredentials = false
       }
-      request.getBody().then(function (body) {
+      request.getBody().catch(function () {
+        return null
+      }).then(function (body) {
         xhr.send(body)
-      }).catch(function () {
-        xhr.send()
+        if (request.$abort) {
+          xhr.abort()
+        }
       })
     }
   })

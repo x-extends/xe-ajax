@@ -107,6 +107,19 @@ export function arrayEach (array, callback, context) {
   }
 }
 
+export function arrayIncludes (array, value) {
+  if (array.includes) {
+    return array.includes(value)
+  } else {
+    for (var index = 0, len = array.length || 0; index < len; index++) {
+      if (array[index] === value) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 export function clearXEAjaxContext (XEAjax) {
   XEAjax.$context = XEAjax.$Promise = null
 }

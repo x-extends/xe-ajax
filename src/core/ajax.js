@@ -6,6 +6,7 @@ import { sendJSONP } from '../adapters/jsonp'
 export var setupDefaults = {
   method: 'GET',
   baseURL: getBaseURL(),
+  cache: 'default',
   credentials: 'same-origin',
   bodyType: 'JSON_DATA',
   log: 'development' !== 'production',

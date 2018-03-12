@@ -96,6 +96,7 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | body | Object/Array | 提交参数 |  |
 | bodyType | String | 提交参数方式，如果要以表单方式提交改为FORM_DATA | 默认JSON_DATA |
 | jsonp | String | 调用jsonp服务,属性名默认callback | 默认callback |
+| cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
@@ -321,6 +322,7 @@ setTimeout(() => {
 
 ## 拦截器
 ### Request 拦截器
+interceptors.request ( request, next )
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -337,6 +339,7 @@ XEAjax.interceptors.request.use((request, next) => {
 })
 ```
 ### Response 拦截器
+interceptors.response ( response, next, request )
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -375,6 +378,11 @@ XEAjax.interceptors.response.use((response, next) => {
 ``` shell
 import XEAjax from 'xe-ajax'
 
+export function doGet () {
+  return XEAjax.fetchGet.apply(this, arguments).then(response => response.json()).then(body => {
+    return {body: body, status: response.status, headers: response.headers}
+  })
+} 
 export function getText () {
   return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
 } 
@@ -387,7 +395,8 @@ import customs from './customs'
 XEAjax.mixin(customs)
 
 // 调用自定义扩展函数
-XEAjax.getText()
+XEAjax.doGet('/api/user/list')
+XEAjax.getText('/api/user/message')
 ```
 
 ## Mock 虚拟服务

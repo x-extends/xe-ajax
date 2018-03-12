@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.1
+ * xe-ajax.js v3.2.2
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -120,6 +120,19 @@
     }
   }
 
+  function arrayIncludes (array, value) {
+    if (array.includes) {
+      return array.includes(value)
+    } else {
+      for (var index = 0, len = array.length || 0; index < len; index++) {
+        if (array[index] === value) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   function clearXEAjaxContext (XEAjax) {
     XEAjax.$context = XEAjax.$Promise = null
   }
@@ -210,6 +223,53 @@
     }
   }
 
+  function XEReadableStream (body, request) {
+    this.locked = false
+    this._getBody = function () {
+      var that = this
+      var XEPromise = request.$Promise || Promise
+      this.bodyUsed = true
+      return new XEPromise(function (resolve, reject) {
+        if (that.locked) {
+          reject(new TypeError('body stream already read'))
+        } else {
+          that.locked = true
+          resolve(body)
+        }
+      }, request.$context)
+    }
+  }
+
+  /**
+   * response 转换 xhr 属性
+   */
+  function ResponseXHR (result) {
+    try {
+      var responseText = isString(result.body) ? result.body : JSON.stringify(result.body)
+    } catch (e) {
+      responseText = ''
+    }
+    this.status = result.status
+    this.responseHeaders = result.headers
+    this.response = responseText
+    this.responseText = responseText
+  }
+
+  objectAssign(ResponseXHR.prototype, {
+    getAllResponseHeaders: function () {
+      var result = ''
+      var responseHeader = this.responseHeaders
+      if (responseHeader) {
+        for (var key in responseHeader) {
+          if (responseHeader.hasOwnProperty(key)) {
+            result += key + ': ' + responseHeader[key] + '\n'
+          }
+        }
+      }
+      return result
+    }
+  })
+
   var requestList = []
 
   /**
@@ -257,9 +317,7 @@
       var index = getIndex(this.signal)
       if (index !== undefined) {
         arrayEach(requestList[index][1], function (request) {
-          setTimeout(function () {
-            request.abort()
-          })
+          request.abort()
         })
         requestList.splice(index, 1)
       }
@@ -314,7 +372,7 @@
             } else {
               resolve(resp)
             }
-          })
+          }, request)
         }, request.$context)
       }).catch(function (resp) {
         console.error(resp)
@@ -358,19 +416,21 @@
   }
 
   objectAssign(XERequest.prototype, {
-    abort: function (response) {
-      this.xhr.abort(response)
+    abort: function () {
+      if (this.xhr) {
+        this.xhr.abort()
+      }
+      this.$abort = true
     },
     getUrl: function () {
       var url = this.url
       var params = ''
       if (url) {
         if (isFunction(this.transformParams)) {
-          // 避免空值报错，params 始终保持是对象
           this.params = this.transformParams(this.params || {}, this)
         }
         if (this.params && !isFormData(this.params)) {
-          params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this.params, this) : serialize(this.params)
+          params = (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? { _: Date.now() } : {}, this.params), this)
         }
         if (params) {
           url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -393,7 +453,6 @@
         if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
           try {
             if (isFunction(request.transformBody)) {
-              // 避免空值报错，body 始终保持是对象
               request.body = request.transformBody(request.body || {}, request) || request.body
             }
             if (isFunction(request.stringifyBody)) {
@@ -401,7 +460,7 @@
             } else {
               if (isFormData(request.body)) {
                 result = request.body
-              } else if (String(request.bodyType).toLocaleUpperCase() === 'FORM_DATA') {
+              } else if (request.bodyType === 'FORM_DATA') {
                 result = serialize(request.body)
               } else {
                 result = JSON.stringify(request.body)
@@ -436,85 +495,9 @@
     })
   }
 
-  function ResponseXHR (result) {
-    try {
-      var responseText = isString(result.body) ? result.body : JSON.stringify(result.body)
-    } catch (e) {
-      responseText = ''
-    }
-    this.status = result.status
-    this.responseHeaders = result.headers
-    this.response = responseText
-    this.responseText = responseText
-  }
-
-  objectAssign(ResponseXHR.prototype, {
-    getAllResponseHeaders: function () {
-      var result = ''
-      var responseHeader = this.responseHeaders
-      if (responseHeader) {
-        for (var key in responseHeader) {
-          if (responseHeader.hasOwnProperty(key)) {
-            result += key + ': ' + responseHeader[key] + '\n'
-          }
-        }
-      }
-      return result
-    }
-  })
-
-  function XEReadableStream (xhr, request) {
-    this.locked = false
-    this._xhr = xhr
-    this._request = request
-  }
-
-  objectAssign(XEReadableStream.prototype, {
-    _getBody: function () {
-      var that = this
-      var xhr = this._xhr
-      var request = this._request
-      var XEPromise = request.$Promise || Promise
-      return new XEPromise(function (resolve, reject) {
-        var body = { responseText: '', response: xhr }
-        if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
-          if (xhr.responseText) {
-            body.responseText = xhr.responseText
-            try {
-              body.response = JSON.parse(xhr.responseText)
-            } catch (e) {
-              reject(new TypeError(e))
-            }
-          } else {
-            body.response = xhr.response
-            body.responseText = JSON.stringify(xhr.response)
-          }
-        } else {
-          body.responseText = JSON.stringify(body.response)
-        }
-        if (that.locked) {
-          reject(new TypeError('body stream already read'))
-        } else {
-          that.locked = true
-          resolve(body)
-        }
-      }, request.$context)
-    }
-  })
-
   function XEResponse (request, xhr) {
     var that = this
     var $resp = {}
-
-    $resp.body = new XEReadableStream(xhr, request)
-    $resp.bodyUsed = false
-    $resp.url = request.url
-    $resp.headers = new XEHeaders()
-    $resp.status = 0
-    $resp.statusText = ''
-    $resp.ok = false
-    $resp.redirected = false
-    $resp.type = 'basic'
 
     arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
       Object.defineProperty(that, name, {
@@ -524,51 +507,56 @@
       })
     })
 
-    this.json = function () {
+    $resp.body = new XEReadableStream(xhr.responseText || null, request)
+    $resp.bodyUsed = false
+    $resp.url = request.url
+    $resp.headers = parseXHRHeaders($resp, xhr)
+    $resp.status = xhr.status
+    $resp.statusText = parseStatusText($resp, xhr)
+    $resp.ok = request.validateStatus(this)
+    $resp.redirected = $resp.status === 302
+    $resp.type = 'basic'
+  }
+
+  objectAssign(XEResponse.prototype, {
+    json: function () {
       return this.body._getBody().then(function (body) {
-        $resp.bodyUsed = true
-        return body.response
+        return JSON.parse(body)
       })
+    },
+    text: function () {
+      return this.body._getBody()
     }
+  })
 
-    this.text = function () {
-      return $resp.body._getBody().then(function (body) {
-        $resp.bodyUsed = true
-        return body.responseText
-      })
-    }
-
-    // xhr handle
-    if (xhr && xhr.response !== undefined && xhr.status !== undefined) {
-      $resp.status = xhr.status
-      $resp.redirected = $resp.status === 302
-      $resp.ok = request.validateStatus(this)
-
-      // if no content
-      if ($resp.status === 1223 || $resp.status === 204) {
-        $resp.statusText = 'No Content'
-      } else if ($resp.status === 304) {
-        // if not modified
-        $resp.statusText = 'Not Modified'
-      } else if ($resp.status === 404) {
-        // if not found
-        $resp.statusText = 'Not Found'
-      } else {
-        // statusText
-        $resp.statusText = (xhr.statusText || $resp.statusText).trim()
-      }
-
-      // parse headers
-      if (xhr.getAllResponseHeaders) {
-        var allResponseHeaders = xhr.getAllResponseHeaders().trim()
-        if (allResponseHeaders) {
-          arrayEach(allResponseHeaders.split('\n'), function (row) {
-            var index = row.indexOf(':')
-            $resp.headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
-          })
-        }
+  // 解析响应头
+  function parseXHRHeaders ($resp, xhr) {
+    var headers = new XEHeaders()
+    if (xhr.getAllResponseHeaders) {
+      var allResponseHeaders = xhr.getAllResponseHeaders().trim()
+      if (allResponseHeaders) {
+        arrayEach(allResponseHeaders.split('\n'), function (row) {
+          var index = row.indexOf(':')
+          headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
+        })
       }
     }
+    return headers
+  }
+
+  // 解析状态信息
+  function parseStatusText ($resp, xhr) {
+    // if no content
+    if (xhr.status === 1223 || xhr.status === 204) {
+      return 'No Content'
+    } else if (xhr.status === 304) {
+      // if not modified
+      return 'Not Modified'
+    } else if (xhr.status === 404) {
+      // if not found
+      return 'Not Found'
+    }
+    return (xhr.statusText || xhr.statusText || '').trim()
   }
 
   /**
@@ -585,13 +573,14 @@
           var options = {
             _request: request,
             method: request.method,
+            cache: request.cache,
             credentials: request.credentials,
             body: body,
             headers: request.headers
           }
           if (request.timeout) {
             setTimeout(function () {
-              responseComplete(request, { status: 0, body: '' }, resolve)
+              responseComplete(request, { status: 0, body: null }, resolve)
             }, request.timeout)
           }
           $fetch(request.getUrl(), options).then(function (resp) {
@@ -607,7 +596,7 @@
         xhr.open(request.method, request.getUrl(), true)
         if (request.timeout) {
           setTimeout(function () {
-            responseComplete(request, { status: 0, body: '' }, resolve)
+            responseComplete(request, { status: 0, body: null }, resolve)
           }, request.timeout)
         }
         request.headers.forEach(function (value, name) {
@@ -623,10 +612,13 @@
         } else if (request.credentials === 'omit') {
           xhr.withCredentials = false
         }
-        request.getBody().then(function (body) {
+        request.getBody().catch(function () {
+          return null
+        }).then(function (body) {
           xhr.send(body)
-        }).catch(function () {
-          xhr.send()
+          if (request.$abort) {
+            xhr.abort()
+          }
         })
       }
     })
@@ -676,10 +668,10 @@
         script.type = 'text/javascript'
         script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
         script.onerror = function (evnt) {
-          jsonpHandle(request, { status: 500, body: '' }, resolve, reject)
+          jsonpHandle(request, { status: 500, body: null }, resolve, reject)
         }
         script.onabort = function (evnt) {
-          jsonpHandle(request, { status: 500, body: '' }, resolve, reject)
+          jsonpHandle(request, { status: 0, body: null }, resolve, reject)
         }
         if (request.timeout) {
           setTimeout(function () {
@@ -694,6 +686,7 @@
   var setupDefaults = {
     method: 'GET',
     baseURL: getBaseURL(),
+    cache: 'default',
     credentials: 'same-origin',
     bodyType: 'JSON_DATA',
     log: 'development' !== 'production',
@@ -883,7 +876,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.1',
+    version: '3.2.2',
     $name: 'XEAjax'
   })
 

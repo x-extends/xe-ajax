@@ -47,9 +47,7 @@ objectAssign(XEAbortController.prototype, {
     var index = getIndex(this.signal)
     if (index !== undefined) {
       arrayEach(requestList[index][1], function (request) {
-        setTimeout(function () {
-          request.abort()
-        })
+        request.abort()
       })
       requestList.splice(index, 1)
     }

@@ -1,5 +1,6 @@
 import { isFormData, arrayEach } from '../core/utils'
-import { XEResponse, ResponseXHR } from '../entity/response'
+import { ResponseXHR } from './responseXHR'
+import { XEResponse } from '../entity/response'
 
 /**
  * 拦截器队列
@@ -49,7 +50,7 @@ export function responseInterceptor (request, response) {
           } else {
             resolve(resp)
           }
-        })
+        }, request)
       }, request.$context)
     }).catch(function (resp) {
       console.error(resp)

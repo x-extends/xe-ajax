@@ -46,10 +46,10 @@ export function sendJSONP (request, resolve, reject) {
       script.type = 'text/javascript'
       script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
       script.onerror = function (evnt) {
-        jsonpHandle(request, {status: 500, body: ''}, resolve, reject)
+        jsonpHandle(request, {status: 500, body: null}, resolve, reject)
       }
       script.onabort = function (evnt) {
-        jsonpHandle(request, {status: 500, body: ''}, resolve, reject)
+        jsonpHandle(request, {status: 0, body: null}, resolve, reject)
       }
       if (request.timeout) {
         setTimeout(function () {

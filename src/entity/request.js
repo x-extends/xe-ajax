@@ -1,4 +1,4 @@
-import { isFunction, isFormData, isCrossOrigin, serialize, objectAssign, getLocatOrigin } from '../core/utils'
+import { isFunction, isFormData, isCrossOrigin, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
 import { XEHeaders } from '../entity/headers'
 
 export function XERequest (options) {
@@ -13,19 +13,21 @@ export function XERequest (options) {
 }
 
 objectAssign(XERequest.prototype, {
-  abort: function (response) {
-    this.xhr.abort(response)
+  abort: function () {
+    if (this.xhr) {
+      this.xhr.abort()
+    }
+    this.$abort = true
   },
   getUrl: function () {
     var url = this.url
     var params = ''
     if (url) {
       if (isFunction(this.transformParams)) {
-        // 避免空值报错，params 始终保持是对象
         this.params = this.transformParams(this.params || {}, this)
       }
       if (this.params && !isFormData(this.params)) {
-        params = isFunction(this.paramsSerializer) ? this.paramsSerializer(this.params, this) : serialize(this.params)
+        params = (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? {_: Date.now()} : {}, this.params), this)
       }
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -48,7 +50,6 @@ objectAssign(XERequest.prototype, {
       if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
         try {
           if (isFunction(request.transformBody)) {
-            // 避免空值报错，body 始终保持是对象
             request.body = request.transformBody(request.body || {}, request) || request.body
           }
           if (isFunction(request.stringifyBody)) {
@@ -56,7 +57,7 @@ objectAssign(XERequest.prototype, {
           } else {
             if (isFormData(request.body)) {
               result = request.body
-            } else if (String(request.bodyType).toLocaleUpperCase() === 'FORM_DATA') {
+            } else if (request.bodyType === 'FORM_DATA') {
               result = serialize(request.body)
             } else {
               result = JSON.stringify(request.body)
