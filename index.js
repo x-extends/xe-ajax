@@ -38,7 +38,7 @@ objectAssign(XEAjax, {
   AbortController: AbortController,
   serialize: serialize,
   interceptors: interceptors,
-  version: '3.2.2',
+  version: '3.2.3',
   $name: 'XEAjax'
 })
 
