@@ -1,4 +1,4 @@
-# 异步请求函数，支持 xhr、fetch、jsonp 以及 mock，更简洁的 API
+# 异步请求函数
 
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
