@@ -407,7 +407,6 @@ ES6 + Vue + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/e
 ES6 + React + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/react-mock1)  
 RequireJS + Vue + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock3)  
 RequireJS + Vue + VXEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock4)  
-RequireJS + React + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/react-mock2)  
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
