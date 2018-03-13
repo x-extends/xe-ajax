@@ -1,9 +1,9 @@
-# XEAjax 异步请求函数
+# 异步请求函数，支持 xhr、fetch、jsonp 以及 mock，更简洁的 API
 
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-XEAjax 便捷的异步请求函数；支持 xhr、fetch、jsonp 以及 mock，更高效、简洁的 API、轻封装、高扩展。
+基于 Promise 实现的异步请求函数；支持 xhr、fetch、jsonp 以及 mock，更高效、简洁的 API、轻封装、高扩展。
 
 ## 兼容性
 基于 Promise 实现，低版本浏览器使用 polyfill es6-promise.js  
