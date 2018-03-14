@@ -1,5 +1,5 @@
 import { isFunction, isFormData, isCrossOrigin, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
-import { XEHeaders } from '../entity/headers'
+import { XEHeaders } from '../handle/headers'
 
 export function XERequest (options) {
   objectAssign(this, {url: '', body: null, params: null, signal: null}, options)

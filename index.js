@@ -1,10 +1,8 @@
 import { serialize, objectEach, isFunction, clearXEAjaxContext, objectAssign } from './src/core/utils'
-import { XEAbortController } from './src/entity/abort'
 import { XEAjax, setupDefaults, setup } from './src/core/ajax'
-import { interceptors } from './src/entity/interceptor'
+import { interceptors } from './src/handle/interceptor'
 import { exportMethods } from './src/core/methods'
-
-export var AbortController = XEAbortController
+import { AbortController } from './src/core'
 
 /**
  * 混合函数
@@ -38,7 +36,7 @@ objectAssign(XEAjax, {
   AbortController: AbortController,
   serialize: serialize,
   interceptors: interceptors,
-  version: '3.2.3',
+  version: '3.2.4',
   $name: 'XEAjax'
 })
 

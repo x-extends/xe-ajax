@@ -1,6 +1,6 @@
-import { isFunction } from '../core/utils'
-import { XEResponse, responseComplete } from '../entity/response'
-import { requestInterceptor } from '../entity/interceptor'
+import { isFunction, arrayEach } from '../core/utils'
+import { XEResponse } from '../handle/response'
+import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
 /**
  * fetch 异步请求
@@ -10,7 +10,7 @@ import { requestInterceptor } from '../entity/interceptor'
  */
 export function fetchRequest (request, resolve, reject) {
   requestInterceptor(request).then(function () {
-    if (!request.signal && typeof fetch === 'function') {
+    if (!request.signal && typeof self.fetch === 'function') {
       var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
       request.getBody().then(function (body) {
         var options = {
@@ -23,13 +23,13 @@ export function fetchRequest (request, resolve, reject) {
         }
         if (request.timeout) {
           setTimeout(function () {
-            responseComplete(request, {status: 0, body: null}, resolve)
+            responseInterceptor(request, new TypeError('Network request failed')).then(reject)
           }, request.timeout)
         }
         $fetch(request.getUrl(), options).then(function (resp) {
-          responseComplete(request, resp, resolve)
+          responseInterceptor(request, resp).then(resolve)
         }).catch(function (resp) {
-          responseComplete(request, resp, reject)
+          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
         })
       })
     } else {
@@ -39,17 +39,26 @@ export function fetchRequest (request, resolve, reject) {
       xhr.open(request.method, request.getUrl(), true)
       if (request.timeout) {
         setTimeout(function () {
-          responseComplete(request, {status: 0, body: null}, resolve)
+          xhr.abort()
         }, request.timeout)
       }
       request.headers.forEach(function (value, name) {
         xhr.setRequestHeader(name, value)
       })
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-          responseComplete(request, new XEResponse(request, xhr), resolve)
-        }
+      xhr.onload = function () {
+        responseInterceptor(request, new XEResponse(xhr.response, {
+          status: xhr.status,
+          statusText: parseStatusText(xhr),
+          headers: parseXHRHeaders(xhr)
+        }, request)).then(resolve)
       }
+      xhr.onerror = function () {
+        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      }
+      xhr.ontimeout = function () {
+        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      }
+      xhr.responseType = 'blob'
       if (request.credentials === 'include') {
         xhr.withCredentials = true
       } else if (request.credentials === 'omit') {
@@ -65,4 +74,32 @@ export function fetchRequest (request, resolve, reject) {
       })
     }
   })
+}
+
+function parseXHRHeaders (options) {
+  var headers = {}
+  if (options.getAllResponseHeaders) {
+    var allResponseHeaders = options.getAllResponseHeaders().trim()
+    if (allResponseHeaders) {
+      arrayEach(allResponseHeaders.split('\n'), function (row) {
+        var index = row.indexOf(':')
+        headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+      })
+    }
+  }
+  return headers
+}
+
+function parseStatusText (options) {
+  // if no content
+  if (options.status === 1223 || options.status === 204) {
+    return 'No Content'
+  } else if (options.status === 304) {
+    // if not modified
+    return 'Not Modified'
+  } else if (options.status === 404) {
+    // if not found
+    return 'Not Found'
+  }
+  return (options.statusText || options.statusText || '').trim()
 }

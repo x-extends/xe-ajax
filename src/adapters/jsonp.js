@@ -1,6 +1,5 @@
 import { isFunction } from '../core/utils'
-import { responseComplete } from '../entity/response'
-import { requestInterceptor } from '../entity/interceptor'
+import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
 var jsonpIndex = 0
 var $global = typeof window === 'undefined' ? this : window
@@ -12,12 +11,12 @@ var $global = typeof window === 'undefined' ? this : window
  * @param { resolve } resolve 成功 Promise
  * @param { reject } reject 失败 Promise
  */
-function jsonpHandle (request, xhr, resolve, reject) {
+function jsonpHandle (request, response, resolve, reject) {
   if (request.script.parentNode === document.body) {
     document.body.removeChild(request.script)
   }
   delete $global[request.jsonpCallback]
-  responseComplete(request, xhr, resolve)
+  responseInterceptor(request, response).then(resolve)
 }
 
 /**
@@ -31,12 +30,10 @@ export function sendJSONP (request, resolve, reject) {
       request.jsonpCallback = '_xeajax_jsonp' + (++jsonpIndex)
     }
     if (isFunction(request.$jsonp)) {
-      return new Promise(function (resolve, reject) {
-        request.$jsonp(script, request, resolve, reject)
-      }).then(function (resp) {
-        responseComplete(request, resp, resolve)
+      return request.$jsonp(script, request, resolve, reject).then(function (resp) {
+        responseInterceptor(request, resp).then(resolve)
       }).catch(function (resp) {
-        responseComplete(request, resp, reject)
+        responseInterceptor(request, resp).then(resolve)
       })
     } else {
       var url = request.getUrl()

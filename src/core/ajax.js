@@ -1,4 +1,4 @@
-import { XERequest } from '../entity/request'
+import { XERequest } from '../handle/request'
 import { objectAssign, getBaseURL } from '../core/utils'
 import { fetchRequest } from '../adapters/fetch'
 import { sendJSONP } from '../adapters/jsonp'

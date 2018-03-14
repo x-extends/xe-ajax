@@ -1,11 +1,10 @@
 import { isFormData, arrayEach } from '../core/utils'
-import { ResponseXHR } from './responseXHR'
-import { XEResponse } from '../entity/response'
+import { XEResponse } from '../handle/response'
 
 /**
  * 拦截器队列
  */
-var state = {request: [], response: []}
+var state = {reqQueue: [], respQueue: []}
 
 function useInterceptors (calls) {
   return function (callback) {
@@ -21,7 +20,7 @@ function useInterceptors (calls) {
 export function requestInterceptor (request) {
   var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(request, request.$context)
-  arrayEach(state.request, function (callback) {
+  arrayEach(state.reqQueue, function (callback) {
     thenInterceptor = thenInterceptor.then(function (req) {
       return new XEPromise(function (resolve) {
         callback(req, function () {
@@ -41,14 +40,18 @@ export function requestInterceptor (request) {
 export function responseInterceptor (request, response) {
   var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(response, request.$context)
-  arrayEach(state.response, function (callback) {
-    thenInterceptor = thenInterceptor.then(function (resp) {
+  arrayEach(state.respQueue, function (callback) {
+    thenInterceptor = thenInterceptor.then(function (response) {
       return new XEPromise(function (resolve) {
-        callback(resp, function (result) {
-          if (result && result.constructor !== XEResponse) {
-            resolve(new XEResponse(request, new ResponseXHR(result)))
+        callback(response, function (resp) {
+          if (resp && resp.body && resp.status) {
+            if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
+              resolve(resp)
+            } else {
+              resolve(new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), {status: resp.status, headers: resp.headers}, request))
+            }
           } else {
-            resolve(resp)
+            resolve(response)
           }
         }, request)
       }, request.$context)
@@ -61,10 +64,10 @@ export function responseInterceptor (request, response) {
 
 export var interceptors = {
   request: {
-    use: useInterceptors(state.request)
+    use: useInterceptors(state.reqQueue)
   },
   response: {
-    use: useInterceptors(state.response)
+    use: useInterceptors(state.respQueue)
   }
 }
 

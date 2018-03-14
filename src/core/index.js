@@ -1,5 +1,6 @@
 import { isObject, objectAssign, clearXEAjaxContext, arrayEach } from '../core/utils'
 import { XEAjax } from '../core/ajax'
+import { XEAbortController } from '../handle/abort'
 
 function getOptions (method, def, options) {
   var opts = objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
@@ -64,6 +65,8 @@ arrayEach(['POST', 'PUT', 'DELETE', 'PATCH'], function (method) {
     return getOptions(method, isObject(url) ? url : {url: url, body: body}, opts)
   }
 })
+
+export var AbortController = XEAbortController
 
 export var fetchHead = responseResult(requests.HEAD)
 export var fetchGet = responseResult(requests.GET)

@@ -2,11 +2,7 @@ import { arrayEach, objectAssign } from '../core/utils'
 
 var requestList = []
 
-/**
- * 索引 XHR Request 是否存在
- * @param { XERequest } item 对象
- */
-function getIndex (item) {
+function getSignalIndex (item) {
   for (var index = 0, len = requestList.length; index < len; index++) {
     if (item === requestList[index][0]) {
       return index
@@ -14,20 +10,21 @@ function getIndex (item) {
   }
 }
 
-export function XEAbortSignal () {
-  var $signal = {aborted: false}
-  Object.defineProperty(this, 'aborted', {
-    get: function () {
-      return $signal.aborted
-    }
-  })
+function $AbortSignal () {
+  this._abortSignal = {aborted: false}
 }
 
-objectAssign(XEAbortSignal.prototype, {
+Object.defineProperty(this, 'aborted', {
+  get: function () {
+    return this._abortSignal.aborted
+  }
+})
+
+objectAssign($AbortSignal.prototype, {
   // 将 Request 注入控制器
   install: function (request) {
     if (request.signal) {
-      var index = getIndex(request.signal)
+      var index = getSignalIndex(request.signal)
       if (index === undefined) {
         requestList.push([request.signal, [request]])
       } else {
@@ -37,14 +34,14 @@ objectAssign(XEAbortSignal.prototype, {
   }
 })
 
-export function XEAbortController () {
+function $AbortController () {
   this.signal = new XEAbortSignal()
 }
 
-objectAssign(XEAbortController.prototype, {
+objectAssign($AbortController.prototype, {
   // 中止请求
   abort: function () {
-    var index = getIndex(this.signal)
+    var index = getSignalIndex(this.signal)
     if (index !== undefined) {
       arrayEach(requestList[index][1], function (request) {
         request.abort()
@@ -54,4 +51,5 @@ objectAssign(XEAbortController.prototype, {
   }
 })
 
-export default XEAbortController
+export var XEAbortSignal = $AbortSignal
+export var XEAbortController = $AbortController

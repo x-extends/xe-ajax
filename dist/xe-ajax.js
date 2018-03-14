@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.3
+ * xe-ajax.js v3.2.4
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -146,7 +146,7 @@
     for (var key in obj) {
       if (obj.hasOwnProperty(key)) {
         var value = obj[key]
-        result.push([key, value.join(', '), [key, value.join(', ')]][getIndex])
+        result.push([key, value, [key, value]][getIndex])
       }
     }
     return result
@@ -157,71 +157,66 @@
     return { done: done, value: done ? undefined : value }
   }
 
-  function XEIterator (list) {
+  function XEIterator (iterator, value) {
     this.$index = 0
-    this.$list = list
+    this.$list = getObjectIterators(iterator, value)
     this.next = function () {
       return getIteratorResult(this, this.$list[this.$index])
     }
   }
 
-  var XEHeaders = typeof Headers === 'function' ? Headers : function (heads) {
-    var $state = {}
-
-    this.set = function (key, value) {
-      $state[toKey(key)] = [value]
-    }
-
-    this.get = function (key) {
-      var _key = toKey(key)
-      return this.has(_key) ? $state[_key].join(', ') : null
-    }
-
-    this.append = function (key, value) {
-      var _key = toKey(key)
-      if (this.has(_key)) {
-        return $state[_key].push(value)
-      } else {
-        this.set(_key, value)
-      }
-    }
-
-    this.has = function (key) {
-      return !!$state[toKey(key)]
-    }
-
-    this.keys = function () {
-      return new XEIterator(getObjectIterators($state, 0))
-    }
-
-    this.values = function () {
-      return new XEIterator(getObjectIterators($state, 1))
-    }
-
-    this.entries = function () {
-      return new XEIterator(getObjectIterators($state, 2))
-    }
-
-    this['delete'] = function (key) {
-      delete $state[toKey(key)]
-    }
-
-    this.forEach = function (callback, context) {
-      objectEach($state, function (value, key, state) {
-        callback.call(context, value.join(', '), key, this)
-      }, this)
-    }
-
-    if (heads instanceof XEHeaders) {
-      heads.forEach(function (value, key) {
+  function $Headers (headers) {
+    this._map = {}
+    if (headers instanceof $Headers) {
+      headers.forEach(function (value, key) {
         this.set(key, value)
       }, this)
     } else {
-      objectEach(heads, function (value, key) {
+      objectEach(headers, function (value, key) {
         this.set(key, value)
       }, this)
     }
   }
+
+  objectAssign($Headers.prototype, {
+    set: function (key, value) {
+      this._map[toKey(key)] = value
+    },
+    get: function (key) {
+      var _key = toKey(key)
+      return this.has(_key) ? this._map[_key] : null
+    },
+    append: function (key, value) {
+      var _key = toKey(key)
+      if (this.has(_key)) {
+        this._map[key] = this._map[key] + ', ' + value
+      } else {
+        this._map[key] = '' + value
+      }
+    },
+    has: function (key) {
+      return this._map.hasOwnProperty(toKey(key))
+    },
+    keys: function () {
+      return new XEIterator(this._map, 0)
+    },
+    values: function () {
+      return new XEIterator(this._map, 1)
+    },
+    entries: function () {
+      return new XEIterator(this._map, 2)
+    },
+    'delete': function (key) {
+      delete this._map[toKey(key)]
+    },
+    forEach: function (callback, context) {
+      objectEach(this._map, function (value, key, state) {
+        callback.call(context, value, key, this)
+      }, this)
+    }
+  })
+
+  var XEHeaders = typeof Headers === 'function' ? Headers : $Headers
 
   function XEReadableStream (body, request) {
     this.locked = false
@@ -240,43 +235,9 @@
     }
   }
 
-  /**
-   * response 转换 xhr 属性
-   */
-  function ResponseXHR (result) {
-    try {
-      var responseText = isString(result.body) ? result.body : JSON.stringify(result.body)
-    } catch (e) {
-      responseText = ''
-    }
-    this.status = result.status
-    this.responseHeaders = result.headers
-    this.response = responseText
-    this.responseText = responseText
-  }
-
-  objectAssign(ResponseXHR.prototype, {
-    getAllResponseHeaders: function () {
-      var result = ''
-      var responseHeader = this.responseHeaders
-      if (responseHeader) {
-        for (var key in responseHeader) {
-          if (responseHeader.hasOwnProperty(key)) {
-            result += key + ': ' + responseHeader[key] + '\n'
-          }
-        }
-      }
-      return result
-    }
-  })
-
   var requestList = []
 
-  /**
-   * 索引 XHR Request 是否存在
-   * @param { XERequest } item 对象
-   */
-  function getIndex (item) {
+  function getSignalIndex (item) {
     for (var index = 0, len = requestList.length; index < len; index++) {
       if (item === requestList[index][0]) {
         return index
@@ -284,20 +245,21 @@
     }
   }
 
-  function XEAbortSignal () {
-    var $signal = { aborted: false }
-    Object.defineProperty(this, 'aborted', {
-      get: function () {
-        return $signal.aborted
-      }
-    })
+  function $AbortSignal () {
+    this._abortSignal = { aborted: false }
   }
 
-  objectAssign(XEAbortSignal.prototype, {
+  Object.defineProperty(this, 'aborted', {
+    get: function () {
+      return this._abortSignal.aborted
+    }
+  })
+
+  objectAssign($AbortSignal.prototype, {
     // 将 Request 注入控制器
     install: function (request) {
       if (request.signal) {
-        var index = getIndex(request.signal)
+        var index = getSignalIndex(request.signal)
         if (index === undefined) {
           requestList.push([request.signal, [request]])
         } else {
@@ -307,14 +269,14 @@
     }
   })
 
-  function XEAbortController () {
+  function $AbortController () {
     this.signal = new XEAbortSignal()
   }
 
-  objectAssign(XEAbortController.prototype, {
+  objectAssign($AbortController.prototype, {
     // 中止请求
     abort: function () {
-      var index = getIndex(this.signal)
+      var index = getSignalIndex(this.signal)
       if (index !== undefined) {
         arrayEach(requestList[index][1], function (request) {
           request.abort()
@@ -324,10 +286,13 @@
     }
   })
 
+  var XEAbortSignal = $AbortSignal
+  var XEAbortController = $AbortController
+
   /**
    * 拦截器队列
    */
-  var state = { request: [], response: [] }
+  var state = { reqQueue: [], respQueue: [] }
 
   function useInterceptors (calls) {
     return function (callback) {
@@ -343,7 +308,7 @@
   function requestInterceptor (request) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(request, request.$context)
-    arrayEach(state.request, function (callback) {
+    arrayEach(state.reqQueue, function (callback) {
       thenInterceptor = thenInterceptor.then(function (req) {
         return new XEPromise(function (resolve) {
           callback(req, function () {
@@ -363,14 +328,18 @@
   function responseInterceptor (request, response) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(response, request.$context)
-    arrayEach(state.response, function (callback) {
-      thenInterceptor = thenInterceptor.then(function (resp) {
+    arrayEach(state.respQueue, function (callback) {
+      thenInterceptor = thenInterceptor.then(function (response) {
         return new XEPromise(function (resolve) {
-          callback(resp, function (result) {
-            if (result && result.constructor !== XEResponse) {
-              resolve(new XEResponse(request, new ResponseXHR(result)))
+          callback(response, function (resp) {
+            if (resp && resp.body && resp.status) {
+              if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
+                resolve(resp)
+              } else {
+                resolve(new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), { status: resp.status, headers: resp.headers }, request))
+              }
             } else {
-              resolve(resp)
+              resolve(response)
             }
           }, request)
         }, request.$context)
@@ -383,10 +352,10 @@
 
   var interceptors = {
     request: {
-      use: useInterceptors(state.request)
+      use: useInterceptors(state.reqQueue)
     },
     response: {
-      use: useInterceptors(state.response)
+      use: useInterceptors(state.respQueue)
     }
   }
 
@@ -475,88 +444,74 @@
     }
   })
 
-  function getResponse (request, result) {
-    if (result) {
-      if (typeof Response === 'undefined') {
-        if (result.constructor === XEResponse) {
-          return result
-        }
-      } else if (result.constructor === Response || result.constructor === XEResponse) {
-        return result
-      }
+  function XEResponse (body, options, request) {
+    this._request = request
+    this._response = {
+      body: new XEReadableStream(body, request),
+      bodyUsed: false,
+      url: request.url,
+      status: options.status,
+      statusText: options.statusText,
+      redirected: options.status === 302,
+      headers: new XEHeaders(options.headers),
+      type: 'basic'
     }
-    return new XEResponse(request, new ResponseXHR(result))
+    this._response.ok = request.validateStatus(this)
   }
 
-  function responseComplete (request, result, complete) {
-    request.$complete = true
-    responseInterceptor(request, getResponse(request, result)).then(function (response) {
-      complete(response)
+  arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+    Object.defineProperty(XEResponse.prototype, name, {
+      get: function () {
+        return this._response[name]
+      }
     })
-  }
-
-  function XEResponse (request, xhr) {
-    var that = this
-    var $resp = {}
-
-    arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
-      Object.defineProperty(that, name, {
-        get: function () {
-          return $resp[name]
-        }
-      })
-    })
-
-    $resp.body = new XEReadableStream(xhr.responseText || null, request)
-    $resp.bodyUsed = false
-    $resp.url = request.url
-    $resp.headers = parseXHRHeaders($resp, xhr)
-    $resp.status = xhr.status
-    $resp.statusText = parseStatusText($resp, xhr)
-    $resp.ok = request.validateStatus(this)
-    $resp.redirected = $resp.status === 302
-    $resp.type = 'basic'
-  }
+  })
 
   objectAssign(XEResponse.prototype, {
+    clone: function () {
+      return new XEResponse(this.body, this, this._request)
+    },
     json: function () {
-      return this.body._getBody().then(function (body) {
-        return JSON.parse(body)
+      return this.text().then(function (text) {
+        return JSON.parse(text)
       })
     },
     text: function () {
+      var request = this._request
+      return this.blob().then(function (blob) {
+        var fileReader = new FileReader()
+        var result = fileReaderReady(request, fileReader)
+        fileReader.readAsText(blob)
+        return result
+      })
+    },
+    blob: function () {
       return this.body._getBody()
+    },
+    arrayBuffer: function () {
+      var request = this._request
+      return this.blob().then(function (blob) {
+        var fileReader = new FileReader()
+        var result = fileReaderReady(request, fileReader)
+        fileReader.readAsArrayBuffer(blob)
+        return result
+      })
+    },
+    formData: function () {
+
     }
   })
 
-  // 解析响应头
-  function parseXHRHeaders ($resp, xhr) {
-    var headers = new XEHeaders()
-    if (xhr.getAllResponseHeaders) {
-      var allResponseHeaders = xhr.getAllResponseHeaders().trim()
-      if (allResponseHeaders) {
-        arrayEach(allResponseHeaders.split('\n'), function (row) {
-          var index = row.indexOf(':')
-          headers.set(row.slice(0, index).trim(), row.slice(index + 1).trim())
-        })
+  function fileReaderReady (request, reader) {
+    var XEPromise = request.$Promise || Promise
+    return new XEPromise(function (resolve, reject) {
+      reader.onload = function () {
+        resolve(reader.result)
       }
-    }
-    return headers
-  }
-
-  // 解析状态信息
-  function parseStatusText ($resp, xhr) {
-    // if no content
-    if (xhr.status === 1223 || xhr.status === 204) {
-      return 'No Content'
-    } else if (xhr.status === 304) {
-      // if not modified
-      return 'Not Modified'
-    } else if (xhr.status === 404) {
-      // if not found
-      return 'Not Found'
-    }
-    return (xhr.statusText || xhr.statusText || '').trim()
+      reader.onerror = function () {
+        reject(reader.error)
+      }
+    }, request.$context)
   }
 
   /**
@@ -567,7 +522,7 @@
    */
   function fetchRequest (request, resolve, reject) {
     requestInterceptor(request).then(function () {
-      if (!request.signal && typeof fetch === 'function') {
+      if (!request.signal && typeof self.fetch === 'function') {
         var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
         request.getBody().then(function (body) {
           var options = {
@@ -580,13 +535,13 @@
           }
           if (request.timeout) {
             setTimeout(function () {
-              responseComplete(request, { status: 0, body: null }, resolve)
+              responseInterceptor(request, new TypeError('Network request failed')).then(reject)
             }, request.timeout)
           }
           $fetch(request.getUrl(), options).then(function (resp) {
-            responseComplete(request, resp, resolve)
+            responseInterceptor(request, resp).then(resolve)
           }).catch(function (resp) {
-            responseComplete(request, resp, reject)
+            responseInterceptor(request, new TypeError('Network request failed')).then(reject)
           })
         })
       } else {
@@ -596,17 +551,26 @@
         xhr.open(request.method, request.getUrl(), true)
         if (request.timeout) {
           setTimeout(function () {
-            responseComplete(request, { status: 0, body: null }, resolve)
+            xhr.abort()
           }, request.timeout)
         }
         request.headers.forEach(function (value, name) {
           xhr.setRequestHeader(name, value)
         })
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-            responseComplete(request, new XEResponse(request, xhr), resolve)
-          }
+        xhr.onload = function () {
+          responseInterceptor(request, new XEResponse(xhr.response, {
+            status: xhr.status,
+            statusText: parseStatusText(xhr),
+            headers: parseXHRHeaders(xhr)
+          }, request)).then(resolve)
         }
+        xhr.onerror = function () {
+          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+        }
+        xhr.ontimeout = function () {
+          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+        }
+        xhr.responseType = 'blob'
         if (request.credentials === 'include') {
           xhr.withCredentials = true
         } else if (request.credentials === 'omit') {
@@ -624,6 +588,34 @@
     })
   }
 
+  function parseXHRHeaders (options) {
+    var headers = {}
+    if (options.getAllResponseHeaders) {
+      var allResponseHeaders = options.getAllResponseHeaders().trim()
+      if (allResponseHeaders) {
+        arrayEach(allResponseHeaders.split('\n'), function (row) {
+          var index = row.indexOf(':')
+          headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+        })
+      }
+    }
+    return headers
+  }
+
+  function parseStatusText (options) {
+    // if no content
+    if (options.status === 1223 || options.status === 204) {
+      return 'No Content'
+    } else if (options.status === 304) {
+      // if not modified
+      return 'Not Modified'
+    } else if (options.status === 404) {
+      // if not found
+      return 'Not Found'
+    }
+    return (options.statusText || options.statusText || '').trim()
+  }
+
   var jsonpIndex = 0
   var $global = typeof window === 'undefined' ? this : window
 
@@ -634,12 +626,12 @@
    * @param { resolve } resolve 成功 Promise
    * @param { reject } reject 失败 Promise
    */
-  function jsonpHandle (request, xhr, resolve, reject) {
+  function jsonpHandle (request, response, resolve, reject) {
     if (request.script.parentNode === document.body) {
       document.body.removeChild(request.script)
     }
     delete $global[request.jsonpCallback]
-    responseComplete(request, xhr, resolve)
+    responseInterceptor(request, response).then(resolve)
   }
 
   /**
@@ -653,12 +645,10 @@
         request.jsonpCallback = '_xeajax_jsonp' + (++jsonpIndex)
       }
       if (isFunction(request.$jsonp)) {
-        return new Promise(function (resolve, reject) {
-          request.$jsonp(script, request, resolve, reject)
-        }).then(function (resp) {
-          responseComplete(request, resp, resolve)
+        return request.$jsonp(script, request, resolve, reject).then(function (resp) {
+          responseInterceptor(request, resp).then(resolve)
         }).catch(function (resp) {
-          responseComplete(request, resp, reject)
+          responseInterceptor(request, resp).then(resolve)
         })
       } else {
         var url = request.getUrl()
@@ -807,6 +797,8 @@
     }
   })
 
+  var AbortController = XEAbortController
+
   var fetchHead = responseResult(requests.HEAD)
   var fetchGet = responseResult(requests.GET)
   var fetchPost = responseResult(requests.POST)
@@ -842,8 +834,6 @@
     jsonp: jsonp
   }
 
-  var AbortController = XEAbortController
-
   /**
    * 混合函数
    *
@@ -876,7 +866,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.3',
+    version: '3.2.4',
     $name: 'XEAjax'
   })
 
