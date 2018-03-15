@@ -249,7 +249,7 @@
     this._abortSignal = { aborted: false }
   }
 
-  Object.defineProperty(this, 'aborted', {
+  Object.defineProperty($AbortSignal, 'aborted', {
     get: function () {
       return this._abortSignal.aborted
     }
