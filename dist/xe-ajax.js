@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.5
+ * xe-ajax.js v3.2.6
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -141,16 +141,16 @@
     XEAjax.$context = XEAjax.$Promise = null
   }
 
-  function toKey (key) {
-    return String(key).toLowerCase()
+  function toKey (name) {
+    return String(name).toLowerCase()
   }
 
   function getObjectIterators (obj, getIndex) {
     var result = []
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        var value = obj[key]
-        result.push([key, value, [key, value]][getIndex])
+    for (var name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        var value = obj[name]
+        result.push([name, value, [name, value]][getIndex])
       }
     }
     return result
@@ -172,34 +172,34 @@
   function $Headers (headers) {
     this._map = {}
     if (headers instanceof $Headers) {
-      headers.forEach(function (value, key) {
-        this.set(key, value)
+      headers.forEach(function (value, name) {
+        this.set(name, value)
       }, this)
     } else {
-      objectEach(headers, function (value, key) {
-        this.set(key, value)
+      objectEach(headers, function (value, name) {
+        this.set(name, value)
       }, this)
     }
   }
 
   objectAssign($Headers.prototype, {
-    set: function (key, value) {
-      this._map[toKey(key)] = value
+    set: function (name, value) {
+      this._map[toKey(name)] = value
     },
-    get: function (key) {
-      var _key = toKey(key)
+    get: function (name) {
+      var _key = toKey(name)
       return this.has(_key) ? this._map[_key] : null
     },
-    append: function (key, value) {
-      var _key = toKey(key)
+    append: function (name, value) {
+      var _key = toKey(name)
       if (this.has(_key)) {
-        this._map[key] = this._map[key] + ', ' + value
+        this._map[_key] = this._map[_key] + ', ' + value
       } else {
-        this._map[key] = '' + value
+        this._map[_key] = '' + value
       }
     },
-    has: function (key) {
-      return this._map.hasOwnProperty(toKey(key))
+    has: function (name) {
+      return this._map.hasOwnProperty(toKey(name))
     },
     keys: function () {
       return new XEIterator(this._map, 0)
@@ -210,17 +210,17 @@
     entries: function () {
       return new XEIterator(this._map, 2)
     },
-    'delete': function (key) {
-      delete this._map[toKey(key)]
+    'delete': function (name) {
+      delete this._map[toKey(name)]
     },
     forEach: function (callback, context) {
-      objectEach(this._map, function (value, key, state) {
-        callback.call(context, value, key, this)
+      objectEach(this._map, function (value, name, state) {
+        callback.call(context, value, name, this)
       }, this)
     }
   })
 
-  var XEHeaders = typeof Headers === 'function' ? Headers : $Headers
+  var XEHeaders = typeof Headers === 'undefined' ? $Headers : Headers
 
   function XEReadableStream (body, request) {
     this.locked = false
@@ -250,10 +250,11 @@
   }
 
   function $AbortSignal () {
+    this.onaborted = null
     this._abortSignal = { aborted: false }
   }
 
-  Object.defineProperty($AbortSignal, 'aborted', {
+  Object.defineProperty($AbortSignal.prototype, 'aborted', {
     get: function () {
       return this._abortSignal.aborted
     }
@@ -283,12 +284,14 @@
       if (index !== undefined) {
         arrayEach(requestList[index][1], function (request) {
           request.abort()
+          requestList[index][0]._abortSignal.aborted = true
         })
         requestList.splice(index, 1)
       }
     }
   })
 
+  /* eslint-disable no-undef */
   var XEAbortSignal = $AbortSignal
   var XEAbortController = $AbortController
 
@@ -452,7 +455,7 @@
       status: options.status,
       statusText: options.statusText,
       redirected: options.status === 302,
-      headers: new XEHeaders(options.headers),
+      headers: new XEHeaders(options.headers || {}),
       type: 'basic'
     }
     this._response.ok = request.validateStatus(this)
@@ -468,7 +471,7 @@
 
   objectAssign(XEResponse.prototype, {
     clone: function () {
-      return new XEResponse(this.body, this, this._request)
+      return new XEResponse(this.body, { status: this.status, statusText: this.statusText, headers: this.headers }, this._request)
     },
     json: function () {
       return this.text().then(function (text) {
@@ -537,11 +540,91 @@
     if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
       return resp
     }
+    var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
     if (isSupportAdvanced()) {
-      return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), { status: resp.status, headers: resp.headers }, request)
+      return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), options, request)
     }
-    return new XEResponse(JSON.stringify(resp.body), { status: resp.status, headers: resp.headers }, request)
+    return new XEResponse(JSON.stringify(resp.body), options, request)
   }
+
+  function sendFetch (request, resolve, reject) {
+    var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
+    request.getBody().then(function (body) {
+      var options = {
+        _request: request,
+        method: request.method,
+        cache: request.cache,
+        credentials: request.credentials,
+        body: body,
+        headers: request.headers
+      }
+      if (request.timeout) {
+        setTimeout(function () {
+          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+        }, request.timeout)
+      }
+      $fetch(request.getUrl(), options).then(function (resp) {
+        responseInterceptor(request, toResponse(resp, request)).then(resolve)
+      }).catch(function (resp) {
+        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      })
+    })
+  }
+
+  function sendXHR (request, resolve, reject) {
+    var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
+    var xhr = request.xhr = new $XMLHttpRequest()
+    xhr._request = request
+    xhr.open(request.method, request.getUrl(), true)
+    if (request.timeout) {
+      setTimeout(function () {
+        xhr.abort()
+      }, request.timeout)
+    }
+    request.headers.forEach(function (value, name) {
+      xhr.setRequestHeader(name, value)
+    })
+    xhr.onload = function () {
+      responseInterceptor(request, new XEResponse(xhr.response, {
+        status: xhr.status,
+        statusText: parseStatusText(xhr),
+        headers: parseXHRHeaders(xhr)
+      }, request)).then(resolve)
+    }
+    xhr.onerror = function () {
+      responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+    }
+    xhr.ontimeout = function () {
+      responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+    }
+    if (isSupportAdvanced()) {
+      xhr.responseType = 'blob'
+    }
+    if (request.credentials === 'include') {
+      xhr.withCredentials = true
+    } else if (request.credentials === 'omit') {
+      xhr.withCredentials = false
+    }
+    request.getBody().catch(function () {
+      return null
+    }).then(function (body) {
+      xhr.send(body)
+      if (request.$abort) {
+        xhr.abort()
+      }
+    })
+  }
+
+  function createRequestFactory () {
+    if (self.fetch) {
+      return function (request, resolve, reject) {
+        return (request.signal ? sendXHR : sendFetch).apply(this, arguments)
+      }
+    }
+    return sendXHR
+  }
+
+  var sendRequest = createRequestFactory()
 
   /**
    * fetch 异步请求
@@ -550,72 +633,8 @@
    * @param { Promise.reject } reject 失败 Promise
    */
   function fetchRequest (request, resolve, reject) {
-    requestInterceptor(request).then(function () {
-      if (!request.signal && typeof self.fetch === 'function') {
-        var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
-        request.getBody().then(function (body) {
-          var options = {
-            _request: request,
-            method: request.method,
-            cache: request.cache,
-            credentials: request.credentials,
-            body: body,
-            headers: request.headers
-          }
-          if (request.timeout) {
-            setTimeout(function () {
-              responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-            }, request.timeout)
-          }
-          $fetch(request.getUrl(), options).then(function (resp) {
-            responseInterceptor(request, toResponse(resp, request)).then(resolve)
-          }).catch(function (resp) {
-            responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-          })
-        })
-      } else {
-        var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
-        var xhr = request.xhr = new $XMLHttpRequest()
-        xhr._request = request
-        xhr.open(request.method, request.getUrl(), true)
-        if (request.timeout) {
-          setTimeout(function () {
-            xhr.abort()
-          }, request.timeout)
-        }
-        request.headers.forEach(function (value, name) {
-          xhr.setRequestHeader(name, value)
-        })
-        xhr.onload = function () {
-          responseInterceptor(request, new XEResponse(xhr.response, {
-            status: xhr.status,
-            statusText: parseStatusText(xhr),
-            headers: parseXHRHeaders(xhr)
-          }, request)).then(resolve)
-        }
-        xhr.onerror = function () {
-          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-        }
-        xhr.ontimeout = function () {
-          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-        }
-        if (isSupportAdvanced()) {
-          xhr.responseType = 'blob'
-        }
-        if (request.credentials === 'include') {
-          xhr.withCredentials = true
-        } else if (request.credentials === 'omit') {
-          xhr.withCredentials = false
-        }
-        request.getBody().catch(function () {
-          return null
-        }).then(function (body) {
-          xhr.send(body)
-          if (request.$abort) {
-            xhr.abort()
-          }
-        })
-      }
+    return requestInterceptor(request).then(function () {
+      return sendRequest(request, resolve, reject)
     })
   }
 
@@ -895,7 +914,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.5',
+    version: '3.2.6',
     $name: 'XEAjax'
   })
 
