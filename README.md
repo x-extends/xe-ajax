@@ -106,11 +106,22 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
 | validateStatus | Function ( response ) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
+### Headers 对象说明
+| 属性 | 类型 | 描述 |
+|------|------|-----|
+| set | Function ( name, value ) | 添加 |
+| append | Function ( name, value ) | 追加 |
+| get | Function ( name ) | 根据 name 获取 |
+| has | Function ( name ) | 返回 name 是否存 |
+| delete | Function ( name ) | 根据 name 删除 |
+| keys | Function | 以迭代器的形式返回所有 name |
+| values | Function | 以迭代器的形式返回所有 value |
+| entries | Function | 以迭代器的形式返回所有 [name, value] |
+| forEach | Function ( callback, context ) | 是否重定向了 |
+
 ### Response 对象说明
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| json | Function | 获取 json 数据 |
-| test | Function | 获取 text 数据 |
 | body | ReadableStream | 数据流 |
 | bodyUsed | Boolean | 内容是否已被读取 |
 | headers | Headers | 响应头 |
@@ -120,6 +131,11 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | ok | Boolean | 请求完成还是失败 |
 | redirected | Boolean | 是否重定向了 |
 | type | String | 类型 |
+| clone | Function | 返回一个新的 Response 对象 |
+| json | Function | 获取 json 数据 |
+| test | Function | 获取 text 数据 |
+| blob | Function | (ie10+) 获取 Blob 对象 |
+| arrayBuffer | Function | (ie10+) 获取 ArrayBuffer 对象 |
 
 ## 全局参数设置
 ``` shell
@@ -173,29 +189,54 @@ ajax({
 ``` shell
 import { fetchGet, fetchPost } from 'xe-ajax'
 
-// 获取文本
+// Response Text
 fetchGet('/api/user/list').then(response => {
-  // response.ok 获取请求成功或失败
   response.text().then(text => {
     // 获取 text
   })
 })
 
-// 获取数据
+// Response JSON
 fetchGet('/api/user/list').then(response => {
   response.json().then(data => {
     // 获取 data
   })
 })
 
-// 提交数据
-fetchPost('/api/user/save', {name: 'test'})
+// Response Blob
+fetchGet('/api/user/list').then(response => {
+  response.blob().then(blob => {
+    // 获取 blob
+  })
+})
 
-// json 方式提交数据
+// Response ArrayBuffer
+fetchGet('/api/user/list').then(response => {
+  response.arrayBuffer().then(arrayBuffer => {
+    // 获取 arrayBuffer
+  })
+})
+
+// 默认方式提交数据
+fetchPost('/api/user/save', {name: 'test'}).then(response => {
+  if (response.ok) {
+    // 请求成功
+  } else {
+    // 请求失败
+  }
+})
+
+// application/json 方式提交数据
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
 
-// form 方式提交数据
+// application/x-www-form-urlencoded 方式提交数据
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+
+// multipart/form-data 方式提交数据
+const file = document.querySelector('#myFile').files[0]
+const formBody = new FormData()
+formBody.append('file', file)
+fetchPost('/api/user/save', formBody)
 
 // 查询参数和数据同时提交
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
