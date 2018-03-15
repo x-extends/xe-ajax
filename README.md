@@ -7,7 +7,7 @@
 
 ## 兼容性
 基于 Promise 实现，低版本浏览器使用 polyfill es6-promise.js  
-支持 IE9+、Edge、Chrome、Firefox、Opera、Safari等...
+支持 IE8+、Edge、Chrome、Firefox、Opera、Safari等...
 
 ## CDN 安装
 使用 script 方式安装，XEAjax 会定义为全局变量  
