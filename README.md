@@ -136,6 +136,7 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | test | Function | 获取 text 数据 |
 | blob | Function | (ie10+) 获取 Blob 对象 |
 | arrayBuffer | Function | (ie10+) 获取 ArrayBuffer 对象 |
+| formData | Function | (ie10+) 获取 FormData 对象 |
 
 ## 全局参数设置
 ``` shell
@@ -181,8 +182,8 @@ ajax({
   params: {id: 1}
 }).then(response => {
   // response
-}).catch(response => {
-  // response
+}).catch(e => {
+  // 发生错误
 })
 ```
 ### 响应 response 方式调用
@@ -217,19 +218,17 @@ fetchGet('/api/user/list').then(response => {
   })
 })
 
-// 默认方式提交数据
-fetchPost('/api/user/save', {name: 'test'}).then(response => {
-  if (response.ok) {
-    // 请求成功
-  } else {
-    // 请求失败
-  }
+// Response FormData
+fetchGet('/api/user/list').then(response => {
+  response.formData().then(formData => {
+    // 获取 formData
+  })
 })
 
-// application/json 方式提交数据
-fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
+// 提交 application/json（默认方式）
+fetchPost('/api/user/save', {name: 'test', password: '123456'})
 
-// application/x-www-form-urlencoded 方式提交数据
+// 提交 application/x-www-form-urlencoded
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 
 // 提交 FormData
@@ -252,14 +251,19 @@ getJSON('/api/user/list').then(data => {
   // 请求失败
 })
 
-// 提交数据
 postJSON('/api/user/save', {name: 'test'})
 
-// json 方式提交数据
+// 提交 application/json（默认方式）
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
 
-// form 方式提交数据
+// 提交 application/x-www-form-urlencoded
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+
+// 提交 FormData
+const file = document.querySelector('#myFile').files[0]
+const formBody = new FormData()
+formBody.append('file', file)
+postJSON('/api/user/save', formBody)
 
 // 查询参数和数据同时提交
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
@@ -268,13 +272,13 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}}
 ``` shell
 import { jsonp } from 'xe-ajax'
 
-fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(response => {
+fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
     // 获取 data
   })
 })
 
-jsonp('http://xuliangzhan.com/jsonp/user/message', {params: {id: 1}}).then(data => {
+jsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(data => {
   // 请求成功
 }).catch(data => {
   // 请求失败
@@ -289,10 +293,8 @@ iterable1.push(fetchGet('/api/user/list'))
 iterable1.push(getJSON('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
   // 所有异步完成之后执行
-  // datas 数组
 }).catch(data => {
-  // 某个异步请求失败时执行
-  // data 
+  // 请求失败时执行
 })
 
 // doAll 使用对象参数, 用法和 Promise.all 一致
@@ -306,10 +308,10 @@ doAll(iterable2)
 import { getJSON } from 'xe-ajax'
 
 // 相互依赖的嵌套请求(项目中应该避免这种情况)
-getJSON('/api/user/info').then(data => {
-  return getJSON('/api/user/details', {id: data.id})
-}).then(data => {
-  // 获取 data
+fetchGet('/api/user/info').then(response => response.json()).then(data => {
+  return fetchGet('/api/user/details', {id: data.id})
+}).then(response => {
+  // response
 })
 ```
 ### AMD 使用方式
@@ -319,25 +321,25 @@ define([
 ], function (XEAjax) {
 
   XEAjax.fetchGet('/api/user/list').then(response => {
-    // response.ok 获取请求成功或失败
-    response.text().then(text => {
-      // 获取 text
+    response.json().then(data => {
+      // 获取 data
     })
   })
 
-  XEAjax.getJSON('/api/user/list').then(data => {
-    // 请求成功
-  }).catch(data => {
-    // 请求失败
-  })
+  // 提交 application/json（默认方式）
+  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'})
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'})
+  // 提交 application/x-www-form-urlencoded
+  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 
-  // json 方式提交数据
-  XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
+  // 提交 FormData
+  var file = document.querySelector('#myFile').files[0]
+  var formBody = new FormData()
+  formBody.append('file', file)
+  XEAjax.fetchPost('/api/user/save', formBody)
 
-  // form 方式提交数据
-  XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+  // 查询参数和数据同时提交
+  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 })
 ```
 
@@ -352,8 +354,8 @@ const controller = new AbortController()
 // 获取signal
 const signal = controller.signal
 // 给请求加入控制器 signal
-getJSON('/api/user/list', {id: 1}, {signal}).then(data => {
-  // data
+fetchGet('/api/user/list', {id: 1}, {signal}).catch(function (e) {
+  console.error(e)
 })
 setTimeout(() => {
   // 终止请求
@@ -397,7 +399,7 @@ XEAjax.interceptors.response.use((response, next) => {
   }
 })
 
-// 支持重置响应数据
+// 重置响应数据
 XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后对所有返回的数据进行统一的处理...
   // 格式: {status: 200, body: {}, headers: {}}
@@ -421,7 +423,11 @@ import XEAjax from 'xe-ajax'
 
 export function doGet () {
   return XEAjax.fetchGet.apply(this, arguments).then(response => response.json()).then(body => {
-    return {body: body, status: response.status, headers: response.headers}
+    return {
+      body: body, 
+      status: response.status, 
+      headers: response.headers
+    }
   })
 } 
 export function getText () {

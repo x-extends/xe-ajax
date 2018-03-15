@@ -56,7 +56,18 @@ objectAssign(XEResponse.prototype, {
     })
   },
   formData: function () {
-
+    return this.text().then(function (text) {
+      var formData = new FormData()
+      text.trim().split('&').forEach(function (bytes) {
+        if (bytes) {
+          var split = bytes.split('=')
+          var name = split.shift().replace(/\+/g, ' ')
+          var value = split.join('=').replace(/\+/g, ' ')
+          formData.append(decodeURIComponent(name), decodeURIComponent(value))
+        }
+      })
+      return formData
+    })
   }
 })
 
