@@ -1,15 +1,15 @@
 import { objectEach, objectAssign } from '../core/utils'
 
-function toKey (key) {
-  return String(key).toLowerCase()
+function toKey (name) {
+  return String(name).toLowerCase()
 }
 
 function getObjectIterators (obj, getIndex) {
   var result = []
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      var value = obj[key]
-      result.push([key, value, [key, value]][getIndex])
+  for (var name in obj) {
+    if (obj.hasOwnProperty(name)) {
+      var value = obj[name]
+      result.push([name, value, [name, value]][getIndex])
     }
   }
   return result
@@ -31,34 +31,34 @@ function XEIterator (iterator, value) {
 function $Headers (headers) {
   this._map = {}
   if (headers instanceof $Headers) {
-    headers.forEach(function (value, key) {
-      this.set(key, value)
+    headers.forEach(function (value, name) {
+      this.set(name, value)
     }, this)
   } else {
-    objectEach(headers, function (value, key) {
-      this.set(key, value)
+    objectEach(headers, function (value, name) {
+      this.set(name, value)
     }, this)
   }
 }
 
 objectAssign($Headers.prototype, {
-  set: function (key, value) {
-    this._map[toKey(key)] = value
+  set: function (name, value) {
+    this._map[toKey(name)] = value
   },
-  get: function (key) {
-    var _key = toKey(key)
+  get: function (name) {
+    var _key = toKey(name)
     return this.has(_key) ? this._map[_key] : null
   },
-  append: function (key, value) {
-    var _key = toKey(key)
+  append: function (name, value) {
+    var _key = toKey(name)
     if (this.has(_key)) {
-      this._map[key] = this._map[key] + ', ' + value
+      this._map[_key] = this._map[_key] + ', ' + value
     } else {
-      this._map[key] = '' + value
+      this._map[_key] = '' + value
     }
   },
-  has: function (key) {
-    return this._map.hasOwnProperty(toKey(key))
+  has: function (name) {
+    return this._map.hasOwnProperty(toKey(name))
   },
   keys: function () {
     return new XEIterator(this._map, 0)
@@ -69,14 +69,14 @@ objectAssign($Headers.prototype, {
   entries: function () {
     return new XEIterator(this._map, 2)
   },
-  'delete': function (key) {
-    delete this._map[toKey(key)]
+  'delete': function (name) {
+    delete this._map[toKey(name)]
   },
   forEach: function (callback, context) {
-    objectEach(this._map, function (value, key, state) {
-      callback.call(context, value, key, this)
+    objectEach(this._map, function (value, name, state) {
+      callback.call(context, value, name, this)
     }, this)
   }
 })
 
-export var XEHeaders = typeof Headers === 'function' ? Headers : $Headers
+export var XEHeaders = typeof Headers === 'undefined' ? $Headers : Headers

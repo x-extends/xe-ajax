@@ -2,6 +2,85 @@ import { isSupportAdvanced, isFunction, arrayEach } from '../core/utils'
 import { XEResponse, toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
+function sendFetch (request, resolve, reject) {
+  var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
+  request.getBody().then(function (body) {
+    var options = {
+      _request: request,
+      method: request.method,
+      cache: request.cache,
+      credentials: request.credentials,
+      body: body,
+      headers: request.headers
+    }
+    if (request.timeout) {
+      setTimeout(function () {
+        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      }, request.timeout)
+    }
+    $fetch(request.getUrl(), options).then(function (resp) {
+      responseInterceptor(request, toResponse(resp, request)).then(resolve)
+    }).catch(function (resp) {
+      responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+    })
+  })
+}
+
+function sendXHR (request, resolve, reject) {
+  var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
+  var xhr = request.xhr = new $XMLHttpRequest()
+  xhr._request = request
+  xhr.open(request.method, request.getUrl(), true)
+  if (request.timeout) {
+    setTimeout(function () {
+      xhr.abort()
+    }, request.timeout)
+  }
+  request.headers.forEach(function (value, name) {
+    xhr.setRequestHeader(name, value)
+  })
+  xhr.onload = function () {
+    responseInterceptor(request, new XEResponse(xhr.response, {
+      status: xhr.status,
+      statusText: parseStatusText(xhr),
+      headers: parseXHRHeaders(xhr)
+    }, request)).then(resolve)
+  }
+  xhr.onerror = function () {
+    responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+  }
+  xhr.ontimeout = function () {
+    responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+  }
+  if (isSupportAdvanced()) {
+    xhr.responseType = 'blob'
+  }
+  if (request.credentials === 'include') {
+    xhr.withCredentials = true
+  } else if (request.credentials === 'omit') {
+    xhr.withCredentials = false
+  }
+  request.getBody().catch(function () {
+    return null
+  }).then(function (body) {
+    xhr.send(body)
+    if (request.$abort) {
+      xhr.abort()
+    }
+  })
+}
+
+function createRequestFactory () {
+  if (self.fetch) {
+    return function (request, resolve, reject) {
+      return (request.signal ? sendXHR : sendFetch).apply(this, arguments)
+    }
+  }
+  return sendXHR
+}
+
+var sendRequest = createRequestFactory()
+
 /**
  * fetch 异步请求
  * @param { XHR } xhr 请求
@@ -9,72 +88,8 @@ import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
  * @param { Promise.reject } reject 失败 Promise
  */
 export function fetchRequest (request, resolve, reject) {
-  requestInterceptor(request).then(function () {
-    if (!request.signal && typeof self.fetch === 'function') {
-      var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
-      request.getBody().then(function (body) {
-        var options = {
-          _request: request,
-          method: request.method,
-          cache: request.cache,
-          credentials: request.credentials,
-          body: body,
-          headers: request.headers
-        }
-        if (request.timeout) {
-          setTimeout(function () {
-            responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-          }, request.timeout)
-        }
-        $fetch(request.getUrl(), options).then(function (resp) {
-          responseInterceptor(request, toResponse(resp, request)).then(resolve)
-        }).catch(function (resp) {
-          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-        })
-      })
-    } else {
-      var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
-      var xhr = request.xhr = new $XMLHttpRequest()
-      xhr._request = request
-      xhr.open(request.method, request.getUrl(), true)
-      if (request.timeout) {
-        setTimeout(function () {
-          xhr.abort()
-        }, request.timeout)
-      }
-      request.headers.forEach(function (value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-      xhr.onload = function () {
-        responseInterceptor(request, new XEResponse(xhr.response, {
-          status: xhr.status,
-          statusText: parseStatusText(xhr),
-          headers: parseXHRHeaders(xhr)
-        }, request)).then(resolve)
-      }
-      xhr.onerror = function () {
-        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-      }
-      xhr.ontimeout = function () {
-        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
-      }
-      if (isSupportAdvanced()) {
-        xhr.responseType = 'blob'
-      }
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      } else if (request.credentials === 'omit') {
-        xhr.withCredentials = false
-      }
-      request.getBody().catch(function () {
-        return null
-      }).then(function (body) {
-        xhr.send(body)
-        if (request.$abort) {
-          xhr.abort()
-        }
-      })
-    }
+  return requestInterceptor(request).then(function () {
+    return sendRequest(request, resolve, reject)
   })
 }
 

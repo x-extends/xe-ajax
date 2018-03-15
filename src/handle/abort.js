@@ -11,10 +11,11 @@ function getSignalIndex (item) {
 }
 
 function $AbortSignal () {
+  this.onaborted = null
   this._abortSignal = {aborted: false}
 }
 
-Object.defineProperty($AbortSignal, 'aborted', {
+Object.defineProperty($AbortSignal.prototype, 'aborted', {
   get: function () {
     return this._abortSignal.aborted
   }
@@ -44,11 +45,13 @@ objectAssign($AbortController.prototype, {
     if (index !== undefined) {
       arrayEach(requestList[index][1], function (request) {
         request.abort()
+        requestList[index][0]._abortSignal.aborted = true
       })
       requestList.splice(index, 1)
     }
   }
 })
 
+/* eslint-disable no-undef */
 export var XEAbortSignal = $AbortSignal
 export var XEAbortController = $AbortController

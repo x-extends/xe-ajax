@@ -11,7 +11,7 @@ export function XEResponse (body, options, request) {
     status: options.status,
     statusText: options.statusText,
     redirected: options.status === 302,
-    headers: new XEHeaders(options.headers),
+    headers: new XEHeaders(options.headers || {}),
     type: 'basic'
   }
   this._response.ok = request.validateStatus(this)
@@ -27,7 +27,7 @@ arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', '
 
 objectAssign(XEResponse.prototype, {
   clone: function () {
-    return new XEResponse(this.body, this, this._request)
+    return new XEResponse(this.body, {status: this.status, statusText: this.statusText, headers: this.headers}, this._request)
   },
   json: function () {
     return this.text().then(function (text) {
@@ -96,8 +96,9 @@ export function toResponse (resp, request) {
   if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
     return resp
   }
+  var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
   if (isSupportAdvanced()) {
-    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), {status: resp.status, headers: resp.headers}, request)
+    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), options, request)
   }
-  return new XEResponse(JSON.stringify(resp.body), {status: resp.status, headers: resp.headers}, request)
+  return new XEResponse(JSON.stringify(resp.body), options, request)
 }

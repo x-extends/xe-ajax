@@ -402,7 +402,7 @@ XEAjax.interceptors.response.use((response, next) => {
 // 重置响应数据
 XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后对所有返回的数据进行统一的处理...
-  // 格式: {status: 200, body: {}, headers: {}}
+  // 格式: {status: 200, statusText: 'OK', body: {}, headers: {}}
 
   // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
