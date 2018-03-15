@@ -1,4 +1,4 @@
-import { objectAssign, arrayEach } from '../core/utils'
+import { isSupportAdvanced, objectAssign, arrayEach } from '../core/utils'
 import { XEReadableStream } from './readableStream'
 import { XEHeaders } from '../handle/headers'
 
@@ -35,41 +35,49 @@ objectAssign(XEResponse.prototype, {
     })
   },
   text: function () {
-    var request = this._request
-    return this.blob().then(function (blob) {
-      var fileReader = new FileReader()
-      var result = fileReaderReady(request, fileReader)
-      fileReader.readAsText(blob)
-      return result
-    })
-  },
-  blob: function () {
     return this.body._getBody()
-  },
-  arrayBuffer: function () {
-    var request = this._request
-    return this.blob().then(function (blob) {
-      var fileReader = new FileReader()
-      var result = fileReaderReady(request, fileReader)
-      fileReader.readAsArrayBuffer(blob)
-      return result
-    })
-  },
-  formData: function () {
-    return this.text().then(function (text) {
-      var formData = new FormData()
-      text.trim().split('&').forEach(function (bytes) {
-        if (bytes) {
-          var split = bytes.split('=')
-          var name = split.shift().replace(/\+/g, ' ')
-          var value = split.join('=').replace(/\+/g, ' ')
-          formData.append(decodeURIComponent(name), decodeURIComponent(value))
-        }
-      })
-      return formData
-    })
   }
 })
+
+if (isSupportAdvanced()) {
+  objectAssign(XEResponse.prototype, {
+    text: function () {
+      var request = this._request
+      return this.blob().then(function (blob) {
+        var fileReader = new FileReader()
+        var result = fileReaderReady(request, fileReader)
+        fileReader.readAsText(blob)
+        return result
+      })
+    },
+    blob: function () {
+      return this.body._getBody()
+    },
+    arrayBuffer: function () {
+      var request = this._request
+      return this.blob().then(function (blob) {
+        var fileReader = new FileReader()
+        var result = fileReaderReady(request, fileReader)
+        fileReader.readAsArrayBuffer(blob)
+        return result
+      })
+    },
+    formData: function () {
+      return this.text().then(function (text) {
+        var formData = new FormData()
+        text.trim().split('&').forEach(function (bytes) {
+          if (bytes) {
+            var split = bytes.split('=')
+            var name = split.shift().replace(/\+/g, ' ')
+            var value = split.join('=').replace(/\+/g, ' ')
+            formData.append(decodeURIComponent(name), decodeURIComponent(value))
+          }
+        })
+        return formData
+      })
+    }
+  })
+}
 
 function fileReaderReady (request, reader) {
   var XEPromise = request.$Promise || Promise
@@ -88,5 +96,8 @@ export function toResponse (resp, request) {
   if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
     return resp
   }
-  return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), {status: resp.status, headers: resp.headers}, request)
+  if (isSupportAdvanced()) {
+    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), {status: resp.status, headers: resp.headers}, request)
+  }
+  return new XEResponse(JSON.stringify(resp.body), {status: resp.status, headers: resp.headers}, request)
 }

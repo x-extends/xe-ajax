@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.4
+ * xe-ajax.js v3.2.5
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -26,6 +26,10 @@
       }
     }
     return false
+  }
+
+  function isSupportAdvanced () {
+    return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
   }
 
   function isString (obj) {
@@ -472,41 +476,49 @@
       })
     },
     text: function () {
-      var request = this._request
-      return this.blob().then(function (blob) {
-        var fileReader = new FileReader()
-        var result = fileReaderReady(request, fileReader)
-        fileReader.readAsText(blob)
-        return result
-      })
-    },
-    blob: function () {
       return this.body._getBody()
-    },
-    arrayBuffer: function () {
-      var request = this._request
-      return this.blob().then(function (blob) {
-        var fileReader = new FileReader()
-        var result = fileReaderReady(request, fileReader)
-        fileReader.readAsArrayBuffer(blob)
-        return result
-      })
-    },
-    formData: function () {
-      return this.text().then(function (text) {
-        var formData = new FormData()
-        text.trim().split('&').forEach(function (bytes) {
-          if (bytes) {
-            var split = bytes.split('=')
-            var name = split.shift().replace(/\+/g, ' ')
-            var value = split.join('=').replace(/\+/g, ' ')
-            formData.append(decodeURIComponent(name), decodeURIComponent(value))
-          }
-        })
-        return formData
-      })
     }
   })
+
+  if (isSupportAdvanced()) {
+    objectAssign(XEResponse.prototype, {
+      text: function () {
+        var request = this._request
+        return this.blob().then(function (blob) {
+          var fileReader = new FileReader()
+          var result = fileReaderReady(request, fileReader)
+          fileReader.readAsText(blob)
+          return result
+        })
+      },
+      blob: function () {
+        return this.body._getBody()
+      },
+      arrayBuffer: function () {
+        var request = this._request
+        return this.blob().then(function (blob) {
+          var fileReader = new FileReader()
+          var result = fileReaderReady(request, fileReader)
+          fileReader.readAsArrayBuffer(blob)
+          return result
+        })
+      },
+      formData: function () {
+        return this.text().then(function (text) {
+          var formData = new FormData()
+          text.trim().split('&').forEach(function (bytes) {
+            if (bytes) {
+              var split = bytes.split('=')
+              var name = split.shift().replace(/\+/g, ' ')
+              var value = split.join('=').replace(/\+/g, ' ')
+              formData.append(decodeURIComponent(name), decodeURIComponent(value))
+            }
+          })
+          return formData
+        })
+      }
+    })
+  }
 
   function fileReaderReady (request, reader) {
     var XEPromise = request.$Promise || Promise
@@ -525,7 +537,10 @@
     if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
       return resp
     }
-    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), { status: resp.status, headers: resp.headers }, request)
+    if (isSupportAdvanced()) {
+      return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), { status: resp.status, headers: resp.headers }, request)
+    }
+    return new XEResponse(JSON.stringify(resp.body), { status: resp.status, headers: resp.headers }, request)
   }
 
   /**
@@ -584,7 +599,9 @@
         xhr.ontimeout = function () {
           responseInterceptor(request, new TypeError('Network request failed')).then(reject)
         }
-        xhr.responseType = 'blob'
+        if (isSupportAdvanced()) {
+          xhr.responseType = 'blob'
+        }
         if (request.credentials === 'include') {
           xhr.withCredentials = true
         } else if (request.credentials === 'omit') {
@@ -878,7 +895,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.4',
+    version: '3.2.5',
     $name: 'XEAjax'
   })
 

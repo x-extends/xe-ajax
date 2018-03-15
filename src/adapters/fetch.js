@@ -1,4 +1,4 @@
-import { isFunction, arrayEach } from '../core/utils'
+import { isSupportAdvanced, isFunction, arrayEach } from '../core/utils'
 import { XEResponse, toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
@@ -58,7 +58,9 @@ export function fetchRequest (request, resolve, reject) {
       xhr.ontimeout = function () {
         responseInterceptor(request, new TypeError('Network request failed')).then(reject)
       }
-      xhr.responseType = 'blob'
+      if (isSupportAdvanced()) {
+        xhr.responseType = 'blob'
+      }
       if (request.credentials === 'include') {
         xhr.withCredentials = true
       } else if (request.credentials === 'omit') {
