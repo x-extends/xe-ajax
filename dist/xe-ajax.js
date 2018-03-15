@@ -256,7 +256,6 @@
   })
 
   objectAssign($AbortSignal.prototype, {
-    // 将 Request 注入控制器
     install: function (request) {
       if (request.signal) {
         var index = getSignalIndex(request.signal)
@@ -274,7 +273,7 @@
   }
 
   objectAssign($AbortController.prototype, {
-    // 中止请求
+    // Abort Request
     abort: function () {
       var index = getSignalIndex(this.signal)
       if (index !== undefined) {
@@ -290,7 +289,7 @@
   var XEAbortController = $AbortController
 
   /**
-   * 拦截器队列
+   * Interceptor Queue
    */
   var state = { reqQueue: [], respQueue: [] }
 
@@ -303,7 +302,7 @@
   }
 
   /**
-   * Request 拦截器
+   * Request Interceptor
    */
   function requestInterceptor (request) {
     var XEPromise = request.$Promise || Promise
@@ -323,7 +322,7 @@
   }
 
   /**
-   * Response 拦截器
+   * Response Interceptor
    */
   function responseInterceptor (request, response) {
     var XEPromise = request.$Promise || Promise
@@ -333,11 +332,7 @@
         return new XEPromise(function (resolve) {
           callback(response, function (resp) {
             if (resp && resp.body && resp.status) {
-              if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
-                resolve(resp)
-              } else {
-                resolve(new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), { status: resp.status, headers: resp.headers }, request))
-              }
+              resolve(toResponse(resp, request))
             } else {
               resolve(response)
             }
@@ -359,7 +354,7 @@
     }
   }
 
-  // 默认拦截器
+  // default interceptor
   interceptors.request.use(function (request, next) {
     if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
       request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
@@ -514,6 +509,14 @@
     }, request.$context)
   }
 
+  // Result to Response
+  function toResponse (resp, request) {
+    if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
+      return resp
+    }
+    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), { status: resp.status, headers: resp.headers }, request)
+  }
+
   /**
    * fetch 异步请求
    * @param { XHR } xhr 请求
@@ -539,7 +542,7 @@
             }, request.timeout)
           }
           $fetch(request.getUrl(), options).then(function (resp) {
-            responseInterceptor(request, resp).then(resolve)
+            responseInterceptor(request, toResponse(resp, request)).then(resolve)
           }).catch(function (resp) {
             responseInterceptor(request, new TypeError('Network request failed')).then(reject)
           })
@@ -631,7 +634,7 @@
       document.body.removeChild(request.script)
     }
     delete $global[request.jsonpCallback]
-    responseInterceptor(request, response).then(resolve)
+    responseInterceptor(request, toResponse(response, request)).then(resolve)
   }
 
   /**
@@ -645,10 +648,8 @@
         request.jsonpCallback = '_xeajax_jsonp' + (++jsonpIndex)
       }
       if (isFunction(request.$jsonp)) {
-        return request.$jsonp(script, request, resolve, reject).then(function (resp) {
-          responseInterceptor(request, resp).then(resolve)
-        }).catch(function (resp) {
-          responseInterceptor(request, resp).then(resolve)
+        return request.$jsonp(script, request).then(function (resp) {
+          responseInterceptor(request, toResponse(resp, request)).then(resolve)
         })
       } else {
         var url = request.getUrl()

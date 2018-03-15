@@ -232,7 +232,7 @@ fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON
 // application/x-www-form-urlencoded 方式提交数据
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
 
-// multipart/form-data 方式提交数据
+// 提交 FormData
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)

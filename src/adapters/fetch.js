@@ -1,5 +1,5 @@
 import { isFunction, arrayEach } from '../core/utils'
-import { XEResponse } from '../handle/response'
+import { XEResponse, toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
 /**
@@ -27,7 +27,7 @@ export function fetchRequest (request, resolve, reject) {
           }, request.timeout)
         }
         $fetch(request.getUrl(), options).then(function (resp) {
-          responseInterceptor(request, resp).then(resolve)
+          responseInterceptor(request, toResponse(resp, request)).then(resolve)
         }).catch(function (resp) {
           responseInterceptor(request, new TypeError('Network request failed')).then(reject)
         })

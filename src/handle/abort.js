@@ -21,7 +21,6 @@ Object.defineProperty($AbortSignal, 'aborted', {
 })
 
 objectAssign($AbortSignal.prototype, {
-  // 将 Request 注入控制器
   install: function (request) {
     if (request.signal) {
       var index = getSignalIndex(request.signal)
@@ -39,7 +38,7 @@ function $AbortController () {
 }
 
 objectAssign($AbortController.prototype, {
-  // 中止请求
+  // Abort Request
   abort: function () {
     var index = getSignalIndex(this.signal)
     if (index !== undefined) {

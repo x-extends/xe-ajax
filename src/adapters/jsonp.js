@@ -1,4 +1,5 @@
 import { isFunction } from '../core/utils'
+import { toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
 var jsonpIndex = 0
@@ -16,7 +17,7 @@ function jsonpHandle (request, response, resolve, reject) {
     document.body.removeChild(request.script)
   }
   delete $global[request.jsonpCallback]
-  responseInterceptor(request, response).then(resolve)
+  responseInterceptor(request, toResponse(response, request)).then(resolve)
 }
 
 /**
@@ -30,10 +31,8 @@ export function sendJSONP (request, resolve, reject) {
       request.jsonpCallback = '_xeajax_jsonp' + (++jsonpIndex)
     }
     if (isFunction(request.$jsonp)) {
-      return request.$jsonp(script, request, resolve, reject).then(function (resp) {
-        responseInterceptor(request, resp).then(resolve)
-      }).catch(function (resp) {
-        responseInterceptor(request, resp).then(resolve)
+      return request.$jsonp(script, request).then(function (resp) {
+        responseInterceptor(request, toResponse(resp, request)).then(resolve)
       })
     } else {
       var url = request.getUrl()

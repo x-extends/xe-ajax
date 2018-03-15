@@ -1,8 +1,8 @@
 import { isFormData, arrayEach } from '../core/utils'
-import { XEResponse } from '../handle/response'
+import { toResponse } from '../handle/response'
 
 /**
- * 拦截器队列
+ * Interceptor Queue
  */
 var state = {reqQueue: [], respQueue: []}
 
@@ -15,7 +15,7 @@ function useInterceptors (calls) {
 }
 
 /**
- * Request 拦截器
+ * Request Interceptor
  */
 export function requestInterceptor (request) {
   var XEPromise = request.$Promise || Promise
@@ -35,7 +35,7 @@ export function requestInterceptor (request) {
 }
 
 /**
- * Response 拦截器
+ * Response Interceptor
  */
 export function responseInterceptor (request, response) {
   var XEPromise = request.$Promise || Promise
@@ -45,11 +45,7 @@ export function responseInterceptor (request, response) {
       return new XEPromise(function (resolve) {
         callback(response, function (resp) {
           if (resp && resp.body && resp.status) {
-            if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
-              resolve(resp)
-            } else {
-              resolve(new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), {status: resp.status, headers: resp.headers}, request))
-            }
+            resolve(toResponse(resp, request))
           } else {
             resolve(response)
           }
@@ -71,7 +67,7 @@ export var interceptors = {
   }
 }
 
-// 默认拦截器
+// default interceptor
 interceptors.request.use(function (request, next) {
   if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
     request.headers.set('Content-Type', 'application/x-www-form-urlencoded')

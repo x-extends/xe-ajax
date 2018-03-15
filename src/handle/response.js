@@ -71,3 +71,11 @@ function fileReaderReady (request, reader) {
     }
   }, request.$context)
 }
+
+// Result to Response
+export function toResponse (resp, request) {
+  if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
+    return resp
+  }
+  return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), {status: resp.status, headers: resp.headers}, request)
+}
