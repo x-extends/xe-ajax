@@ -5,9 +5,9 @@
  * @preserve
  */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-      (global.XEAjax = factory());
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory()
+    : typeof define === 'function' && define.amd ? define(factory)
+      : (global.XEAjax = factory())
 }(this, function () {
   'use strict'
 
@@ -15,11 +15,11 @@
     return obj ? obj.constructor === Array : false
   }
 
-  function isFormData(obj) {
+  function isFormData (obj) {
     return typeof FormData !== 'undefined' && obj instanceof FormData
   }
 
-  function isCrossOrigin(request) {
+  function isCrossOrigin (request) {
     if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(request.url)) {
       if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
         return true
@@ -28,33 +28,33 @@
     return false
   }
 
-  function isSupportAdvanced() {
+  function isSupportAdvanced () {
     return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
   }
 
-  function isString(obj) {
+  function isString (obj) {
     return typeof obj === 'string'
   }
 
-  function isObject(obj) {
+  function isObject (obj) {
     return obj && typeof obj === 'object'
   }
 
-  function isFunction(obj) {
+  function isFunction (obj) {
     return typeof obj === 'function'
   }
 
-  function getLocatOrigin() {
+  function getLocatOrigin () {
     return location.origin || (location.protocol + '//' + location.host)
   }
 
-  function getBaseURL() {
+  function getBaseURL () {
     var pathname = location.pathname
     var lastIndex = lastIndexOf(pathname, '/') + 1
     return getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
   }
 
-  function lastIndexOf(str, val) {
+  function lastIndexOf (str, val) {
     if (isFunction(str.lastIndexOf)) {
       return str.lastIndexOf(val)
     } else {
@@ -67,7 +67,7 @@
     return -1
   }
 
-  function objectEach(obj, iteratee, context) {
+  function objectEach (obj, iteratee, context) {
     for (var key in obj) {
       if (obj.hasOwnProperty(key)) {
         iteratee.call(context, obj[key], key, obj)
@@ -75,7 +75,7 @@
     }
   }
 
-  function parseParam(resultVal, resultKey, isArr) {
+  function parseParam (resultVal, resultKey, isArr) {
     var result = []
     objectEach(resultVal, function (item, key) {
       if (isObject(item)) {
@@ -88,7 +88,7 @@
   }
 
   // Serialize Body
-  function serialize(body) {
+  function serialize (body) {
     var params = []
     objectEach(body, function (item, key) {
       if (item !== undefined) {
@@ -114,7 +114,7 @@
     return target
   }
 
-  function arrayEach(array, callback, context) {
+  function arrayEach (array, callback, context) {
     if (array.forEach) {
       array.forEach(callback, context)
     } else {
@@ -124,7 +124,7 @@
     }
   }
 
-  function arrayIncludes(array, value) {
+  function arrayIncludes (array, value) {
     if (array.includes) {
       return array.includes(value)
     } else {
@@ -137,17 +137,15 @@
     return false
   }
 
-  function clearXEAjaxContext(XEAjax) {
+  function clearXEAjaxContext (XEAjax) {
     XEAjax.$context = XEAjax.$Promise = null
   }
 
-
-
-  function toKey(name) {
+  function toKey (name) {
     return String(name).toLowerCase()
   }
 
-  function getObjectIterators(obj, getIndex) {
+  function getObjectIterators (obj, getIndex) {
     var result = []
     for (var name in obj) {
       if (obj.hasOwnProperty(name)) {
@@ -158,12 +156,12 @@
     return result
   }
 
-  function getIteratorResult(iterator, value) {
+  function getIteratorResult (iterator, value) {
     var done = iterator.$index++ >= iterator.$list.length
     return { done: done, value: done ? undefined : value }
   }
 
-  function XEIterator(iterator, value) {
+  function XEIterator (iterator, value) {
     this.$index = 0
     this.$list = getObjectIterators(iterator, value)
     this.next = function () {
@@ -171,7 +169,7 @@
     }
   }
 
-  function $Headers(headers) {
+  function $Headers (headers) {
     this._map = {}
     if (headers instanceof $Headers) {
       headers.forEach(function (value, name) {
@@ -224,7 +222,7 @@
 
   var XEHeaders = typeof Headers === 'undefined' ? $Headers : Headers
 
-  function XEReadableStream(body, request) {
+  function XEReadableStream (body, request) {
     this.locked = false
     this._getBody = function () {
       var that = this
@@ -241,11 +239,9 @@
     }
   }
 
-
-
   var requestList = []
 
-  function getSignalIndex(item) {
+  function getSignalIndex (item) {
     for (var index = 0, len = requestList.length; index < len; index++) {
       if (item === requestList[index][0]) {
         return index
@@ -253,7 +249,7 @@
     }
   }
 
-  function $AbortSignal() {
+  function $AbortSignal () {
     this.onaborted = null
     this._abortSignal = { aborted: false }
   }
@@ -277,7 +273,7 @@
     }
   })
 
-  function $AbortController() {
+  function $AbortController () {
     this.signal = new XEAbortSignal()
   }
 
@@ -299,15 +295,12 @@
   var XEAbortSignal = $AbortSignal
   var XEAbortController = $AbortController
 
-
-
-
   /**
    * Interceptor Queue
    */
   var state = { reqQueue: [], respQueue: [] }
 
-  function useInterceptors(calls) {
+  function useInterceptors (calls) {
     return function (callback) {
       if (calls.indexOf(callback) === -1) {
         calls.push(callback)
@@ -318,7 +311,7 @@
   /**
    * Request Interceptor
    */
-  function requestInterceptor(request) {
+  function requestInterceptor (request) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(request, request.$context)
     arrayEach(state.reqQueue, function (callback) {
@@ -338,7 +331,7 @@
   /**
    * Response Interceptor
    */
-  function responseInterceptor(request, response) {
+  function responseInterceptor (request, response) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(response, request.$context)
     arrayEach(state.respQueue, function (callback) {
@@ -382,10 +375,7 @@
     next()
   })
 
-
-
-
-  function XERequest(options) {
+  function XERequest (options) {
     objectAssign(this, { url: '', body: null, params: null, signal: null }, options)
     this.headers = new XEHeaders(options.headers)
     this.method = String(this.method).toLocaleUpperCase()
@@ -456,11 +446,7 @@
     }
   })
 
-
-
-
-
-  function XEResponse(body, options, request) {
+  function XEResponse (body, options, request) {
     this._request = request
     this._response = {
       body: new XEReadableStream(body, request),
@@ -537,7 +523,7 @@
     })
   }
 
-  function fileReaderReady(request, reader) {
+  function fileReaderReady (request, reader) {
     var XEPromise = request.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       reader.onload = function () {
@@ -550,7 +536,7 @@
   }
 
   // Result to Response
-  function toResponse(resp, request) {
+  function toResponse (resp, request) {
     if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
       return resp
     }
@@ -561,11 +547,7 @@
     return new XEResponse(JSON.stringify(resp.body), options, request)
   }
 
-
-
-
-
-  function sendFetch(request, resolve, reject) {
+  function sendFetch (request, resolve, reject) {
     var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
     request.getBody().then(function (body) {
       var options = {
@@ -589,7 +571,7 @@
     })
   }
 
-  function sendXHR(request, resolve, reject) {
+  function sendXHR (request, resolve, reject) {
     var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
     xhr._request = request
@@ -633,7 +615,7 @@
     })
   }
 
-  function createRequestFactory() {
+  function createRequestFactory () {
     if (self.fetch) {
       return function (request, resolve, reject) {
         return (request.signal ? sendXHR : sendFetch).apply(this, arguments)
@@ -650,13 +632,13 @@
    * @param { Promise.resolve } resolve 成功 Promise
    * @param { Promise.reject } reject 失败 Promise
    */
-  function fetchRequest(request, resolve, reject) {
+  function fetchRequest (request, resolve, reject) {
     return requestInterceptor(request).then(function () {
       return sendRequest(request, resolve, reject)
     })
   }
 
-  function parseXHRHeaders(options) {
+  function parseXHRHeaders (options) {
     var headers = {}
     if (options.getAllResponseHeaders) {
       var allResponseHeaders = options.getAllResponseHeaders().trim()
@@ -670,7 +652,7 @@
     return headers
   }
 
-  function parseStatusText(options) {
+  function parseStatusText (options) {
     if (options.status === 1223 || options.status === 204) {
       return 'No Content'
     } else if (options.status === 304) {
@@ -680,10 +662,6 @@
     }
     return (options.statusText || options.statusText || '').trim()
   }
-
-
-
-
 
   var jsonpIndex = 0
   var $global = typeof window === 'undefined' ? this : window
@@ -695,7 +673,7 @@
    * @param { resolve } resolve 成功 Promise
    * @param { reject } reject 失败 Promise
    */
-  function jsonpHandle(request, response, resolve, reject) {
+  function jsonpHandle (request, response, resolve, reject) {
     if (request.script.parentNode === document.body) {
       document.body.removeChild(request.script)
     }
@@ -706,7 +684,7 @@
   /**
    * jsonp 异步请求
    */
-  function sendJSONP(request, resolve, reject) {
+  function sendJSONP (request, resolve, reject) {
     request.script = document.createElement('script')
     requestInterceptor(request).then(function () {
       var script = request.script
@@ -740,11 +718,6 @@
     })
   }
 
-
-
-
-
-
   var setupDefaults = {
     method: 'GET',
     baseURL: getBaseURL(),
@@ -766,7 +739,7 @@
     * @param Object options 请求参数
     * @return Promise
     */
-  function XEAjax(options) {
+  function XEAjax (options) {
     var opts = objectAssign({}, setupDefaults, { headers: objectAssign({}, setupDefaults.headers) }, options)
     var XEPromise = opts.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
@@ -802,28 +775,24 @@
    * @param Function $Promise 自定义 Promise 函数
    * @param Function $context 自定义上下文
    */
-  var setup = function setup(options) {
+  var setup = function setup (options) {
     objectAssign(setupDefaults, options)
   }
 
-
-
-
-
-  function getOptions(method, def, options) {
+  function getOptions (method, def, options) {
     var opts = objectAssign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
     clearXEAjaxContext(XEAjax)
     return opts
   }
 
-  function responseResult(method) {
+  function responseResult (method) {
     return function () {
       return ajax(method.apply(this, arguments))
     }
   }
 
   // xhr response JSON
-  function responseJSON(method) {
+  function responseJSON (method) {
     return function () {
       var opts = method.apply(this, arguments)
       var XEPromise = opts.$Promise || Promise
@@ -843,7 +812,7 @@
   var ajax = XEAjax
 
   // Http Request All
-  function doAll(iterable) {
+  function doAll (iterable) {
     var XEPromise = XEAjax.$Promise || Promise
     var context = XEAjax.$context
     clearXEAjaxContext(XEAjax)
@@ -857,7 +826,7 @@
     }), context)
   }
 
-  function requestFn(method, defs) {
+  function requestFn (method, defs) {
     return function (url, params, opts) {
       return getOptions(method, isObject(url) ? url : objectAssign({ url: url, params: params }, defs), opts)
     }
@@ -892,8 +861,6 @@
   var patchJSON = responseJSON(requests.PATCH)
   var jsonp = responseJSON(requests.JSONP)
 
-
-
   var exportMethods = {
     doAll: doAll,
     ajax: ajax,
@@ -913,18 +880,12 @@
     jsonp: jsonp
   }
 
-
-
-
-
-
-
   /**
    * 混合函数
    *
    * @param {Object} methods 扩展
    */
-  function mixin(methods) {
+  function mixin (methods) {
     objectEach(methods, function (fn, name) {
       XEAjax[name] = isFunction(fn) ? function () {
         var result = fn.apply(XEAjax.$context, arguments)
@@ -937,7 +898,7 @@
   /**
    * 安装插件
    */
-  function use(plugin) {
+  function use (plugin) {
     plugin.install(XEAjax)
     if (setupDefaults.log) {
       console.info('[' + XEAjax.$name + '] Ready. Detected ' + plugin.$name + ' v' + plugin.version)
@@ -956,9 +917,6 @@
   })
 
   mixin(exportMethods)
-
-
-
 
   return XEAjax
 }))
