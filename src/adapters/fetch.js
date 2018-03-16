@@ -108,14 +108,11 @@ function parseXHRHeaders (options) {
 }
 
 function parseStatusText (options) {
-  // if no content
   if (options.status === 1223 || options.status === 204) {
     return 'No Content'
   } else if (options.status === 304) {
-    // if not modified
     return 'Not Modified'
   } else if (options.status === 404) {
-    // if not found
     return 'Not Found'
   }
   return (options.statusText || options.statusText || '').trim()

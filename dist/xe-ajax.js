@@ -365,7 +365,7 @@
   interceptors.request.use(function (request, next) {
     if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
       request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-      if (!isFormData(request.body) && request.bodyType === 'JSON_DATA') {
+      if (!isFormData(request.body) && (request.bodyType === 'json-data' || request.bodyType === 'json_data')) {
         request.headers.set('Content-Type', 'application/json; charset=utf-8')
       }
     }
@@ -379,7 +379,7 @@
     objectAssign(this, { url: '', body: null, params: null, signal: null }, options)
     this.headers = new XEHeaders(options.headers)
     this.method = String(this.method).toLocaleUpperCase()
-    this.bodyType = String(this.bodyType).toLocaleUpperCase()
+    this.bodyType = String(this.bodyType).toLowerCase()
     this.crossOrigin = isCrossOrigin(this)
     if (this.signal && isFunction(this.signal.install)) {
       this.signal.install(this)
@@ -431,7 +431,7 @@
             } else {
               if (isFormData(request.body)) {
                 result = request.body
-              } else if (request.bodyType === 'FORM_DATA') {
+              } else if (request.bodyType === 'form-data' || request.bodyType === 'form_data') {
                 result = serialize(request.body)
               } else {
                 result = JSON.stringify(request.body)
@@ -653,14 +653,11 @@
   }
 
   function parseStatusText (options) {
-    // if no content
     if (options.status === 1223 || options.status === 204) {
       return 'No Content'
     } else if (options.status === 304) {
-      // if not modified
       return 'Not Modified'
     } else if (options.status === 404) {
-      // if not found
       return 'Not Found'
     }
     return (options.statusText || options.statusText || '').trim()
@@ -726,7 +723,7 @@
     baseURL: getBaseURL(),
     cache: 'default',
     credentials: 'same-origin',
-    bodyType: 'JSON_DATA',
+    bodyType: 'json-data',
     log: 'development' !== 'production',
     headers: {
       Accept: 'application/json, text/plain, */*;'
@@ -759,7 +756,7 @@
    * @param String method 请求方法(默认GET)
    * @param Object params 请求参数，序列化后会拼接在url
    * @param Object body 提交参数
-   * @param String bodyType 提交参数方式(默认JSON_DATA) 支持[JSON_DATA:以json data方式提交数据] [FORM_DATA:以form data方式提交数据]
+   * @param String bodyType 提交参数方式可以设置json-data,form-data(json-data)
    * @param String jsonp 调用jsonp服务,回调属性默认callback
    * @param String cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
    * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)

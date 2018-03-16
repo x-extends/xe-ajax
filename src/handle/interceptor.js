@@ -71,7 +71,7 @@ export var interceptors = {
 interceptors.request.use(function (request, next) {
   if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
     request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-    if (!isFormData(request.body) && request.bodyType === 'JSON_DATA') {
+    if (!isFormData(request.body) && (request.bodyType === 'json-data' || request.bodyType === 'json_data')) {
       request.headers.set('Content-Type', 'application/json; charset=utf-8')
     }
   }

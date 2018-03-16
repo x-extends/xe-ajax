@@ -5,7 +5,7 @@ export function XERequest (options) {
   objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
   this.headers = new XEHeaders(options.headers)
   this.method = String(this.method).toLocaleUpperCase()
-  this.bodyType = String(this.bodyType).toLocaleUpperCase()
+  this.bodyType = String(this.bodyType).toLowerCase()
   this.crossOrigin = isCrossOrigin(this)
   if (this.signal && isFunction(this.signal.install)) {
     this.signal.install(this)
@@ -57,7 +57,7 @@ objectAssign(XERequest.prototype, {
           } else {
             if (isFormData(request.body)) {
               result = request.body
-            } else if (request.bodyType === 'FORM_DATA') {
+            } else if (request.bodyType === 'form-data' || request.bodyType === 'form_data') {
               result = serialize(request.body)
             } else {
               result = JSON.stringify(request.body)

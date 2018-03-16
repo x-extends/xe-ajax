@@ -94,10 +94,10 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | method | String | 请求方法 | 默认GET |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式，如果要以表单方式提交改为FORM_DATA | 默认JSON_DATA |
-| jsonp | String | 调用jsonp服务,属性名默认callback | 默认callback |
+| bodyType | String | 提交参数方式，可以设置json-data,form-data | 默认json-data |
 | cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
+| jsonp | String | 调用jsonp服务的属性名参数 | 默认callback |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | transformParams | Function ( params, request ) | 用于改变URL参数 |  |
@@ -112,12 +112,12 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | set | Function ( name, value ) | 添加 |
 | append | Function ( name, value ) | 追加 |
 | get | Function ( name ) | 根据 name 获取 |
-| has | Function ( name ) | 返回 name 是否存 |
+| has | Function ( name ) | 检查 name 是否存在 |
 | delete | Function ( name ) | 根据 name 删除 |
 | keys | Function | 以迭代器的形式返回所有 name |
 | values | Function | 以迭代器的形式返回所有 value |
 | entries | Function | 以迭代器的形式返回所有 [name, value] |
-| forEach | Function ( callback, context ) | 是否重定向了 |
+| forEach | Function ( callback, context ) | 迭代器 |
 
 ### Response 对象说明
 | 属性 | 类型 | 描述 |
@@ -134,9 +134,9 @@ XEAjax.postJSON('/api/user/save', {id: 1})
 | clone | Function | 返回一个新的 Response 对象 |
 | json | Function | 获取 json 数据 |
 | test | Function | 获取 text 数据 |
-| blob | Function | (ie10+) 获取 Blob 对象 |
-| arrayBuffer | Function | (ie10+) 获取 ArrayBuffer 对象 |
-| formData | Function | (ie10+) 获取 FormData 对象 |
+| blob | Function | 获取 Blob 对象 |
+| arrayBuffer | Function | 获取 ArrayBuffer 对象 |
+| formData | Function | 获取 FormData 对象 |
 
 ## 全局参数设置
 ``` shell
@@ -229,7 +229,7 @@ fetchGet('/api/user/list').then(response => {
 fetchPost('/api/user/save', {name: 'test', password: '123456'})
 
 // 提交 application/x-www-form-urlencoded
-fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 // 提交 FormData
 const file = document.querySelector('#myFile').files[0]
@@ -254,10 +254,10 @@ getJSON('/api/user/list').then(data => {
 postJSON('/api/user/save', {name: 'test'})
 
 // 提交 application/json（默认方式）
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'JSON_DATA'})
+postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
 // 提交 application/x-www-form-urlencoded
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 // 提交 FormData
 const file = document.querySelector('#myFile').files[0]
@@ -330,7 +330,7 @@ define([
   XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'})
 
   // 提交 application/x-www-form-urlencoded
-  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'FORM_DATA'})
+  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
   // 提交 FormData
   var file = document.querySelector('#myFile').files[0]
