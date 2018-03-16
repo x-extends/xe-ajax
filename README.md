@@ -145,7 +145,7 @@ import XEAjax from 'xe-ajax'
 // 示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
-  bodyType: 'FORM_DATA',
+  bodyType: 'form-data',
   credentials: 'include',
   headers: {
     'Accept': 'application/json, text/plain, \*/\*;'
