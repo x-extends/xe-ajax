@@ -6,7 +6,7 @@
 基于 Promise 的异步请求函数；支持 xhr、fetch、jsonp 以及 mock，更简洁的 API、轻封装、高扩展。
 
 ## 兼容性
-使用原生 Promise 实现，低版本浏览器使用 polyfill es6-promise.js  
+依赖原生 Promise，低版本浏览器使用 polyfill es6-promise.js  
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- |
