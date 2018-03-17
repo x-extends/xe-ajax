@@ -41,7 +41,7 @@ npm install xe-ajax --save
 ```
 ### import 部分导入
 ``` shell
-import { fetchGet, getJSON, fetchPost, postJSON } from 'xe-ajax'
+import { fetchGet, fetchPost } from 'xe-ajax'
 
 fetchGet('/api/user/list', {id: 1})
 fetchPost('/api/user/save', {id: 1})
@@ -183,7 +183,7 @@ XEAjax.fetch('/api/user/save', {method: 'POST', body: {id: 1}}).then(response =>
   // 发生错误
 })
 ```
-### 响应 response 方式调用
+### 便捷调用
 ``` shell
 import { fetchGet, fetchPost } from 'xe-ajax'
 
@@ -237,11 +237,10 @@ fetchPost('/api/user/save', formBody)
 // 查询参数和数据同时提交
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-### 响应 json 方式调用
+### 根据状态完成或失败直接响应 json 数据
 ``` shell
 import { getJSON, postJSON, jsonp } from 'xe-ajax'
 
-// 直接返回请求结果
 getJSON('/api/user/list').then(data => {
   // 请求成功
 }).catch(data => {
@@ -267,27 +266,21 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}}
 ```
 ### jsonp 调用
 ``` shell
-import { jsonp } from 'xe-ajax'
+import { fetchJsonp } from 'xe-ajax'
 
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
     // 获取 data
   })
 })
-
-jsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {jsonp: 'cb'}).then(data => {
-  // 请求成功
-}).catch(data => {
-  // 请求失败
-})
 ```
 ### 并发多个请求
 ``` shell
-import { doAll, fetchGet, getJSON } from 'xe-ajax'
+import { doAll, fetchGet } from 'xe-ajax'
 
 const iterable1 = []
 iterable1.push(fetchGet('/api/user/list'))
-iterable1.push(getJSON('/api/user/message'), {id: 1})
+iterable1.push(fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
   // 所有异步完成之后执行
 }).catch(data => {
@@ -302,7 +295,7 @@ doAll(iterable2)
 ```
 ### 嵌套请求
 ``` shell
-import { getJSON } from 'xe-ajax'
+import { fetchGet } from 'xe-ajax'
 
 // 相互依赖的嵌套请求(项目中应该避免这种情况)
 fetchGet('/api/user/info').then(response => response.json()).then(data => {
@@ -344,7 +337,7 @@ define([
 ### AbortController 控制器对象
 允许控制一个或多个取消指令请求
 ``` shell
-import { AbortController, getJSON, fetchPost } from 'xe-ajax'
+import { AbortController, fetchGet } from 'xe-ajax'
 
 // 创建一个控制器对象
 const controller = new AbortController()
