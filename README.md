@@ -438,7 +438,7 @@ XEAjax.getText('/api/user/message')
 
 ## 安装插件
 ### Mock 虚拟服务
-支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等插件..。点击[查看详细信息](https://github.com/xuliangzhan/xe-ajax-mock)
+支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等。
 
 ES6 + Vue + VXEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock1)  
 ES6 + Vue + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock2)  
