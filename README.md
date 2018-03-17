@@ -143,6 +143,7 @@ XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'json-data',
   credentials: 'include',
+  log: false,
   headers: {
     'Accept': 'application/json, text/plain, \*/\*;'
   },
