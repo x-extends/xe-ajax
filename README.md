@@ -7,9 +7,14 @@
 
 ## 兼容性
 使用原生 Promise 实现，低版本浏览器使用 polyfill es6-promise.js  
-|![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png) |
-| --- | --- | --- | --- | --- |
-| 8+ ✔ | ✔ | ✔ | ✔ | 6.1+ ✔ |
+
+![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) |
+![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) |
+![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) |
+![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) |
+![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
+--- | --- | --- | --- | --- |
+8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## CDN 安装
 使用 script 方式安装，XEAjax 会定义为全局变量  
