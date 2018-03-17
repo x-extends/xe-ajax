@@ -242,7 +242,7 @@ fetchPost('/api/user/save', formBody)
 // 查询参数和数据同时提交
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-### 根据状态完成或失败直接响应 json 数据
+### 根据状态响应 json 数据
 ``` shell
 import { getJSON, postJSON, jsonp } from 'xe-ajax'
 
