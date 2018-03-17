@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.7
+ * xe-ajax.js v3.2.8
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -910,7 +910,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.7',
+    version: '3.2.8',
     $name: 'XEAjax'
   })
 
