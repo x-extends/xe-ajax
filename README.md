@@ -92,7 +92,8 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 | bodyType | String | 提交参数方式，可以设置json-data,form-data | 默认json-data |
 | cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
-| jsonp | String | 调用jsonp服务的属性名参数 | 默认callback |
+| jsonp | String | jsonp入参属性名 | 默认callback |
+| jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
 | transformParams | Function ( params, request ) | 用于改变URL参数 |  |
@@ -268,9 +269,27 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}}
 ``` shell
 import { fetchJsonp } from 'xe-ajax'
 
+// http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1
+// jsonp_xeajax_1({message: 'success'})
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
-    // 获取 data
+    // {message: 'success'}
+  })
+})
+
+// http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_2
+// jsonp_xeajax_2({message: 'success'})
+fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {jsonp: 'cb'}).then(response => {
+  response.json().then(data => {
+    // {message: 'success'}
+  })
+})
+
+// http://xuliangzhan.com/jsonp/user/message?cb=custom3
+// custom3({message: 'success'})
+fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {jsonp: 'cb', jsonpCallback: 'custom3'}).then(response => {
+  response.json().then(data => {
+    // {message: 'success'}
   })
 })
 ```

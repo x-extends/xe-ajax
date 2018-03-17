@@ -28,7 +28,7 @@ export function sendJSONP (request, resolve, reject) {
   requestInterceptor(request).then(function () {
     var script = request.script
     if (!request.jsonpCallback) {
-      request.jsonpCallback = '_xeajax_jsonp' + (++jsonpIndex)
+      request.jsonpCallback = 'jsonp_xeajax_' + (++jsonpIndex)
     }
     if (isFunction(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
