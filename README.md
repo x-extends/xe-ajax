@@ -14,7 +14,7 @@
 ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) |
 ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- |
-8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
+8+ ✔ | ✔ | ✔ | ✔ | 6.1+ ✔ |
 
 ## CDN 安装
 使用 script 方式安装，XEAjax 会定义为全局变量  
