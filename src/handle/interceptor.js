@@ -1,4 +1,4 @@
-import { isFormData, arrayEach } from '../core/utils'
+import { isFormData, isCrossOrigin, arrayEach } from '../core/utils'
 import { toResponse } from '../handle/response'
 
 /**
@@ -27,8 +27,8 @@ export function requestInterceptor (request) {
           resolve(req)
         })
       }, request.$context)
-    }).catch(function (req) {
-      console.error(req)
+    }).catch(function (e) {
+      console.error(e)
     })
   })
   return thenInterceptor
@@ -51,8 +51,8 @@ export function responseInterceptor (request, response) {
           }
         }, request)
       }, request.$context)
-    }).catch(function (resp) {
-      console.error(resp)
+    }).catch(function (e) {
+      console.error(e)
     })
   })
   return thenInterceptor
@@ -75,7 +75,7 @@ interceptors.request.use(function (request, next) {
       request.headers.set('Content-Type', 'application/json; charset=utf-8')
     }
   }
-  if (request.crossOrigin) {
+  if (isCrossOrigin(request.getUrl())) {
     request.headers.set('X-Requested-With', 'XMLHttpRequest')
   }
   next()

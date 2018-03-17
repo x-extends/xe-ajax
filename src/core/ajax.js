@@ -28,7 +28,7 @@ export function XEAjax (options) {
   var opts = objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
   var XEPromise = opts.$Promise || Promise
   return new XEPromise(function (resolve, reject) {
-    return (opts.jsonp ? sendJSONP : fetchRequest)(new XERequest(opts), resolve, reject)
+    (opts.jsonp ? sendJSONP : fetchRequest)(new XERequest(opts), resolve, reject)
   }, opts.$context)
 }
 

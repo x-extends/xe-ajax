@@ -23,8 +23,8 @@ function responseJSON (method) {
       return new XEPromise(function (resolve, reject) {
         response.json().then(function (data) {
           (response.ok ? resolve : reject)(data)
-        }).catch(function (data) {
-          reject(data)
+        }).catch(function (e) {
+          reject(null)
         })
       }, this)
     })
@@ -39,12 +39,7 @@ export function doAll (iterable) {
   var context = XEAjax.$context
   clearXEAjaxContext(XEAjax)
   return XEPromise.all(iterable.map(function (item) {
-    if (item instanceof XEPromise) {
-      return item
-    } else if (item && isObject(item)) {
-      return XEAjax(objectAssign({$context: context, $Promise: XEPromise}, item))
-    }
-    return item
+    return isObject(item) ? XEAjax(objectAssign({$context: context, $Promise: XEPromise}, item)) : item
   }), context)
 }
 

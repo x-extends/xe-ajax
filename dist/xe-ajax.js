@@ -19,8 +19,8 @@
     return typeof FormData !== 'undefined' && obj instanceof FormData
   }
 
-  function isCrossOrigin (request) {
-    if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(request.url)) {
+  function isCrossOrigin (url) {
+    if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
       if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
         return true
       }
@@ -317,8 +317,8 @@
             resolve(req)
           })
         }, request.$context)
-      }).catch(function (req) {
-        console.error(req)
+      }).catch(function (e) {
+        console.error(e)
       })
     })
     return thenInterceptor
@@ -341,8 +341,8 @@
             }
           }, request)
         }, request.$context)
-      }).catch(function (resp) {
-        console.error(resp)
+      }).catch(function (e) {
+        console.error(e)
       })
     })
     return thenInterceptor
@@ -365,7 +365,7 @@
         request.headers.set('Content-Type', 'application/json; charset=utf-8')
       }
     }
-    if (request.crossOrigin) {
+    if (isCrossOrigin(request.getUrl())) {
       request.headers.set('X-Requested-With', 'XMLHttpRequest')
     }
     next()
@@ -376,7 +376,6 @@
     this.headers = new XEHeaders(options.headers)
     this.method = String(this.method).toLocaleUpperCase()
     this.bodyType = String(this.bodyType).toLowerCase()
-    this.crossOrigin = isCrossOrigin(this)
     if (this.signal && isFunction(this.signal.install)) {
       this.signal.install(this)
     }
@@ -739,7 +738,7 @@
     var opts = objectAssign({}, setupDefaults, { headers: objectAssign({}, setupDefaults.headers) }, options)
     var XEPromise = opts.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
-      return (opts.jsonp ? sendJSONP : fetchRequest)(new XERequest(opts), resolve, reject)
+      (opts.jsonp ? sendJSONP : fetchRequest)(new XERequest(opts), resolve, reject)
     }, opts.$context)
   }
 
@@ -796,8 +795,8 @@
         return new XEPromise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
-          }).catch(function (data) {
-            reject(data)
+          }).catch(function (e) {
+            reject(null)
           })
         }, this)
       })
@@ -812,12 +811,7 @@
     var context = XEAjax.$context
     clearXEAjaxContext(XEAjax)
     return XEPromise.all(iterable.map(function (item) {
-      if (item instanceof XEPromise) {
-        return item
-      } else if (item && isObject(item)) {
-        return XEAjax(objectAssign({ $context: context, $Promise: XEPromise }, item))
-      }
-      return item
+      return isObject(item) ? XEAjax(objectAssign({ $context: context, $Promise: XEPromise }, item)) : item
     }), context)
   }
 
@@ -856,12 +850,14 @@
   var patchJSON = responseJSON(requests.PATCH)
   var jsonp = responseJSON(requests.JSONP)
 
+  function ajaxFetch (url, options) {
+    return fetchGet(url, null, options)
+  }
+
   var exportMethods = {
     doAll: doAll,
     ajax: ajax,
-    fetch: function (url, options) {
-      return fetchGet(url, null, options)
-    },
+    fetch: ajaxFetch,
     fetchGet: fetchGet,
     fetchPost: fetchPost,
     fetchPut: fetchPut,

@@ -1,4 +1,4 @@
-import { isFunction, isFormData, isCrossOrigin, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
+import { isFunction, isFormData, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
 import { XEHeaders } from '../handle/headers'
 
 export function XERequest (options) {
@@ -6,7 +6,6 @@ export function XERequest (options) {
   this.headers = new XEHeaders(options.headers)
   this.method = String(this.method).toLocaleUpperCase()
   this.bodyType = String(this.bodyType).toLowerCase()
-  this.crossOrigin = isCrossOrigin(this)
   if (this.signal && isFunction(this.signal.install)) {
     this.signal.install(this)
   }

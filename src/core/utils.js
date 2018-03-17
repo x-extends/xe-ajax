@@ -6,8 +6,8 @@ export function isFormData (obj) {
   return typeof FormData !== 'undefined' && obj instanceof FormData
 }
 
-export function isCrossOrigin (request) {
-  if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(request.url)) {
+export function isCrossOrigin (url) {
+  if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
     if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
       return true
     }

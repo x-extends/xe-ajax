@@ -1,11 +1,13 @@
 import { doAll, ajax, fetchGet, fetchPost, fetchPut, fetchDelete, fetchPatch, fetchHead, fetchJsonp, getJSON, postJSON, putJSON, deleteJSON, patchJSON, headJSON, jsonp } from './index'
 
+function ajaxFetch (url, options) {
+  return fetchGet(url, null, options)
+}
+
 export var exportMethods = {
   doAll: doAll,
   ajax: ajax,
-  fetch: function (url, options) {
-    return fetchGet(url, null, options)
-  },
+  fetch: ajaxFetch,
   fetchGet: fetchGet,
   fetchPost: fetchPost,
   fetchPut: fetchPut,
