@@ -269,7 +269,7 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}}
 ``` shell
 import { fetchJsonp } from 'xe-ajax'
 
-// URL: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1
+// URL: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
 // Response: jsonp_xeajax_1({message: 'success'})
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
@@ -277,7 +277,7 @@ fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response =
   })
 })
 
-// URL: http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_2
+// URL: http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_1521272815608_2
 // Response: jsonp_xeajax_2({message: 'success'})
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
   jsonp: 'cb'
