@@ -316,7 +316,7 @@ define([
     })
   })
 
-  // 提交 application/json（默认方式）
+  // 提交 application/json
   XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'})
 
   // 提交 application/x-www-form-urlencoded
