@@ -464,7 +464,7 @@ XEAjax.doGet('/api/user/list')
 XEAjax.getText('/api/user/message')
 ```
 
-## 安装插件
+## 插件
 ### Mock 虚拟服务
 支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等。
 
