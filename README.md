@@ -45,9 +45,6 @@ import { fetchGet, getJSON, fetchPost, postJSON } from 'xe-ajax'
 
 fetchGet('/api/user/list', {id: 1})
 fetchPost('/api/user/save', {id: 1})
-
-getJSON('/api/user/list', {id: 1})
-postJSON('/api/user/save', {id: 1})
 ```
 ### import 导入所有
 ``` shell
@@ -55,16 +52,14 @@ import XEAjax from 'xe-ajax'
 
 XEAjax.fetchGet('/api/user/list', {id: 1})
 XEAjax.fetchPost ('/api/user/save', {id: 1})
-
-XEAjax.getJSON('/api/user/list', {id: 1})
-XEAjax.postJSON('/api/user/save', {id: 1})
 ```
 
 ## API:
 ### 提供常用便捷方法:
-* doAll (iterable)
+* doAll ( iterable )
 * ajax ( options )
 * 
+* fetch ( url, options )
 * fetchJsonp ( url, params, options )
 * fetchHead ( url, params, options )
 * fetchGet ( url, params, options )
@@ -174,13 +169,15 @@ XEAjax.setup({
 ## 示例
 ### 完整参数调用
 ``` shell
-import { ajax } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
-ajax({
-  url: '/api/user/list', 
-  method: 'GET', 
-  params: {id: 1}
-}).then(response => {
+XEAjax.fetch('/api/user/list').then(response => {
+  // response
+}).catch(e => {
+  // 发生错误
+})
+
+XEAjax.fetch('/api/user/save', {method: 'POST', body: {id: 1}}).then(response => {
   // response
 }).catch(e => {
   // 发生错误
@@ -278,7 +275,7 @@ fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response =
   })
 })
 
-jsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(data => {
+jsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {jsonp: 'cb'}).then(data => {
   // 请求成功
 }).catch(data => {
   // 请求失败

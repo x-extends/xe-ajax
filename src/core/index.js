@@ -10,7 +10,7 @@ function getOptions (method, def, options) {
 
 function responseResult (method) {
   return function () {
-    return ajax(method.apply(this, arguments))
+    return XEAjax(method.apply(this, arguments))
   }
 }
 
@@ -19,7 +19,7 @@ function responseJSON (method) {
   return function () {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
-    return ajax(opts).then(function (response) {
+    return XEAjax(opts).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         response.json().then(function (data) {
           (response.ok ? resolve : reject)(data)
@@ -31,7 +31,6 @@ function responseJSON (method) {
   }
 }
 
-// Http Request
 export var ajax = XEAjax
 
 // Http Request All
@@ -43,7 +42,7 @@ export function doAll (iterable) {
     if (item instanceof XEPromise) {
       return item
     } else if (item && isObject(item)) {
-      return ajax(objectAssign({$context: context, $Promise: XEPromise}, item))
+      return XEAjax(objectAssign({$context: context, $Promise: XEPromise}, item))
     }
     return item
   }), context)

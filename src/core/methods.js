@@ -3,6 +3,9 @@ import { doAll, ajax, fetchGet, fetchPost, fetchPut, fetchDelete, fetchPatch, fe
 export var exportMethods = {
   doAll: doAll,
   ajax: ajax,
+  fetch: function (url, options) {
+    return fetchGet(url, null, options)
+  },
   fetchGet: fetchGet,
   fetchPost: fetchPost,
   fetchPut: fetchPut,

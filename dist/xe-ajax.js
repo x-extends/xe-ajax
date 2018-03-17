@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.6
+ * xe-ajax.js v3.2.7
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -30,10 +30,6 @@
 
   function isSupportAdvanced () {
     return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
-  }
-
-  function isString (obj) {
-    return typeof obj === 'string'
   }
 
   function isObject (obj) {
@@ -787,7 +783,7 @@
 
   function responseResult (method) {
     return function () {
-      return ajax(method.apply(this, arguments))
+      return XEAjax(method.apply(this, arguments))
     }
   }
 
@@ -796,7 +792,7 @@
     return function () {
       var opts = method.apply(this, arguments)
       var XEPromise = opts.$Promise || Promise
-      return ajax(opts).then(function (response) {
+      return XEAjax(opts).then(function (response) {
         return new XEPromise(function (resolve, reject) {
           response.json().then(function (data) {
             (response.ok ? resolve : reject)(data)
@@ -808,7 +804,6 @@
     }
   }
 
-  // Http Request
   var ajax = XEAjax
 
   // Http Request All
@@ -820,7 +815,7 @@
       if (item instanceof XEPromise) {
         return item
       } else if (item && isObject(item)) {
-        return ajax(objectAssign({ $context: context, $Promise: XEPromise }, item))
+        return XEAjax(objectAssign({ $context: context, $Promise: XEPromise }, item))
       }
       return item
     }), context)
@@ -864,6 +859,9 @@
   var exportMethods = {
     doAll: doAll,
     ajax: ajax,
+    fetch: function (url, options) {
+      return fetchGet(url, null, options)
+    },
     fetchGet: fetchGet,
     fetchPost: fetchPost,
     fetchPut: fetchPut,
@@ -912,7 +910,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.6',
+    version: '3.2.7',
     $name: 'XEAjax'
   })
 
