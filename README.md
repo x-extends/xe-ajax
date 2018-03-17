@@ -167,7 +167,7 @@ XEAjax.setup({
 ```
 
 ## 示例
-### 完整参数调用
+### 完整调用
 ``` shell
 import XEAjax from 'xe-ajax'
 
