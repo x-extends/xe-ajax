@@ -269,24 +269,24 @@ postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}}
 ``` shell
 import { fetchJsonp } from 'xe-ajax'
 
-// http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1
-// jsonp_xeajax_1({message: 'success'})
+// URL: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1
+// Response: jsonp_xeajax_1({message: 'success'})
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
     // {message: 'success'}
   })
 })
 
-// http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_2
-// jsonp_xeajax_2({message: 'success'})
+// URL: http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_2
+// Response: jsonp_xeajax_2({message: 'success'})
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {jsonp: 'cb'}).then(response => {
   response.json().then(data => {
     // {message: 'success'}
   })
 })
 
-// http://xuliangzhan.com/jsonp/user/message?cb=custom3
-// custom3({message: 'success'})
+// URL: http://xuliangzhan.com/jsonp/user/message?cb=custom3
+// Response: custom3({message: 'success'})
 fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {jsonp: 'cb', jsonpCallback: 'custom3'}).then(response => {
   response.json().then(data => {
     // {message: 'success'}
