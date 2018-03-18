@@ -674,7 +674,11 @@
     if (request.script.parentNode === document.body) {
       document.body.removeChild(request.script)
     }
-    delete $global[request.jsonpCallback]
+    try {
+      delete $global[request.jsonpCallback]
+    } catch (e) {
+      $global[request.jsonpCallback] = undefined
+    }
   }
 
   function jsonpSuccess (request, response, resolve) {
