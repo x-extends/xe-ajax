@@ -235,7 +235,7 @@ fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json
 // request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-// 提交 FormData
+// 模拟表单 FormData 提交
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
@@ -305,7 +305,7 @@ iterable1.push(fetchGet('/api/user/list'))
 iterable1.push(fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
   // 所有异步完成之后执行
-}).catch(data => {
+}).catch(e => {
   // 请求失败时执行
 })
 
@@ -323,7 +323,9 @@ import { fetchGet } from 'xe-ajax'
 fetchGet('/api/user/info').then(response => response.json()).then(data => {
   return fetchGet('/api/user/details', {id: data.id})
 }).then(response => {
-  // response
+  response.json().then(data => {
+    // 获取 data
+  })
 })
 ```
 ### AMD 使用方式
@@ -338,19 +340,15 @@ define([
     })
   })
 
-  // 提交 application/json
   XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'})
 
-  // 提交 application/x-www-form-urlencoded
   XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-  // 提交 FormData
   var file = document.querySelector('#myFile').files[0]
   var formBody = new FormData()
   formBody.append('file', file)
   XEAjax.fetchPost('/api/user/save', formBody)
 
-  // 查询参数和数据同时提交
   XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 })
 ```
@@ -366,8 +364,10 @@ const controller = new AbortController()
 // 获取signal
 const signal = controller.signal
 // 给请求加入控制器 signal
-fetchGet('/api/user/list', {id: 1}, {signal}).catch(function (e) {
-  console.error(e)
+fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
+  // 请求成功
+}).catch(function (e) {
+  // 取消请求
 })
 setTimeout(() => {
   // 终止请求
@@ -385,7 +385,6 @@ import XEAjax from 'xe-ajax'
 XEAjax.interceptors.request.use((request, next) => {
   // 请求之前拦截器,可以用于统一的权限拦截、设置头、参数等处理...
 
-  // request.method = 'POST' // 修改 method
   // request.params.id = 1 // 修改参数
   // request.headers.set('X-Token', 123) // 设置请求头
 
@@ -434,7 +433,9 @@ XEAjax.interceptors.response.use((response, next) => {
 import XEAjax from 'xe-ajax'
 
 export function doGet () {
-  return XEAjax.fetchGet.apply(this, arguments).then(response => response.json()).then(body => {
+  return XEAjax.fetchGet.apply(this, arguments)
+  .then(response => response.json())
+  .then(body => {
     return {
       body: body, 
       status: response.status, 
