@@ -176,19 +176,26 @@ XEAjax.setup({
 ``` shell
 import XEAjax from 'xe-ajax'
 
-XEAjax.fetch('/api/user/list').then(response => {
+XEAjax.ajax({
+  url: '/api/user/list',
+  method: 'GET',
+  params: {id: 1}
+}).then(response => {
   // response
 }).catch(e => {
   // 发生错误
 })
 
-XEAjax.fetch('/api/user/save', {method: 'POST', body: {id: 1}}).then(response => {
+XEAjax.fetch('/api/user/list', {
+  method: 'POST',
+  body: {name: 'test'}
+}).then(response => {
   // response
 }).catch(e => {
   // 发生错误
 })
 ```
-### 便捷调用
+### fetch 调用
 ``` shell
 import { fetchGet, fetchPost } from 'xe-ajax'
 
@@ -244,7 +251,7 @@ fetchPost('/api/user/save', formBody)
 // 查询参数和数据同时提交
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-### 根据状态响应 json 数据
+### 根据状态响应 json 调用
 ``` shell
 import { getJSON, postJSON, jsonp } from 'xe-ajax'
 

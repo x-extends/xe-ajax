@@ -19,6 +19,10 @@ export function isSupportAdvanced () {
   return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
 }
 
+export function isString (val) {
+  return typeof val === 'string'
+}
+
 export function isObject (obj) {
   return obj && typeof obj === 'object'
 }

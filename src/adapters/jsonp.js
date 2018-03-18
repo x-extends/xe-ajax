@@ -5,19 +5,21 @@ import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 var jsonpIndex = 0
 var $global = typeof window === 'undefined' ? this : window
 
-/**
- * jsonp 请求结果处理
- * @param { XERequest } request 对象
- * @param { XHR } xhr 请求
- * @param { resolve } resolve 成功 Promise
- * @param { reject } reject 失败 Promise
- */
-function jsonpHandle (request, response, resolve, reject) {
+function jsonpClear (request) {
   if (request.script.parentNode === document.body) {
     document.body.removeChild(request.script)
   }
   delete $global[request.jsonpCallback]
+}
+
+function jsonpSuccess (request, response, resolve) {
+  jsonpClear(request)
   responseInterceptor(request, toResponse(response, request)).then(resolve)
+}
+
+function jsonpError (request, reject) {
+  jsonpClear(request)
+  reject(new TypeError('JSONP request failed'))
 }
 
 /**
@@ -32,24 +34,23 @@ export function sendJSONP (request, resolve, reject) {
     }
     if (isFunction(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
-        responseInterceptor(request, toResponse(resp, request)).then(resolve)
+        responseInterceptor(request, toResponse({status: 200, body: resp}, request)).then(resolve)
+      }).catch(function (e) {
+        reject(e)
       })
     } else {
       var url = request.getUrl()
       $global[request.jsonpCallback] = function (body) {
-        jsonpHandle(request, {status: 200, body: body}, resolve, reject)
+        jsonpSuccess(request, {status: 200, body: body}, resolve)
       }
       script.type = 'text/javascript'
       script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
       script.onerror = function (evnt) {
-        jsonpHandle(request, {status: 500, body: null}, resolve, reject)
-      }
-      script.onabort = function (evnt) {
-        jsonpHandle(request, {status: 0, body: null}, resolve, reject)
+        jsonpError(request, reject)
       }
       if (request.timeout) {
         setTimeout(function () {
-          script.onabort()
+          jsonpError(request, reject)
         }, request.timeout)
       }
       document.body.appendChild(script)

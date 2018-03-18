@@ -32,6 +32,10 @@
     return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
   }
 
+  function isString (val) {
+    return typeof val === 'string'
+  }
+
   function isObject (obj) {
     return obj && typeof obj === 'object'
   }
@@ -398,7 +402,8 @@
           this.params = this.transformParams(this.params || {}, this)
         }
         if (this.params && !isFormData(this.params)) {
-          params = (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? { _: Date.now() } : {}, this.params), this)
+          var _param = arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
+          params = isString(this.params) ? this.params : (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(_param, this.params), this)
         }
         if (params) {
           url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -428,10 +433,8 @@
             } else {
               if (isFormData(request.body)) {
                 result = request.body
-              } else if (request.bodyType === 'form-data' || request.bodyType === 'form_data') {
-                result = serialize(request.body)
               } else {
-                result = JSON.stringify(request.body)
+                result = isString(request.body) ? request.body : (request.bodyType === 'form-data' || request.bodyType === 'form_data' ? serialize(request.body) : JSON.stringify(request.body))
               }
             }
           } catch (e) {
@@ -544,6 +547,10 @@
     return new XEResponse(JSON.stringify(resp.body), options, request)
   }
 
+  function requestError (request, reject) {
+    reject(new TypeError('Network request failed'))
+  }
+
   function sendFetch (request, resolve, reject) {
     var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
     request.getBody().then(function (body) {
@@ -557,13 +564,13 @@
       }
       if (request.timeout) {
         setTimeout(function () {
-          responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+          requestError(request, reject)
         }, request.timeout)
       }
       $fetch(request.getUrl(), options).then(function (resp) {
         responseInterceptor(request, toResponse(resp, request)).then(resolve)
-      }).catch(function (resp) {
-        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      }).catch(function (e) {
+        requestError(request, reject)
       })
     })
   }
@@ -589,10 +596,10 @@
       }, request)).then(resolve)
     }
     xhr.onerror = function () {
-      responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      requestError(request, reject)
     }
     xhr.ontimeout = function () {
-      responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+      requestError(request, reject)
     }
     if (isSupportAdvanced()) {
       xhr.responseType = 'blob'
@@ -663,19 +670,21 @@
   var jsonpIndex = 0
   var $global = typeof window === 'undefined' ? this : window
 
-  /**
-   * jsonp 请求结果处理
-   * @param { XERequest } request 对象
-   * @param { XHR } xhr 请求
-   * @param { resolve } resolve 成功 Promise
-   * @param { reject } reject 失败 Promise
-   */
-  function jsonpHandle (request, response, resolve, reject) {
+  function jsonpClear (request) {
     if (request.script.parentNode === document.body) {
       document.body.removeChild(request.script)
     }
     delete $global[request.jsonpCallback]
+  }
+
+  function jsonpSuccess (request, response, resolve) {
+    jsonpClear(request)
     responseInterceptor(request, toResponse(response, request)).then(resolve)
+  }
+
+  function jsonpError (request, reject) {
+    jsonpClear(request)
+    reject(new TypeError('JSONP request failed'))
   }
 
   /**
@@ -690,24 +699,23 @@
       }
       if (isFunction(request.$jsonp)) {
         return request.$jsonp(script, request).then(function (resp) {
-          responseInterceptor(request, toResponse(resp, request)).then(resolve)
+          responseInterceptor(request, toResponse({ status: 200, body: resp }, request)).then(resolve)
+        }).catch(function (e) {
+          reject(e)
         })
       } else {
         var url = request.getUrl()
         $global[request.jsonpCallback] = function (body) {
-          jsonpHandle(request, { status: 200, body: body }, resolve, reject)
+          jsonpSuccess(request, { status: 200, body: body }, resolve)
         }
         script.type = 'text/javascript'
         script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
         script.onerror = function (evnt) {
-          jsonpHandle(request, { status: 500, body: null }, resolve, reject)
-        }
-        script.onabort = function (evnt) {
-          jsonpHandle(request, { status: 0, body: null }, resolve, reject)
+          jsonpError(request, reject)
         }
         if (request.timeout) {
           setTimeout(function () {
-            script.onabort()
+            jsonpError(request, reject)
           }, request.timeout)
         }
         document.body.appendChild(script)

@@ -1,4 +1,4 @@
-import { isFunction, isFormData, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
+import { isString, isFunction, isFormData, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
 import { XEHeaders } from '../handle/headers'
 
 export function XERequest (options) {
@@ -26,7 +26,8 @@ objectAssign(XERequest.prototype, {
         this.params = this.transformParams(this.params || {}, this)
       }
       if (this.params && !isFormData(this.params)) {
-        params = (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? {_: Date.now()} : {}, this.params), this)
+        var _param = arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? {_t: Date.now()} : {}
+        params = isString(this.params) ? this.params : (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(_param, this.params), this)
       }
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -56,10 +57,8 @@ objectAssign(XERequest.prototype, {
           } else {
             if (isFormData(request.body)) {
               result = request.body
-            } else if (request.bodyType === 'form-data' || request.bodyType === 'form_data') {
-              result = serialize(request.body)
             } else {
-              result = JSON.stringify(request.body)
+              result = isString(request.body) ? request.body : (request.bodyType === 'form-data' || request.bodyType === 'form_data' ? serialize(request.body) : JSON.stringify(request.body))
             }
           }
         } catch (e) {

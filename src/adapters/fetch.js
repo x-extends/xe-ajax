@@ -2,6 +2,10 @@ import { isSupportAdvanced, isFunction, arrayEach } from '../core/utils'
 import { XEResponse, toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
+function requestError (request, reject) {
+  reject(new TypeError('Network request failed'))
+}
+
 function sendFetch (request, resolve, reject) {
   var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
   request.getBody().then(function (body) {
@@ -15,13 +19,13 @@ function sendFetch (request, resolve, reject) {
     }
     if (request.timeout) {
       setTimeout(function () {
-        responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+        requestError(request, reject)
       }, request.timeout)
     }
     $fetch(request.getUrl(), options).then(function (resp) {
       responseInterceptor(request, toResponse(resp, request)).then(resolve)
-    }).catch(function (resp) {
-      responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+    }).catch(function (e) {
+      requestError(request, reject)
     })
   })
 }
@@ -47,10 +51,10 @@ function sendXHR (request, resolve, reject) {
     }, request)).then(resolve)
   }
   xhr.onerror = function () {
-    responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+    requestError(request, reject)
   }
   xhr.ontimeout = function () {
-    responseInterceptor(request, new TypeError('Network request failed')).then(reject)
+    requestError(request, reject)
   }
   if (isSupportAdvanced()) {
     xhr.responseType = 'blob'
