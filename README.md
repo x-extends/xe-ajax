@@ -98,7 +98,7 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 | jsonp | String | jsonp入参属性名 | 默认callback |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置超时 |  |
-| headers | Object | 请求头 | {Accept: 'application/json, text/plain, \*/\*;'} |
+| headers | Object | 请求头 |  |
 | transformParams | Function ( params, request ) | 用于改变URL参数 |  |
 | paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
 | transformBody | Function ( body, request ) | 用于改变提交数据 |  |

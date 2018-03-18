@@ -10,9 +10,7 @@ export var setupDefaults = {
   credentials: 'same-origin',
   bodyType: 'json-data',
   log: 'development' !== 'production',
-  headers: {
-    Accept: 'application/json, text/plain, */*;'
-  },
+  headers: {},
   validateStatus: function (response) {
     return response.status >= 200 && response.status < 300
   }

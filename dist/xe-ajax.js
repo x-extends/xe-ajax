@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.8
+ * xe-ajax.js v3.2.9
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -720,9 +720,7 @@
     credentials: 'same-origin',
     bodyType: 'json-data',
     log: 'development' !== 'production',
-    headers: {
-      Accept: 'application/json, text/plain, */*;'
-    },
+    headers: {},
     validateStatus: function (response) {
       return response.status >= 200 && response.status < 300
     }
@@ -906,7 +904,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.8',
+    version: '3.2.9',
     $name: 'XEAjax'
   })
 
