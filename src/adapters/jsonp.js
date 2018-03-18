@@ -12,6 +12,7 @@ function jsonpClear (request) {
   try {
     delete $global[request.jsonpCallback]
   } catch (e) {
+    // IE8
     $global[request.jsonpCallback] = undefined
   }
 }
