@@ -311,7 +311,7 @@ Promise.all(iterable1).then(datas => {
 
 // doAll 使用对象参数, 用法和 Promise.all 一致
 const iterable2 = []
-iterable2.push({url: '/api/user/list', method: 'GET'})
+iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 doAll(iterable2)
 ```
