@@ -386,7 +386,7 @@ setTimeout(() => {
 ### Request 拦截器
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| interceptors.request.use | Function ( response, next ) | 请求发送之前触发 |
+| interceptors.request.use | Function ( request, next ) | 请求发送之前触发 |
 ``` shell
 import XEAjax from 'xe-ajax'
 
