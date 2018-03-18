@@ -384,6 +384,9 @@ setTimeout(() => {
 
 ## 拦截器
 ### Request 拦截器
+| 属性 | 类型 | 描述 |
+|------|------|-----|
+| interceptors.request.use | Function ( response, next ) | 请求完成之前触发 |
 interceptors.request ( request, next )
 ``` shell
 import XEAjax from 'xe-ajax'
@@ -400,11 +403,13 @@ XEAjax.interceptors.request.use((request, next) => {
 })
 ```
 ### Response 拦截器
-interceptors.response ( response, next, request )
+| 属性 | 类型 | 描述 |
+|------|------|-----|
+| interceptors.response.use | Function ( response, next, request ) | 请求完成之后响应之前触发 |
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 响应之后拦截器
+// 请求完成之后拦截器
 XEAjax.interceptors.response.use((response, next) => {
   // 响应之后拦截器,可以用于响应之后校验session是否失效做处理、统一的错误消息提示处理等...
 
