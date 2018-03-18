@@ -227,11 +227,11 @@ fetchGet('/api/user/list').then(response => {
   })
 })
 
-// 如果 bodyType 设置为 json-data, 则自动设置请求头, 并自动将 body 转换 JSON.stringify
+// 如果 bodyType='json-data', 则默认设置 Content-Type 并使用 JSON.stringify 序列化数据
 // request.headers.set('Content-Type', 'application/json; charset=utf-8')
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
-// 如果 bodyType 设置为 form-data, 则自动设置请求头, 并自动将 body 序列化
+// 如果 bodyType='form-data', 则默认设置 Content-Type 并使用 XEAjax.serialize 序列化数据
 // request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 

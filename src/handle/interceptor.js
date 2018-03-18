@@ -70,9 +70,11 @@ export var interceptors = {
 // default interceptor
 interceptors.request.use(function (request, next) {
   if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
-    request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-    if (!isFormData(request.body) && (request.bodyType === 'json-data' || request.bodyType === 'json_data')) {
-      request.headers.set('Content-Type', 'application/json; charset=utf-8')
+    if (!isFormData(request.body)) {
+      request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
+      if (request.bodyType === 'json-data' || request.bodyType === 'json_data') {
+        request.headers.set('Content-Type', 'application/json; charset=utf-8')
+      }
     }
   }
   if (isCrossOrigin(request.getUrl())) {
