@@ -227,10 +227,12 @@ fetchGet('/api/user/list').then(response => {
   })
 })
 
-// 提交 application/json（默认方式）
-fetchPost('/api/user/save', {name: 'test', password: '123456'})
+// 如果 bodyType 设置为 json-data, 则自动设置请求头, 并自动将 body 转换 JSON.stringify
+// request.headers.set('Content-Type', 'application/json; charset=utf-8')
+fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
-// 提交 application/x-www-form-urlencoded
+// 如果 bodyType 设置为 form-data, 则自动设置请求头, 并自动将 body 序列化
+// request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
 fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 // 提交 FormData
@@ -246,27 +248,19 @@ fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}
 ``` shell
 import { getJSON, postJSON, jsonp } from 'xe-ajax'
 
-getJSON('/api/user/list').then(data => {
-  // 请求成功
-}).catch(data => {
-  // 请求失败
-})
+getJSON('/api/user/list')
 
 postJSON('/api/user/save', {name: 'test'})
 
-// 提交 application/json（默认方式）
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
-// 提交 application/x-www-form-urlencoded
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-// 提交 FormData
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
 postJSON('/api/user/save', formBody)
 
-// 查询参数和数据同时提交
 postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### jsonp 调用
