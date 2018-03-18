@@ -1,7 +1,7 @@
 {
   "name": "xe-ajax",
   "version": "3.2.9",
-  "description": "异步请求函数，支持 xhr、fetch、jsonp 以及 mock，更简洁的 API",
+  "description": "Promise 异步请求函数，支持 xhr、fetch、jsonp 以及 mock，更简洁的 API",
   "main": "index.js",
   "scripts": {
     "test": "make test"
