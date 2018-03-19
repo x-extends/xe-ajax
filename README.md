@@ -191,7 +191,7 @@ XEAjax.ajax({
 ``` shell
 import { fetch, fetchGet, fetchPost } from 'xe-ajax'
 
-XEAjax.fetch('/api/user/list', {
+fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
