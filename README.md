@@ -353,16 +353,16 @@ define([
     })
   })
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'})
+  XEAjax.fetchPost('/api/user/save', {name: 'test'})
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'form-data'})
 
   var file = document.querySelector('#myFile').files[0]
   var formBody = new FormData()
   formBody.append('file', file)
   XEAjax.fetchPost('/api/user/save', formBody)
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {params: {id: 1}})
 })
 ```
 
@@ -398,10 +398,12 @@ import XEAjax from 'xe-ajax'
 
 // 请求之前拦截器
 XEAjax.interceptors.request.use((request, next) => {
-  // 请求之前拦截器,可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
+  // 可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
 
-  // request.params.id = 1 // 修改参数
-  // request.headers.set('X-Token', cookie('x-id')) // 预防 XSRF/CSRF 攻击,设置 Token 验证
+  // 设置参数
+  request.params.version = 1
+  // 设置 Token 验证，预防 XSRF/CSRF 攻击
+  request.headers.set('X-Token', cookie('x-id'))
 
   // 调用 next(),继续执行下一个拦截器
   next()
@@ -416,7 +418,7 @@ import XEAjax from 'xe-ajax'
 
 // 请求完成之后拦截
 XEAjax.interceptors.response.use((response, next) => {
-  // 可以用于在请求完成之后统一处理，例如校验 session 是否失效、错误消息提示，特定场景做处理等...
+  // 请求完成之后统一处理，例如校验登录是否失效、消息提示，特殊场景处理等...
 
   // 例子: 判断登录失效跳转
   if (response.status === 403) {
@@ -429,7 +431,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
 // 请求完成之后重置响应数据
 XEAjax.interceptors.response.use((response, next) => {
-  // 可以用于在所有请求完成之后对返回的数据进行统一的处理...
+  // 请求完成之后对返回的数据进行统一的处理...
   // 格式: {status: 200, statusText: 'OK', body: {}, headers: {}}
 
   // 例如，对所有请求结果进行处理，返回统一的结构
