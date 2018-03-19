@@ -398,10 +398,10 @@ import XEAjax from 'xe-ajax'
 
 // 请求之前拦截器
 XEAjax.interceptors.request.use((request, next) => {
-  // 请求之前拦截器,可以用于统一的权限拦截、设置请求头、参数等处理...
+  // 请求之前拦截器,可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
 
   // request.params.id = 1 // 修改参数
-  // request.headers.set('X-Token', 123) // 设置请求头
+  // request.headers.set('X-Token', cookie('x-id')) // 设置 Token 验证
 
   // 调用 next(),继续执行下一个拦截器
   next()
