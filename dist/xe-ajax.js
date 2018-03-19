@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.9
+ * xe-ajax.js v3.2.10
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -828,40 +828,51 @@
     }), context)
   }
 
-  function requestFn (method, defs) {
-    return function (url, params, opts) {
-      return getOptions(method, isObject(url) ? url : objectAssign({ url: url, params: params }, defs), opts)
+  function createFetch (method) {
+    return function (url, opts) {
+      return getOptions(method, { url: url }, opts)
     }
   }
 
-  var requests = {
-    HEAD: requestFn('HEAD'),
-    GET: requestFn('GET'),
-    JSONP: requestFn('GET', { jsonp: 'callback' })
-  }
-  arrayEach(['POST', 'PUT', 'DELETE', 'PATCH'], function (method) {
-    requests[method] = function (url, body, opts) {
-      return getOptions(method, isObject(url) ? url : { url: url, body: body }, opts)
+  function createParamsFetch (method, defs) {
+    return function (url, params, opts) {
+      return getOptions(method, objectAssign({ url: url, params: params }, defs), opts)
     }
-  })
+  }
+
+  function createBodyFetch (method) {
+    return function (url, body, opts) {
+      return getOptions(method, { url: url, body: body }, opts)
+    }
+  }
+
+  var requestHead = createFetch('HEAD')
+  var requestDelete = createFetch('DELETE')
+
+  var requestJsonp = createParamsFetch('GET', { jsonp: 'callback' })
+  var requestGet = createParamsFetch('GET')
+
+  var requestPost = createBodyFetch('POST')
+  var requestPut = createBodyFetch('PUT')
+  var requestPatch = createBodyFetch('PATCH')
 
   var AbortController = XEAbortController
 
-  var fetchHead = responseResult(requests.HEAD)
-  var fetchGet = responseResult(requests.GET)
-  var fetchPost = responseResult(requests.POST)
-  var fetchPut = responseResult(requests.PUT)
-  var fetchDelete = responseResult(requests.DELETE)
-  var fetchPatch = responseResult(requests.PATCH)
-  var fetchJsonp = responseResult(requests.JSONP)
+  var fetchHead = responseResult(requestHead)
+  var fetchDelete = responseResult(requestDelete)
+  var fetchJsonp = responseResult(requestJsonp)
+  var fetchGet = responseResult(requestGet)
+  var fetchPost = responseResult(requestPost)
+  var fetchPut = responseResult(requestPut)
+  var fetchPatch = responseResult(requestPatch)
 
-  var headJSON = responseJSON(requests.HEAD)
-  var getJSON = responseJSON(requests.GET)
-  var postJSON = responseJSON(requests.POST)
-  var putJSON = responseJSON(requests.PUT)
-  var deleteJSON = responseJSON(requests.DELETE)
-  var patchJSON = responseJSON(requests.PATCH)
-  var jsonp = responseJSON(requests.JSONP)
+  var headJSON = responseJSON(requestHead)
+  var deleteJSON = responseJSON(requestDelete)
+  var jsonp = responseJSON(requestJsonp)
+  var getJSON = responseJSON(requestGet)
+  var postJSON = responseJSON(requestPost)
+  var putJSON = responseJSON(requestPut)
+  var patchJSON = responseJSON(requestPatch)
 
   function ajaxFetch (url, options) {
     return fetchGet(url, null, options)
@@ -919,7 +930,7 @@
     AbortController: AbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.9',
+    version: '3.2.10',
     $name: 'XEAjax'
   })
 

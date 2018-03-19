@@ -63,20 +63,20 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 * ajax ( options )
 * 
 * fetch ( url, options )
+* fetchHead ( url, options )
+* fetchDelete ( url, options )
 * fetchJsonp ( url, params, options )
-* fetchHead ( url, params, options )
 * fetchGet ( url, params, options )
 * fetchPost ( url, body, options )
 * fetchPut ( url, body, options )
-* fetchDelete ( url, body, options )
 * fetchPatch ( url, body, options )
 * 
+* headJSON ( url, options )
+* deleteJSON ( url, options )
 * jsonp ( url, params, options )
-* headJSON ( url, params, options )
 * getJSON ( url, params, options )
 * postJSON ( url, body, options )
 * putJSON ( url, body, options )
-* deleteJSON ( url, body, options )
 * patchJSON ( url, body, options )
 
 ### 入参说明
@@ -186,6 +186,11 @@ XEAjax.ajax({
   // 发生错误
 })
 
+```
+### fetch 调用
+``` shell
+import { fetch, fetchGet, fetchPost } from 'xe-ajax'
+
 XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
@@ -194,10 +199,6 @@ XEAjax.fetch('/api/user/list', {
 }).catch(e => {
   // 发生错误
 })
-```
-### fetch 调用
-``` shell
-import { fetchGet, fetchPost } from 'xe-ajax'
 
 // Response Text
 fetchGet('/api/user/list').then(response => {

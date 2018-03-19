@@ -1,4 +1,4 @@
-import { isObject, objectAssign, clearXEAjaxContext, arrayEach } from '../core/utils'
+import { isObject, objectAssign, clearXEAjaxContext } from '../core/utils'
 import { XEAjax } from '../core/ajax'
 import { XEAbortController } from '../handle/abort'
 
@@ -43,37 +43,48 @@ export function doAll (iterable) {
   }), context)
 }
 
-function requestFn (method, defs) {
-  return function (url, params, opts) {
-    return getOptions(method, isObject(url) ? url : objectAssign({url: url, params: params}, defs), opts)
+function createFetch (method) {
+  return function (url, opts) {
+    return getOptions(method, {url: url}, opts)
   }
 }
 
-var requests = {
-  HEAD: requestFn('HEAD'),
-  GET: requestFn('GET'),
-  JSONP: requestFn('GET', {jsonp: 'callback'})
-}
-arrayEach(['POST', 'PUT', 'DELETE', 'PATCH'], function (method) {
-  requests[method] = function (url, body, opts) {
-    return getOptions(method, isObject(url) ? url : {url: url, body: body}, opts)
+function createParamsFetch (method, defs) {
+  return function (url, params, opts) {
+    return getOptions(method, objectAssign({url: url, params: params}, defs), opts)
   }
-})
+}
+
+function createBodyFetch (method) {
+  return function (url, body, opts) {
+    return getOptions(method, {url: url, body: body}, opts)
+  }
+}
+
+var requestHead = createFetch('HEAD')
+var requestDelete = createFetch('DELETE')
+
+var requestJsonp = createParamsFetch('GET', {jsonp: 'callback'})
+var requestGet = createParamsFetch('GET')
+
+var requestPost = createBodyFetch('POST')
+var requestPut = createBodyFetch('PUT')
+var requestPatch = createBodyFetch('PATCH')
 
 export var AbortController = XEAbortController
 
-export var fetchHead = responseResult(requests.HEAD)
-export var fetchGet = responseResult(requests.GET)
-export var fetchPost = responseResult(requests.POST)
-export var fetchPut = responseResult(requests.PUT)
-export var fetchDelete = responseResult(requests.DELETE)
-export var fetchPatch = responseResult(requests.PATCH)
-export var fetchJsonp = responseResult(requests.JSONP)
+export var fetchHead = responseResult(requestHead)
+export var fetchDelete = responseResult(requestDelete)
+export var fetchJsonp = responseResult(requestJsonp)
+export var fetchGet = responseResult(requestGet)
+export var fetchPost = responseResult(requestPost)
+export var fetchPut = responseResult(requestPut)
+export var fetchPatch = responseResult(requestPatch)
 
-export var headJSON = responseJSON(requests.HEAD)
-export var getJSON = responseJSON(requests.GET)
-export var postJSON = responseJSON(requests.POST)
-export var putJSON = responseJSON(requests.PUT)
-export var deleteJSON = responseJSON(requests.DELETE)
-export var patchJSON = responseJSON(requests.PATCH)
-export var jsonp = responseJSON(requests.JSONP)
+export var headJSON = responseJSON(requestHead)
+export var deleteJSON = responseJSON(requestDelete)
+export var jsonp = responseJSON(requestJsonp)
+export var getJSON = responseJSON(requestGet)
+export var postJSON = responseJSON(requestPost)
+export var putJSON = responseJSON(requestPut)
+export var patchJSON = responseJSON(requestPatch)
