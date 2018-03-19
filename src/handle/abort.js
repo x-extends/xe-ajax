@@ -53,5 +53,5 @@ objectAssign($AbortController.prototype, {
 })
 
 /* eslint-disable no-undef */
-export var XEAbortSignal = $AbortSignal
-export var XEAbortController = $AbortController
+export var XEAbortSignal = typeof AbortSignal === 'function' ? AbortSignal : $AbortSignal
+export var XEAbortController = typeof AbortController === 'function' ? AbortController : $AbortController

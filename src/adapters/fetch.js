@@ -2,32 +2,28 @@ import { isSupportAdvanced, isFunction, arrayEach } from '../core/utils'
 import { XEResponse, toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
-function requestError (request, reject) {
-  reject(new TypeError('Network request failed'))
-}
-
 function sendFetch (request, resolve, reject) {
-  var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
-  request.getBody().then(function (body) {
-    var options = {
-      _request: request,
-      method: request.method,
-      cache: request.cache,
-      credentials: request.credentials,
-      body: body,
-      headers: request.headers
-    }
-    if (request.timeout) {
-      setTimeout(function () {
-        requestError(request, reject)
-      }, request.timeout)
-    }
+  var $fetch = isFunction(request.$fetch) ? request.$fetch : self.fetch
+  var options = {
+    _request: request,
+    method: request.method,
+    cache: request.cache,
+    credentials: request.credentials,
+    body: request.getBody(),
+    headers: request.headers
+  }
+  if (request.timeout) {
+    setTimeout(function () {
+      reject(new TypeError('Request timeout.'))
+    }, request.timeout)
+  }
+  if (request.signal && request.signal.aborted) {
+    reject(new TypeError('The user aborted a request.'))
+  } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       responseInterceptor(request, toResponse(resp, request)).then(resolve)
-    }).catch(function (e) {
-      requestError(request, reject)
-    })
-  })
+    }).catch(reject)
+  }
 }
 
 function sendXHR (request, resolve, reject) {
@@ -51,10 +47,13 @@ function sendXHR (request, resolve, reject) {
     }, request)).then(resolve)
   }
   xhr.onerror = function () {
-    requestError(request, reject)
+    reject(new TypeError('Network request failed'))
   }
   xhr.ontimeout = function () {
-    requestError(request, reject)
+    reject(new TypeError('Request timeout.'))
+  }
+  xhr.onabort = function () {
+    reject(new TypeError('The user aborted a request.'))
   }
   if (isSupportAdvanced()) {
     xhr.responseType = 'blob'
@@ -64,20 +63,28 @@ function sendXHR (request, resolve, reject) {
   } else if (request.credentials === 'omit') {
     xhr.withCredentials = false
   }
-  request.getBody().catch(function () {
-    return null
-  }).then(function (body) {
-    xhr.send(body)
-    if (request.$abort) {
-      xhr.abort()
+  xhr.send(request.getBody())
+  if (request.$abort) {
+    xhr.abort()
+  }
+}
+
+function getRequest (request) {
+  if (request.$fetch) {
+    return request.signal ? sendXHR : sendFetch
+  } else if (self.fetch) {
+    if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
+      return sendFetch
     }
-  })
+    return request.signal ? sendXHR : sendFetch
+  }
+  return sendXHR
 }
 
 function createRequestFactory () {
   if (self.fetch) {
     return function (request, resolve, reject) {
-      return (request.signal ? sendXHR : sendFetch).apply(this, arguments)
+      return getRequest(request).apply(this, arguments)
     }
   }
   return sendXHR

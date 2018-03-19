@@ -43,29 +43,26 @@ objectAssign(XERequest.prototype, {
     return url
   },
   getBody: function () {
-    var request = this
-    var XEPromise = request.$Promise || Promise
-    return new XEPromise(function (resolve, reject) {
-      var result = null
-      if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
-        try {
-          if (isFunction(request.transformBody)) {
-            request.body = request.transformBody(request.body || {}, request) || request.body
-          }
-          if (isFunction(request.stringifyBody)) {
-            result = request.stringifyBody(request.body, request) || null
-          } else {
-            if (isFormData(request.body)) {
-              result = request.body
-            } else {
-              result = isString(request.body) ? request.body : (request.bodyType === 'form-data' || request.bodyType === 'form_data' ? serialize(request.body) : JSON.stringify(request.body))
-            }
-          }
-        } catch (e) {
-          console.error(e)
+    var result = null
+    var body = this.body
+    if (body && this.method !== 'GET' && this.method !== 'HEAD') {
+      try {
+        if (isFunction(this.transformBody)) {
+          body = this.body = this.transformBody(body, this) || body
         }
+        if (isFunction(this.stringifyBody)) {
+          result = this.stringifyBody(body, this) || null
+        } else {
+          if (isFormData(body)) {
+            result = body
+          } else {
+            result = isString(body) ? body : (this.bodyType === 'form-data' || this.bodyType === 'form_data' ? serialize(body) : JSON.stringify(body))
+          }
+        }
+      } catch (e) {
+        console.error(e)
       }
-      resolve(result)
-    }, request.$context)
+    }
+    return result
   }
 })

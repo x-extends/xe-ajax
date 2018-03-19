@@ -292,8 +292,8 @@
   })
 
   /* eslint-disable no-undef */
-  var XEAbortSignal = $AbortSignal
-  var XEAbortController = $AbortController
+  var XEAbortSignal = typeof AbortSignal === 'function' ? AbortSignal : $AbortSignal
+  var XEAbortController = typeof AbortController === 'function' ? AbortController : $AbortController
 
   /**
    * Interceptor Queue
@@ -419,30 +419,27 @@
       return url
     },
     getBody: function () {
-      var request = this
-      var XEPromise = request.$Promise || Promise
-      return new XEPromise(function (resolve, reject) {
-        var result = null
-        if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
-          try {
-            if (isFunction(request.transformBody)) {
-              request.body = request.transformBody(request.body || {}, request) || request.body
-            }
-            if (isFunction(request.stringifyBody)) {
-              result = request.stringifyBody(request.body, request) || null
-            } else {
-              if (isFormData(request.body)) {
-                result = request.body
-              } else {
-                result = isString(request.body) ? request.body : (request.bodyType === 'form-data' || request.bodyType === 'form_data' ? serialize(request.body) : JSON.stringify(request.body))
-              }
-            }
-          } catch (e) {
-            console.error(e)
+      var result = null
+      var body = this.body
+      if (body && this.method !== 'GET' && this.method !== 'HEAD') {
+        try {
+          if (isFunction(this.transformBody)) {
+            body = this.body = this.transformBody(body, this) || body
           }
+          if (isFunction(this.stringifyBody)) {
+            result = this.stringifyBody(body, this) || null
+          } else {
+            if (isFormData(body)) {
+              result = body
+            } else {
+              result = isString(body) ? body : (this.bodyType === 'form-data' || this.bodyType === 'form_data' ? serialize(body) : JSON.stringify(body))
+            }
+          }
+        } catch (e) {
+          console.error(e)
         }
-        resolve(result)
-      }, request.$context)
+      }
+      return result
     }
   })
 
@@ -547,32 +544,28 @@
     return new XEResponse(JSON.stringify(resp.body), options, request)
   }
 
-  function requestError (request, reject) {
-    reject(new TypeError('Network request failed'))
-  }
-
   function sendFetch (request, resolve, reject) {
-    var $fetch = isFunction(request.$fetch) ? request.$fetch : fetch
-    request.getBody().then(function (body) {
-      var options = {
-        _request: request,
-        method: request.method,
-        cache: request.cache,
-        credentials: request.credentials,
-        body: body,
-        headers: request.headers
-      }
-      if (request.timeout) {
-        setTimeout(function () {
-          requestError(request, reject)
-        }, request.timeout)
-      }
+    var $fetch = isFunction(request.$fetch) ? request.$fetch : self.fetch
+    var options = {
+      _request: request,
+      method: request.method,
+      cache: request.cache,
+      credentials: request.credentials,
+      body: request.getBody(),
+      headers: request.headers
+    }
+    if (request.timeout) {
+      setTimeout(function () {
+        reject(new TypeError('Request timeout.'))
+      }, request.timeout)
+    }
+    if (request.signal && request.signal.aborted) {
+      reject(new TypeError('The user aborted a request.'))
+    } else {
       $fetch(request.getUrl(), options).then(function (resp) {
         responseInterceptor(request, toResponse(resp, request)).then(resolve)
-      }).catch(function (e) {
-        requestError(request, reject)
-      })
-    })
+      }).catch(reject)
+    }
   }
 
   function sendXHR (request, resolve, reject) {
@@ -596,10 +589,13 @@
       }, request)).then(resolve)
     }
     xhr.onerror = function () {
-      requestError(request, reject)
+      reject(new TypeError('Network request failed'))
     }
     xhr.ontimeout = function () {
-      requestError(request, reject)
+      reject(new TypeError('Request timeout.'))
+    }
+    xhr.onabort = function () {
+      reject(new TypeError('The user aborted a request.'))
     }
     if (isSupportAdvanced()) {
       xhr.responseType = 'blob'
@@ -609,20 +605,28 @@
     } else if (request.credentials === 'omit') {
       xhr.withCredentials = false
     }
-    request.getBody().catch(function () {
-      return null
-    }).then(function (body) {
-      xhr.send(body)
-      if (request.$abort) {
-        xhr.abort()
+    xhr.send(request.getBody())
+    if (request.$abort) {
+      xhr.abort()
+    }
+  }
+
+  function getRequest (request) {
+    if (request.$fetch) {
+      return request.signal ? sendXHR : sendFetch
+    } else if (self.fetch) {
+      if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
+        return sendFetch
       }
-    })
+      return request.signal ? sendXHR : sendFetch
+    }
+    return sendXHR
   }
 
   function createRequestFactory () {
     if (self.fetch) {
       return function (request, resolve, reject) {
-        return (request.signal ? sendXHR : sendFetch).apply(this, arguments)
+        return getRequest(request).apply(this, arguments)
       }
     }
     return sendXHR
