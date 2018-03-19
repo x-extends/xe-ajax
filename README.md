@@ -181,7 +181,7 @@ XEAjax.ajax({
   method: 'GET',
   params: {id: 1}
 }).then(response => {
-  // response
+  // 请求完成
 }).catch(e => {
   // 发生错误
 })
@@ -195,7 +195,7 @@ XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
-  // response
+  // 请求完成
 }).catch(e => {
   // 发生错误
 })
@@ -401,7 +401,7 @@ XEAjax.interceptors.request.use((request, next) => {
   // 请求之前拦截器,可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
 
   // request.params.id = 1 // 修改参数
-  // request.headers.set('X-Token', cookie('x-id')) // 设置 Token 验证
+  // request.headers.set('X-Token', cookie('x-id')) // 预防 XSRF/CSRF 攻击,设置 Token 验证
 
   // 调用 next(),继续执行下一个拦截器
   next()
@@ -445,7 +445,7 @@ XEAjax.interceptors.response.use((response, next) => {
 ```
 
 ## 混合函数
-### 文件 ./customs.js
+### ./customs.js
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -464,7 +464,7 @@ export function getText () {
   return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
 } 
 ```
-### 示例 ./main.js
+### ./main.js
 ``` shell
 import XEAjax from 'xe-ajax'
 import customs from './customs'
@@ -476,7 +476,7 @@ XEAjax.doGet('/api/user/list')
 XEAjax.getText('/api/user/message')
 ```
 
-## 插件
+## Plugin
 ### Mock 虚拟服务
 支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等。
 
