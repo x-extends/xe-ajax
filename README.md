@@ -254,7 +254,7 @@ fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}
 ```
 ### 根据状态响应 json 调用
 ``` shell
-import { getJSON, postJSON, jsonp } from 'xe-ajax'
+import { getJSON, postJSON } from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败
 getJSON('/api/user/list').then(data => {
