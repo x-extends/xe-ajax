@@ -12,7 +12,7 @@
 --- | --- | --- | --- | --- | --- |
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
-## CDN 安装
+## CDN
 使用 script 方式安装，XEAjax 会定义为全局变量  
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
 ### cdnjs 获取最新版本
@@ -26,7 +26,7 @@
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-## AMD 安装
+## AMD
 ### require.js 安装示例
 ``` shell
 // require 配置
@@ -38,7 +38,7 @@ require.config({
 })
 ```
 
-## ES6 Module 安装（推荐）
+## ES6 Module
 ``` shell
 npm install xe-ajax --save
 ```
@@ -72,12 +72,12 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 * putJSON ( url, body, options )
 * patchJSON ( url, body, options )
 
-### 入参说明
+### Arguments
 * url（字符串） 请求地址，可被自定义 options 属性覆盖
 * params/body（可选，对象/数组） 要发送的数据，可被自定义 options 属性覆盖
 * options （可选，对象） 参数
 
-### options 参数说明
+### Options
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
@@ -98,7 +98,7 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 | stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
 | validateStatus | Function ( response ) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
-### Headers 对象说明
+### Headers
 | 属性 | 类型 | 描述 |
 |------|------|-----|
 | set | Function ( name, value ) | 添加 |
@@ -111,7 +111,7 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 | entries | Function | 以迭代器的形式返回所有 [name, value] |
 | forEach | Function ( callback, context ) | 迭代器 |
 
-### Response 对象说明
+### Response
 | 属性 | 类型 | 描述 |
 |------|------|-----|
 | body | ReadableStream | 数据流 |
