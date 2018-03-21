@@ -17,7 +17,7 @@ export var setupDefaults = {
 }
 
 /**
-  * 支持 xhr、fetch、jsonp
+  * xhr、fetch、jsonp
   *
   * @param Object options 请求参数
   * @return Promise
@@ -31,7 +31,7 @@ export function XEAjax (options) {
 }
 
 /**
- * Request 对象
+ * Request
  *
  * 参数
  * @param String url 请求地址

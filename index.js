@@ -2,12 +2,12 @@ import { serialize, objectEach, isFunction, clearXEAjaxContext, objectAssign } f
 import { XEAjax, setupDefaults, setup } from './src/core/ajax'
 import { interceptors } from './src/handle/interceptor'
 import { exportMethods } from './src/core/methods'
-import { AbortController } from './src/core'
+import { XEAbortController } from './src/handle/abort'
 
 /**
- * 混合函数
+ * Mixin
  *
- * @param {Object} methods 扩展
+ * @param {Object} methods
  */
 function mixin (methods) {
   objectEach(methods, function (fn, name) {
@@ -20,20 +20,17 @@ function mixin (methods) {
 }
 
 /**
- * 安装插件
+ * Installation
  */
 function use (plugin) {
   plugin.install(XEAjax)
-  if (setupDefaults.log) {
-    console.info('[' + XEAjax.$name + '] Ready. Detected ' + plugin.$name + ' v' + plugin.version)
-  }
 }
 
 objectAssign(XEAjax, {
   use: use,
   setup: setup,
   mixin: mixin,
-  AbortController: AbortController,
+  AbortController: XEAbortController,
   serialize: serialize,
   interceptors: interceptors,
   version: '3.2.11',

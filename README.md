@@ -42,14 +42,7 @@ require.config({
 ``` shell
 npm install xe-ajax --save
 ```
-### import 部分导入
-``` shell
-import { fetchGet, fetchPost } from 'xe-ajax'
-
-fetchGet('/api/user/list', {id: 1})
-fetchPost('/api/user/save', {id: 1})
-```
-### import 导入所有
+### import
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -189,9 +182,9 @@ XEAjax.ajax({
 ```
 ### fetch 调用
 ``` shell
-import { fetch, fetchGet, fetchPost } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
-fetch('/api/user/list', {
+XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
@@ -201,35 +194,35 @@ fetch('/api/user/list', {
 })
 
 // Response Text
-fetchGet('/api/user/list').then(response => {
+XEAjax.fetchGet('/api/user/list').then(response => {
   response.text().then(text => {
     // 获取 text
   })
 })
 
 // Response JSON
-fetchGet('/api/user/list').then(response => {
+XEAjax.fetchGet('/api/user/list').then(response => {
   response.json().then(data => {
     // 获取 data
   })
 })
 
 // Response Blob
-fetchGet('/api/user/list').then(response => {
+XEAjax.fetchGet('/api/user/list').then(response => {
   response.blob().then(blob => {
     // 获取 blob
   })
 })
 
 // Response ArrayBuffer
-fetchGet('/api/user/list').then(response => {
+XEAjax.fetchGet('/api/user/list').then(response => {
   response.arrayBuffer().then(arrayBuffer => {
     // 获取 arrayBuffer
   })
 })
 
 // Response FormData
-fetchGet('/api/user/list').then(response => {
+XEAjax.fetchGet('/api/user/list').then(response => {
   response.formData().then(formData => {
     // 获取 formData
   })
@@ -237,60 +230,60 @@ fetchGet('/api/user/list').then(response => {
 
 // 如果 bodyType='json-data', 则默认设置 Content-Type 并使用 JSON.stringify 序列化数据
 // request.headers.set('Content-Type', 'application/json; charset=utf-8')
-fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
 // 如果 bodyType='form-data', 则默认设置 Content-Type 并使用 XEAjax.serialize 序列化数据
 // request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 // 模拟表单 FormData 提交
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
-fetchPost('/api/user/save', formBody)
+XEAjax.fetchPost('/api/user/save', formBody)
 
 // 查询参数和数据同时提交
-fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### 根据状态响应 json 调用
 ``` shell
-import { getJSON, postJSON } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败
-getJSON('/api/user/list').then(data => {
+XEAjax.getJSON('/api/user/list').then(data => {
   // 请求成功
 }).catch(data => {
   // 请求失败
 })
 
-postJSON('/api/user/save', {name: 'test'})
+XEAjax.postJSON('/api/user/save', {name: 'test'})
 
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
-postJSON('/api/user/save', formBody)
+XEAjax.postJSON('/api/user/save', formBody)
 
-postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### jsonp 调用
 ``` shell
-import { fetchJsonp } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 // URL: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
 // Response: jsonp_xeajax_1({message: 'success'})
-fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
     // {message: 'success'}
   })
-})
+})-
 
 // URL: http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_1521272815608_2
 // Response: jsonp_xeajax_2({message: 'success'})
-fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
   jsonp: 'cb'
 }).then(response => {
   response.json().then(data => {
@@ -300,7 +293,7 @@ fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
 
 // URL: http://xuliangzhan.com/jsonp/user/message?cb=custom3
 // Response: custom3({message: 'success'})
-fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
   jsonp: 'cb', 
   jsonpCallback: 'custom3'
 }).then(response => {
@@ -311,11 +304,11 @@ fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
 ```
 ### 并发多个请求
 ``` shell
-import { doAll, fetchGet } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 const iterable1 = []
-iterable1.push(fetchGet('/api/user/list'))
-iterable1.push(fetchGet('/api/user/message'), {id: 1})
+iterable1.push(XEAjax.fetchGet('/api/user/list'))
+iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
   // 所有异步完成之后执行
 }).catch(e => {
@@ -326,14 +319,14 @@ Promise.all(iterable1).then(datas => {
 const iterable2 = []
 iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
-doAll(iterable2)
+XEAjax.doAll(iterable2)
 ```
 ### 嵌套请求
 ``` shell
-import { fetchGet } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 // 相互依赖的嵌套请求(项目中应该避免这种情况)
-fetchGet('/api/user/info').then(response => response.json()).then(data => {
+XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data => {
   return fetchGet('/api/user/details', {id: data.id})
 }).then(response => {
   response.json().then(data => {
@@ -370,14 +363,14 @@ define([
 ### AbortController 控制器对象
 允许控制一个或多个取消指令请求
 ``` shell
-import XEAjax, { fetchGet } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 // 创建一个控制器对象
 const controller = new XEAjax.AbortController()
 // 获取signal
 const signal = controller.signal
 // 给请求加入控制器 signal
-fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
+XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
   // 请求成功
 }).catch(function (e) {
   // 取消请求
