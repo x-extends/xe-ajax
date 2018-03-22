@@ -5,30 +5,11 @@ import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 var jsonpIndex = 0
 var $global = typeof window === 'undefined' ? this : window
 
-function jsonpClear (request) {
-  if (request.script.parentNode === document.body) {
-    document.body.removeChild(request.script)
-  }
-  try {
-    delete $global[request.jsonpCallback]
-  } catch (e) {
-    // IE8
-    $global[request.jsonpCallback] = undefined
-  }
-}
-
-function jsonpSuccess (request, response, resolve) {
-  jsonpClear(request)
-  responseInterceptor(request, toResponse(response, request)).then(resolve)
-}
-
-function jsonpError (request, reject) {
-  jsonpClear(request)
-  reject(new TypeError('JSONP request failed'))
-}
-
 /**
- * jsonp 异步请求
+ * jsonp
+ * @param { XERequest } request
+ * @param { Promise.resolve } resolve
+ * @param { Promise.reject } reject
  */
 export function sendJSONP (request, resolve, reject) {
   request.script = document.createElement('script')
@@ -61,4 +42,26 @@ export function sendJSONP (request, resolve, reject) {
       document.body.appendChild(script)
     }
   })
+}
+
+function jsonpClear (request) {
+  if (request.script.parentNode === document.body) {
+    document.body.removeChild(request.script)
+  }
+  try {
+    delete $global[request.jsonpCallback]
+  } catch (e) {
+    // IE8
+    $global[request.jsonpCallback] = undefined
+  }
+}
+
+function jsonpSuccess (request, response, resolve) {
+  jsonpClear(request)
+  responseInterceptor(request, toResponse(response, request)).then(resolve)
+}
+
+function jsonpError (request, reject) {
+  jsonpClear(request)
+  reject(new TypeError('JSONP request failed'))
 }

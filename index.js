@@ -5,7 +5,7 @@ import { exportMethods } from './src/core/methods'
 import { XEAbortController } from './src/handle/abort'
 
 /**
- * Mixin
+ * functions of mixing
  *
  * @param {Object} methods
  */
@@ -20,7 +20,7 @@ function mixin (methods) {
 }
 
 /**
- * Installation
+ * installation
  */
 function use (plugin) {
   plugin.install(XEAjax)

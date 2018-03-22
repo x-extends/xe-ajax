@@ -7,14 +7,15 @@ function getOptions (method, def, options) {
   return opts
 }
 
-function responseResult (method) {
+// to response
+function requestToResponse (method) {
   return function () {
     return XEAjax(method.apply(this, arguments))
   }
 }
 
-// xhr response JSON
-function responseJSON (method) {
+// to json
+function requestToJSON (method) {
   return function () {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
@@ -32,7 +33,7 @@ function responseJSON (method) {
 
 export var ajax = XEAjax
 
-// Http Request All
+// Promise.all
 export function doAll (iterable) {
   var XEPromise = XEAjax.$Promise || Promise
   var context = XEAjax.$context
@@ -70,18 +71,18 @@ var requestPost = createBodyFetch('POST')
 var requestPut = createBodyFetch('PUT')
 var requestPatch = createBodyFetch('PATCH')
 
-export var fetchHead = responseResult(requestHead)
-export var fetchDelete = responseResult(requestDelete)
-export var fetchJsonp = responseResult(requestJsonp)
-export var fetchGet = responseResult(requestGet)
-export var fetchPost = responseResult(requestPost)
-export var fetchPut = responseResult(requestPut)
-export var fetchPatch = responseResult(requestPatch)
+export var fetchHead = requestToResponse(requestHead)
+export var fetchDelete = requestToResponse(requestDelete)
+export var fetchJsonp = requestToResponse(requestJsonp)
+export var fetchGet = requestToResponse(requestGet)
+export var fetchPost = requestToResponse(requestPost)
+export var fetchPut = requestToResponse(requestPut)
+export var fetchPatch = requestToResponse(requestPatch)
 
-export var headJSON = responseJSON(requestHead)
-export var deleteJSON = responseJSON(requestDelete)
-export var jsonp = responseJSON(requestJsonp)
-export var getJSON = responseJSON(requestGet)
-export var postJSON = responseJSON(requestPost)
-export var putJSON = responseJSON(requestPut)
-export var patchJSON = responseJSON(requestPatch)
+export var headJSON = requestToJSON(requestHead)
+export var deleteJSON = requestToJSON(requestDelete)
+export var jsonp = requestToJSON(requestJsonp)
+export var getJSON = requestToJSON(requestGet)
+export var postJSON = requestToJSON(requestPost)
+export var putJSON = requestToJSON(requestPut)
+export var patchJSON = requestToJSON(requestPatch)

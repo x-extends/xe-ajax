@@ -3,6 +3,12 @@ import { sendXHR } from './xhr'
 import { toResponse } from '../handle/response'
 import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
 
+/**
+ * fetch
+ * @param { XERequest } request
+ * @param { Promise.resolve } resolve
+ * @param { Promise.reject } reject
+ */
 function sendFetch (request, resolve, reject) {
   var $fetch = isFunction(request.$fetch) ? request.$fetch : self.fetch
   var options = {
@@ -50,12 +56,6 @@ function createRequestFactory () {
 
 var sendRequest = createRequestFactory()
 
-/**
- * fetch 异步请求
- * @param { XHR } xhr 请求
- * @param { Promise.resolve } resolve 成功 Promise
- * @param { Promise.reject } reject 失败 Promise
- */
 export function fetchRequest (request, resolve, reject) {
   return requestInterceptor(request).then(function () {
     return sendRequest(request, resolve, reject)

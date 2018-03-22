@@ -91,7 +91,7 @@ function fileReaderReady (request, reader) {
   }, request.$context)
 }
 
-// Result to Response
+// result to Response
 export function toResponse (resp, request) {
   if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
     return resp

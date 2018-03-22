@@ -2,7 +2,7 @@ import { isFormData, isCrossOrigin, arrayEach } from '../core/utils'
 import { toResponse } from '../handle/response'
 
 /**
- * Interceptor Queue
+ * interceptor queue
  */
 var state = {reqQueue: [], respQueue: []}
 
@@ -15,7 +15,7 @@ function useInterceptors (calls) {
 }
 
 /**
- * Request Interceptor
+ * request interceptor
  */
 export function requestInterceptor (request) {
   var XEPromise = request.$Promise || Promise
@@ -35,7 +35,7 @@ export function requestInterceptor (request) {
 }
 
 /**
- * Response Interceptor
+ * response interceptor
  */
 export function responseInterceptor (request, response) {
   var XEPromise = request.$Promise || Promise

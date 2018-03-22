@@ -2,6 +2,12 @@ import { isSupportAdvanced, isFunction, arrayEach } from '../core/utils'
 import { XEResponse } from '../handle/response'
 import { responseInterceptor } from '../handle/interceptor'
 
+/**
+ * xhr
+ * @param { XERequest } request
+ * @param { Promise.resolve } resolve
+ * @param { Promise.reject } reject
+ */
 export function sendXHR (request, resolve, reject) {
   var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
   var xhr = request.xhr = new $XMLHttpRequest()
