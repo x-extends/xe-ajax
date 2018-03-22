@@ -365,18 +365,17 @@ define([
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 创建一个控制器对象
+// 创建一个控制器
 const controller = new XEAjax.AbortController()
-// 获取signal
+// 获取 signal
 const signal = controller.signal
-// 给请求加入控制器 signal
+// 将信号和控制器与获取请求相关联
 XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
-  // 请求成功
+  // success
 }).catch(function (e) {
-  // 取消请求
+  // error
 })
 setTimeout(() => {
-  // 终止请求
   controller.abort()
 }, 10)
 ```
