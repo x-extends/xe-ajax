@@ -165,7 +165,7 @@ XEAjax.setup({
 ```
 
 ## 示例
-### 完整调用
+### ajax
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -180,7 +180,7 @@ XEAjax.ajax({
 })
 
 ```
-### fetch 调用
+### fetch
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -245,7 +245,7 @@ XEAjax.fetchPost('/api/user/save', formBody)
 // 查询参数和数据同时提交
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-### 根据状态响应 json 调用
+### fetch to JSON
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -269,7 +269,7 @@ XEAjax.postJSON('/api/user/save', formBody)
 
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-### jsonp 调用
+### jsonp
 ``` shell
 import XEAjax from 'xe-ajax'
 
