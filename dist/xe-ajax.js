@@ -296,7 +296,7 @@
   var XEAbortController = typeof AbortController === 'function' ? AbortController : $AbortController
 
   /**
-   * Interceptor Queue
+   * interceptor queue
    */
   var state = { reqQueue: [], respQueue: [] }
 
@@ -309,7 +309,7 @@
   }
 
   /**
-   * Request Interceptor
+   * request interceptor
    */
   function requestInterceptor (request) {
     var XEPromise = request.$Promise || Promise
@@ -329,7 +329,7 @@
   }
 
   /**
-   * Response Interceptor
+   * response interceptor
    */
   function responseInterceptor (request, response) {
     var XEPromise = request.$Promise || Promise
@@ -532,7 +532,7 @@
     }, request.$context)
   }
 
-  // Result to Response
+  // result to Response
   function toResponse (resp, request) {
     if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
       return resp
@@ -544,6 +544,12 @@
     return new XEResponse(JSON.stringify(resp.body), options, request)
   }
 
+  /**
+   * xhr
+   * @param { XERequest } request
+   * @param { Promise.resolve } resolve
+   * @param { Promise.reject } reject
+   */
   function sendXHR (request, resolve, reject) {
     var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
@@ -601,6 +607,12 @@
     return headers
   }
 
+  /**
+   * fetch
+   * @param { XERequest } request
+   * @param { Promise.resolve } resolve
+   * @param { Promise.reject } reject
+   */
   function sendFetch (request, resolve, reject) {
     var $fetch = isFunction(request.$fetch) ? request.$fetch : self.fetch
     var options = {
@@ -648,12 +660,6 @@
 
   var sendRequest = createRequestFactory()
 
-  /**
-   * fetch 异步请求
-   * @param { XHR } xhr 请求
-   * @param { Promise.resolve } resolve 成功 Promise
-   * @param { Promise.reject } reject 失败 Promise
-   */
   function fetchRequest (request, resolve, reject) {
     return requestInterceptor(request).then(function () {
       return sendRequest(request, resolve, reject)
@@ -663,30 +669,11 @@
   var jsonpIndex = 0
   var $global = typeof window === 'undefined' ? this : window
 
-  function jsonpClear (request) {
-    if (request.script.parentNode === document.body) {
-      document.body.removeChild(request.script)
-    }
-    try {
-      delete $global[request.jsonpCallback]
-    } catch (e) {
-      // IE8
-      $global[request.jsonpCallback] = undefined
-    }
-  }
-
-  function jsonpSuccess (request, response, resolve) {
-    jsonpClear(request)
-    responseInterceptor(request, toResponse(response, request)).then(resolve)
-  }
-
-  function jsonpError (request, reject) {
-    jsonpClear(request)
-    reject(new TypeError('JSONP request failed'))
-  }
-
   /**
-   * jsonp 异步请求
+   * jsonp
+   * @param { XERequest } request
+   * @param { Promise.resolve } resolve
+   * @param { Promise.reject } reject
    */
   function sendJSONP (request, resolve, reject) {
     request.script = document.createElement('script')
@@ -721,6 +708,28 @@
     })
   }
 
+  function jsonpClear (request) {
+    if (request.script.parentNode === document.body) {
+      document.body.removeChild(request.script)
+    }
+    try {
+      delete $global[request.jsonpCallback]
+    } catch (e) {
+      // IE8
+      $global[request.jsonpCallback] = undefined
+    }
+  }
+
+  function jsonpSuccess (request, response, resolve) {
+    jsonpClear(request)
+    responseInterceptor(request, toResponse(response, request)).then(resolve)
+  }
+
+  function jsonpError (request, reject) {
+    jsonpClear(request)
+    reject(new TypeError('JSONP request failed'))
+  }
+
   var setupDefaults = {
     method: 'GET',
     baseURL: getBaseURL(),
@@ -735,10 +744,10 @@
   }
 
   /**
-    * xhr、fetch、jsonp
+    * support: xhr、fetch、jsonp
     *
-    * @param Object options 请求参数
-    * @return Promise
+    * @param { Object} options
+    * @return { Promise }
     */
   function XEAjax (options) {
     var opts = objectAssign({}, setupDefaults, { headers: objectAssign({}, setupDefaults.headers) }, options)
@@ -749,32 +758,31 @@
   }
 
   /**
-   * Request
+   * required parameter
    *
-   * 参数
-   * @param String url 请求地址
-   * @param String baseURL 基础路径，默认上下文路径
-   * @param String method 请求方法(默认GET)
-   * @param Object params 请求参数，序列化后会拼接在url
-   * @param Object body 提交参数
-   * @param String bodyType 提交参数方式可以设置json-data,form-data(json-data)
-   * @param String jsonp 调用jsonp服务,回调属性默认callback
-   * @param String cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
-   * @param String credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
-   * @param Number timeout 设置超时
-   * @param Object headers 请求头
-   * @param Boolean log 控制台输出日志
-   * @param Function transformParams(params, request) 用于改变URL参数
-   * @param Function paramsSerializer(params, request) 自定义URL序列化函数
-   * @param Function transformBody(body, request) 用于改变提交数据
-   * @param Function stringifyBody(body, request) 自定义转换提交数据的函数
-   * @param Function validateStatus(response) 自定义校验请求是否成功
-   * 高级扩展
-   * @param Function $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
-   * @param Function $fetch 自定义 fetch 请求函数
-   * @param Function $jsonp 自定义 jsonp 处理函数
-   * @param Function $Promise 自定义 Promise 函数
-   * @param Function $context 自定义上下文
+   * @param { String } url 请求地址
+   * @param { String } baseURL 基础路径，默认上下文路径
+   * @param { String } method 请求方法(默认GET)
+   * @param { Object } params 请求参数，序列化后会拼接在url
+   * @param { Object } body 提交参数
+   * @param { String } bodyType 提交参数方式可以设置json-data,form-data(json-data)
+   * @param { String } jsonp 调用jsonp服务,回调属性默认callback
+   * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
+   * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
+   * @param { Number } timeout 设置超时
+   * @param { Object } headers 请求头
+   * @param { Boolean } log 控制台输出日志
+   * @param { Function } transformParams(params, request) 用于改变URL参数
+   * @param { Function } paramsSerializer(params, request) 自定义URL序列化函数
+   * @param { Function } transformBody(body, request) 用于改变提交数据
+   * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
+   * @param { Function } validateStatus(response) 自定义校验请求是否成功
+   * advanced.
+   * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
+   * @param { Function } $fetch 自定义 fetch 请求函数
+   * @param { Function } $jsonp 自定义 jsonp 处理函数
+   * @param { Function } $Promise 自定义 Promise 函数
+   * @param { Function } $context 自定义上下文
    */
   var setup = function setup (options) {
     objectAssign(setupDefaults, options)
@@ -786,14 +794,15 @@
     return opts
   }
 
-  function responseResult (method) {
+  // to response
+  function requestToResponse (method) {
     return function () {
       return XEAjax(method.apply(this, arguments))
     }
   }
 
-  // xhr response JSON
-  function responseJSON (method) {
+  // to json
+  function requestToJSON (method) {
     return function () {
       var opts = method.apply(this, arguments)
       var XEPromise = opts.$Promise || Promise
@@ -811,7 +820,7 @@
 
   var ajax = XEAjax
 
-  // Http Request All
+  // Promise.all
   function doAll (iterable) {
     var XEPromise = XEAjax.$Promise || Promise
     var context = XEAjax.$context
@@ -849,21 +858,21 @@
   var requestPut = createBodyFetch('PUT')
   var requestPatch = createBodyFetch('PATCH')
 
-  var fetchHead = responseResult(requestHead)
-  var fetchDelete = responseResult(requestDelete)
-  var fetchJsonp = responseResult(requestJsonp)
-  var fetchGet = responseResult(requestGet)
-  var fetchPost = responseResult(requestPost)
-  var fetchPut = responseResult(requestPut)
-  var fetchPatch = responseResult(requestPatch)
+  var fetchHead = requestToResponse(requestHead)
+  var fetchDelete = requestToResponse(requestDelete)
+  var fetchJsonp = requestToResponse(requestJsonp)
+  var fetchGet = requestToResponse(requestGet)
+  var fetchPost = requestToResponse(requestPost)
+  var fetchPut = requestToResponse(requestPut)
+  var fetchPatch = requestToResponse(requestPatch)
 
-  var headJSON = responseJSON(requestHead)
-  var deleteJSON = responseJSON(requestDelete)
-  var jsonp = responseJSON(requestJsonp)
-  var getJSON = responseJSON(requestGet)
-  var postJSON = responseJSON(requestPost)
-  var putJSON = responseJSON(requestPut)
-  var patchJSON = responseJSON(requestPatch)
+  var headJSON = requestToJSON(requestHead)
+  var deleteJSON = requestToJSON(requestDelete)
+  var jsonp = requestToJSON(requestJsonp)
+  var getJSON = requestToJSON(requestGet)
+  var postJSON = requestToJSON(requestPost)
+  var putJSON = requestToJSON(requestPut)
+  var patchJSON = requestToJSON(requestPatch)
 
   function ajaxFetch (url, options) {
     return fetchGet(url, null, options)
@@ -890,7 +899,7 @@
   }
 
   /**
-   * Mixin
+   * functions of mixing
    *
    * @param {Object} methods
    */
@@ -905,7 +914,7 @@
   }
 
   /**
-   * Installation
+   * installation
    */
   function use (plugin) {
     plugin.install(XEAjax)
