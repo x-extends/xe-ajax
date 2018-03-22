@@ -1,5 +1,5 @@
 import { serialize, objectEach, isFunction, clearXEAjaxContext, objectAssign } from './src/core/utils'
-import { XEAjax, setupDefaults, setup } from './src/core/ajax'
+import { XEAjax, setup } from './src/core/ajax'
 import { interceptors } from './src/handle/interceptor'
 import { exportMethods } from './src/core/methods'
 import { XEAbortController } from './src/handle/abort'
