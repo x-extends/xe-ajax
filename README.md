@@ -18,11 +18,11 @@ xe-ajax depends on a native ES6 Promise implementation to be supported. If your 
 npm install xe-ajax --save
 ```
 ### CDN
-View all [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
+[All cdnjs package](https://cdn.jsdelivr.net/npm/xe-ajax/)
 ``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
-View all [unpkg](https://unpkg.com/xe-ajax/)
+[All unpkg package](https://unpkg.com/xe-ajax/)
 ``` shell
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
@@ -63,28 +63,28 @@ require.config({
 * options [Object] is an optional options object
 
 ### Options
-| 参数 | 类型 | 描述 | 默认值 |
+| Name | Type | Description | default value |
 |------|------|-----|----|
-| url | String | 请求地址 |  |
-| baseURL | String | 基础路径 | 默认上下文路径 |
-| method | String | 请求方法 | 默认GET |
-| params | Object/Array | 请求参数 |  |
-| body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式，可以设置json-data,form-data | 默认json-data |
-| cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
-| credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
-| jsonp | String | jsonp入参属性名 | 默认callback |
-| jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
-| timeout | Number | 设置超时 |  |
-| headers | Object | 请求头 |  |
-| transformParams | Function ( params, request ) | 用于改变URL参数 |  |
-| paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
-| transformBody | Function ( body, request ) | 用于改变提交数据 |  |
-| stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
-| validateStatus | Function ( response ) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
+| url | String | is the url to fetch |  |
+| baseURL | String | base URL | defaults to context path |
+| method | String | request method | defaults to 'GET' |
+| params | Object/Array | request params |  |
+| body | Object/Array | request body |  |
+| bodyType | String | submit type, Options(json-data,form-data) | defaults to 'json-data' |
+| cache | String | handling cache mode, Option(default,no-store,no-cache,reload,force-cache,only-if-cached) | defaults to 'default' |
+| credentials | String | set the cookie to be sent along with the request, Option(omit,same-origin,include) | defaults to 'same-origin' |
+| jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
+| jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
+| timeout | Number | set a timeout in ms |  |
+| headers | Object | optional header fields |  |
+| transformParams | Function ( params, request ) | Change the URL parameter before sending the request. |  |
+| paramsSerializer | Function ( params, request ) | The custom URL serialization function is finally spliced in the URL. |  |
+| transformBody | Function ( body, request ) | Change the commit body before sending the request. |  |
+| stringifyBody | Function ( body, request ) | Customize the body stringify function. |  |
+| validateStatus | Function ( response ) | Verify that the request is successful. | response.status >= 200 && response.status < 300 |
 
 ### Headers
-| 属性 | 类型 | 描述 |
+| Name | Type | Description |
 |------|------|-----|
 | set | Function ( name, value ) | 添加 |
 | append | Function ( name, value ) | 追加 |
@@ -97,7 +97,7 @@ require.config({
 | forEach | Function ( callback, context ) | 迭代器 |
 
 ### Response
-| 属性 | 类型 | 描述 |
+| Name | Type | Description |
 |------|------|-----|
 | body | ReadableStream | 数据流 |
 | bodyUsed | Boolean | 内容是否已被读取 |
@@ -115,11 +115,10 @@ require.config({
 | arrayBuffer | Function | 获取 ArrayBuffer 对象 |
 | formData | Function | 获取 FormData 对象 |
 
-## Default Settings
+## Default global settings
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'json-data',
@@ -129,21 +128,21 @@ XEAjax.setup({
     'Accept': 'application/json, text/plain, \*/\*;'
   },
   transformParams (params, request) {
-    // 用于在请求发送之前改变URL参数
+    // Change the URL parameter before sending the request.
     params.id = 123
     return params
   },
   paramsSerializer (params, request) {
-    // 自定义URL序列化函数,最终拼接在url
+    // The custom URL serialization function is finally spliced in the URL.
     return 'id=123&name=2'
   }，
   transformBody (body, request) {
-    // 用于在请求发送之前改变提交数据
+    // Change the commit body before sending the request.
     body.startTime = body.startDate.getTime()
     return body
   },
   stringifyBody (body, request) {
-    // 自定义格式化提交数据函数
+    // Customize the body stringify function.
     return JSON.stringify(body)
   }
 })
