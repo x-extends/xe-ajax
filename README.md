@@ -214,15 +214,13 @@ XEAjax.fetchGet('/api/user/list').then(response => {
   })
 })
 
-// 如果 bodyType='json-data', 则默认设置 Content-Type 并使用 JSON.stringify 序列化数据
-// request.headers.set('Content-Type', 'application/json; charset=utf-8')
+// Submit application/json, default uses JSON.stringify(request.body)
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
-// 如果 bodyType='form-data', 则默认设置 Content-Type 并使用 XEAjax.serialize 序列化数据
-// request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
+// Submit application/x-www-form-urlencoded, default uses XEAjax.serialize(request.body)
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-// 模拟表单 FormData 提交
+// Submit FormData
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
@@ -232,7 +230,7 @@ XEAjax.fetchPost('/api/user/save', formBody)
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 根据 validateStatus 状态校验判断完成还是失败
+// The completion or failure is based on state check.
 XEAjax.getJSON('/api/user/list').then(data => {
   // success
 }).catch(data => {
@@ -258,7 +256,7 @@ import XEAjax from 'xe-ajax'
 // Set JSONP callback parameter name, default is 'callback'
 // http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
   response.json().then(data => {
     // {message: 'success'}
   })
@@ -266,9 +264,9 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(res
 
 // Case 2:
 // Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
-// http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_1521272815608_2
+// http://xuliangzhan.com/jsonp/user/message?id=123&cb=jsonp_xeajax_1521272815608_2
 // jsonp_xeajax_1521272815608_2({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   jsonp: 'cb'
 }).then(response => {
   response.json().then(data => {
@@ -278,9 +276,9 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
 
 // Case 3:
 // Set JSONP callback parameter name and callback function name
-// http://xuliangzhan.com/jsonp/user/message?cb=customCallback
+// http://xuliangzhan.com/jsonp/user/message?id=123&cb=customCallback
 // customCallback({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   jsonp: 'cb', 
   jsonpCallback: 'customCallback'
 }).then(response => {
