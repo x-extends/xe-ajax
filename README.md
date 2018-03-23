@@ -5,7 +5,7 @@
 
 基于 Promise 的异步请求函数；支持 xhr、fetch、jsonp 以及 mock，更简洁的 API、轻封装、高扩展。
 
-## 兼容性
+## Browser Support
 依赖原生 Promise，低版本浏览器使用 polyfill es6-promise.js  
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
@@ -15,19 +15,19 @@
 ## CDN
 使用 script 方式安装，XEAjax 会定义为全局变量  
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
-### cdnjs 获取最新版本
+### cdnjs
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
 ``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
-### unpkg 获取最新版本
+### unpkg
 [点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
 ``` shell
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 ## AMD
-### require.js 安装示例
+### require.js
 ``` shell
 // require 配置
 require.config({
@@ -130,7 +130,7 @@ XEAjax.fetchPost ('/api/user/save', {id: 1})
 | arrayBuffer | Function | 获取 ArrayBuffer 对象 |
 | formData | Function | 获取 FormData 对象 |
 
-## 全局参数设置
+## Default Settings
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -164,7 +164,7 @@ XEAjax.setup({
 })
 ```
 
-## 示例
+## Example
 ### ajax
 ``` shell
 import XEAjax from 'xe-ajax'
@@ -180,7 +180,7 @@ XEAjax.ajax({
 })
 
 ```
-### fetch
+### fetch to Response
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -241,9 +241,6 @@ const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
-
-// 查询参数和数据同时提交
-XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### fetch to JSON
 ``` shell
@@ -251,9 +248,9 @@ import XEAjax from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败
 XEAjax.getJSON('/api/user/list').then(data => {
-  // 请求成功
+  // success
 }).catch(data => {
-  // 请求失败
+  // failed
 })
 
 XEAjax.postJSON('/api/user/save', {name: 'test'})
@@ -266,8 +263,6 @@ const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.postJSON('/api/user/save', formBody)
-
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### jsonp
 ``` shell
@@ -334,7 +329,7 @@ XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data =>
   })
 })
 ```
-### AMD 使用方式
+### AMD
 ``` shell
 define([
   'xe-ajax'
@@ -346,20 +341,17 @@ define([
     })
   })
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'})
-
+  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
   XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'form-data'})
 
   var file = document.querySelector('#myFile').files[0]
   var formBody = new FormData()
   formBody.append('file', file)
   XEAjax.fetchPost('/api/user/save', formBody)
-
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {params: {id: 1}})
 })
 ```
 
-## 取消请求
+## Cancel request
 ### AbortController 控制器对象
 允许控制一个或多个取消指令请求
 ``` shell
@@ -380,8 +372,8 @@ setTimeout(() => {
 }, 10)
 ```
 
-## 拦截器
-### Request 拦截器
+## Interceptor
+### Request interceptor
 | 属性 | 类型 | 描述 |
 |------|------|-----|
 | interceptors.request.use | Function ( request, next ) | 请求发送之前触发 |
@@ -401,7 +393,7 @@ XEAjax.interceptors.request.use((request, next) => {
   next()
 })
 ```
-### Response 拦截器
+### Response interceptor
 | 属性 | 类型 | 描述 |
 |------|------|-----|
 | interceptors.response.use | Function ( response, next, request ) | 请求完成之后响应之前触发 |
@@ -438,7 +430,7 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## 混合函数
+## functions of mixing
 ### ./customs.js
 ``` shell
 import XEAjax from 'xe-ajax'
@@ -465,21 +457,20 @@ import customs from './customs'
 
 XEAjax.mixin(customs)
 
-// 调用自定义扩展函数
 XEAjax.doGet('/api/user/list')
 XEAjax.getText('/api/user/message')
 ```
 
 ## Plugin
-### Mock 虚拟服务
-支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等。
+### Mock services
+MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock)
 
 ## Demo
-ES6 + Vue + VXEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock1)  
-ES6 + Vue + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock2)  
-ES6 + React + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/react-mock1)  
-RequireJS + Vue + XEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock3)  
-RequireJS + Vue + VXEAjax + Mock 项目 [点击查看](https://github.com/xuliangzhan/examples/tree/master/vue-mock4)  
+ES6 + Vue + VXEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock1)  
+ES6 + Vue + XEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock2)  
+ES6 + React + XEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/react-mock1)  
+RequireJS + Vue + XEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock3)  
+RequireJS + Vue + VXEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock4)  
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
