@@ -70,9 +70,9 @@ require.config({
 | method | String | request method | defaults to 'GET' |
 | params | Object/Array | request params |  |
 | body | Object/Array | request body |  |
-| bodyType | String | submit type, You can set [**json-data**,**form-data**] | defaults to 'json-data' |
-| cache | String | handling cache mode, You can set [**default**,**no-store**,**no-cache**,**reload**,**force-cache**,**only-if-cached**] | defaults to 'default' |
-| credentials | String | set the cookie to be sent along with the request, You can set [**omit**,**same-origin**,**include**] | defaults to 'same-origin' |
+| bodyType | String | submit type, You can set [**'json-data'**,**'form-data'**] | defaults to 'json-data' |
+| cache | String | handling cache mode, You can set [**'default'**,**'no-store'**,**'no-cache'**,**'reload'**,**'force-cache'**,**'only-if-cached'**] | defaults to 'default' |
+| credentials | String | set the cookie to be sent along with the request, You can set [**'omit'**,**'same-origin'**,**'include'**] | defaults to 'same-origin' |
 | jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |
