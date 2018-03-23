@@ -12,42 +12,28 @@
 --- | --- | --- | --- | --- | --- |
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
-## CDN
-使用 script 方式安装，XEAjax 会定义为全局变量  
-生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
-### cdnjs
-[点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
+## Installation
+### You can install with npm.
+``` shell
+npm install xe-ajax --save
+```
+### You can install with CDN.
+[cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 ``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
-### unpkg
-[点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
+[unpkg](https://unpkg.com/xe-ajax/)
 ``` shell
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
-
-## AMD
-### require.js
+### You can install with AMD.
 ``` shell
-// require 配置
 require.config({
   paths: {
     // ...,
     'xe-ajax': './dist/xe-ajax.min'
   }
 })
-```
-
-## ES6 Module
-``` shell
-npm install xe-ajax --save
-```
-### import
-``` shell
-import XEAjax from 'xe-ajax'
-
-XEAjax.fetchGet('/api/user/list', {id: 1})
-XEAjax.fetchPost ('/api/user/save', {id: 1})
 ```
 
 ## API:
