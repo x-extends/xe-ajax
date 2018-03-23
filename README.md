@@ -86,34 +86,34 @@ require.config({
 ### Headers
 | Name | Type | Description |
 |------|------|-----|
-| set | Function ( name, value ) | 添加 |
-| append | Function ( name, value ) | 追加 |
-| get | Function ( name ) | 根据 name 获取 |
-| has | Function ( name ) | 检查 name 是否存在 |
-| delete | Function ( name ) | 根据 name 删除 |
-| keys | Function | 以迭代器的形式返回所有 name |
-| values | Function | 以迭代器的形式返回所有 value |
-| entries | Function | 以迭代器的形式返回所有 [name, value] |
-| forEach | Function ( callback, context ) | 迭代器 |
+| set | Function ( name, value ) | Sets a new value for an existing header inside a Headers object, or adds the header if it does not already exist. |
+| append | Function ( name, value ) | Appends a new value onto an existing header inside a Headers object, or adds the header if it does not already exist. |
+| get | Function ( name ) | Returns a ByteString sequence of all the values of a header within a Headers object with a given name. |
+| has | Function ( name ) | Returns a boolean stating whether a Headers object contains a certain header. |
+| delete | Function ( name ) | Deletes a header from a Headers object. |
+| keys | Function | Returns an iterator allowing you to go through all keys of the key/value pairs contained in this object. |
+| values | Function | Returns an iterator allowing you to go through all values of the key/value pairs contained in this object. |
+| entries | Function | Returns an iterator allowing to go through all key/value pairs contained in this object. |
+| forEach | Function ( callback, context ) | Executes a provided function once for each array element. |
 
 ### Response
 | Name | Type | Description |
 |------|------|-----|
-| body | ReadableStream | 数据流 |
-| bodyUsed | Boolean | 内容是否已被读取 |
-| headers | Headers | 响应头 |
+| body | ReadableStream | A simple getter used to expose a ReadableStream of the body contents. |
+| bodyUsed | Boolean | Stores a Boolean that declares whether the body has been used in a response yet. |
+| headers | Headers | Contains the Headers object associated with the response. |
 | status | Number | HTTP status code |
-| statusText | String | 状态信息 |
-| url | String | 返回请求路径 |
-| ok | Boolean | 请求完成还是失败 |
-| redirected | Boolean | 是否重定向了 |
-| type | String | 类型 |
-| clone | Function | 返回一个新的 Response 对象 |
-| json | Function | 获取 json 数据 |
-| test | Function | 获取 text 数据 |
-| blob | Function | 获取 Blob 对象 |
-| arrayBuffer | Function | 获取 ArrayBuffer 对象 |
-| formData | Function | 获取 FormData 对象 |
+| statusText | String | Contains the status message corresponding to the status code |
+| url | String | Contains the URL of the response. |
+| ok | Boolean | Contains a boolean stating whether the response was successful (status in the range 200-299) or not. |
+| redirected | Boolean | Indicates whether or not the response is the result of a redirect; that is, its URL list has more than one entry. |
+| type | String | Contains the type of the response |
+| clone | Function | Creates a clone of a Response object. |
+| json | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with the result of parsing the body text as JSON. |
+| test | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a USVString (text). |
+| blob | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a Blob. |
+| arrayBuffer | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with an ArrayBuffer. |
+| formData | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a FormData object. |
 
 ## Default global settings
 ``` shell
@@ -364,7 +364,7 @@ import XEAjax from 'xe-ajax'
 
 // Trigger before the request is sent.
 XEAjax.interceptors.request.use((request, next) => {
-  // 可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
+  // Can be used for unified permission intercept, set request header, Token authentication, parameters, etc.
 
   // 设置参数
   request.params.version = 1
@@ -382,29 +382,27 @@ import XEAjax from 'xe-ajax'
 
 // Intercept when the request is complete.
 XEAjax.interceptors.response.use((response, next) => {
-  // 请求完成之后统一处理，例如校验登录是否失效、消息提示，特殊场景处理等...
+  // It can be used for unified processing after a request is completed, such as checking for invalidation, message prompt, special scenario processing, etc.
 
-  // 例子: 判断登录失效跳转
+  // Example: check login failover.
   if (response.status === 403) {
     router.replace({path: '/login'}) 
   } else {
-    // 调用 next(),继续执行下一个拦截器
+    // Call next(), execute the next interceptor.
     next()
   }
 })
 
 // Intercept and reset the response data after the request is complete.
 XEAjax.interceptors.response.use((response, next) => {
-  // 请求完成之后对返回的数据进行统一的处理...
-  // 格式: {status: 200, statusText: 'OK', body: {}, headers: {}}
+  // format: {status: 200, statusText: 'OK', body: {}, headers: {}}
 
-  // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
     const body = {
       status: response.status === 200 ? 'success' : 'error', 
       result: data
     }
-    // 重置响应数据并继续执行下一个拦截器
+    // Reset the response data and continue with the next interceptor.
     next({status: response.status, body: body})
   })
 })
