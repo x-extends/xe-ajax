@@ -59,7 +59,7 @@ require.config({
 
 ### Arguments
 * **url** is the url to fetch
-* **params/body** The data to be sent.
+* **params/body** the data to be sent.
 * **options** is an optional options object
 
 ### Options
@@ -77,11 +77,11 @@ require.config({
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |
 | headers | Object | optional header fields |  |
-| transformParams | Function ( params, request ) | Change the URL parameter before sending the request. |  |
-| paramsSerializer | Function ( params, request ) | The custom URL serialization function is finally spliced in the URL. |  |
-| transformBody | Function ( body, request ) | Change the commit body before sending the request. |  |
-| stringifyBody | Function ( body, request ) | Customize the body stringify function. |  |
-| validateStatus | Function ( response ) | Verify that the request is successful. | response.status >= 200 && response.status < 300 |
+| transformParams | Function ( params, request ) | change the URL parameter before sending the request. |  |
+| paramsSerializer | Function ( params, request ) | the custom URL serialization function is finally spliced in the URL. |  |
+| transformBody | Function ( body, request ) | change the commit body before sending the request. |  |
+| stringifyBody | Function ( body, request ) | customize the body stringify function. |  |
+| validateStatus | Function ( response ) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
 
 ### Headers
 | Name | Type | Description |
@@ -128,21 +128,17 @@ XEAjax.setup({
     'Accept': 'application/json, text/plain, \*/\*;'
   },
   transformParams (params, request) {
-    // Change the URL parameter before sending the request.
     params.id = 123
     return params
   },
   paramsSerializer (params, request) {
-    // The custom URL serialization function is finally spliced in the URL.
     return 'id=123&name=2'
   }，
   transformBody (body, request) {
-    // Change the commit body before sending the request.
     body.startTime = body.startDate.getTime()
     return body
   },
   stringifyBody (body, request) {
-    // Customize the body stringify function.
     return JSON.stringify(body)
   }
 })
@@ -251,7 +247,7 @@ XEAjax.postJSON('/api/user/save', formBody)
 import XEAjax from 'xe-ajax'
 
 // Case 1:
-// Set JSONP callback parameter name, default is 'callback'
+// Set jsonp callback parameter name, default is 'callback'
 // http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
@@ -273,7 +269,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 })
 
 // Case 3:
-// Set JSONP callback parameter name and callback function name
+// Set jsonp callback parameter name and callback function name
 // http://xuliangzhan.com/jsonp/user/message?id=123&cb=customCallback
 // customCallback({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
