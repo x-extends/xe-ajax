@@ -58,9 +58,9 @@ require.config({
 * patchJSON ( url, body, options )
 
 ### Arguments
-* url [String] is the url to fetch
-* params/body [Object/Array] The data to be sent.
-* options [Object] is an optional options object
+* **url** is the url to fetch
+* **params/body** The data to be sent.
+* **options** is an optional options object
 
 ### Options
 | Name | Type | Description | default value |
