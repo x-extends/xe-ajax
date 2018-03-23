@@ -10,18 +10,18 @@ function getSignalIndex (item) {
   }
 }
 
-function $AbortSignal () {
+function AbortSignalPolyfill () {
   this.onaborted = null
   this._abortSignal = {aborted: false}
 }
 
-Object.defineProperty($AbortSignal.prototype, 'aborted', {
+Object.defineProperty(AbortSignalPolyfill.prototype, 'aborted', {
   get: function () {
     return this._abortSignal.aborted
   }
 })
 
-objectAssign($AbortSignal.prototype, {
+objectAssign(AbortSignalPolyfill.prototype, {
   install: function (request) {
     if (request.signal) {
       var index = getSignalIndex(request.signal)
@@ -34,11 +34,11 @@ objectAssign($AbortSignal.prototype, {
   }
 })
 
-function $AbortController () {
+function AbortControllerPolyfill () {
   this.signal = new XEAbortSignal()
 }
 
-objectAssign($AbortController.prototype, {
+objectAssign(AbortControllerPolyfill.prototype, {
   // Abort Request
   abort: function () {
     var index = getSignalIndex(this.signal)
@@ -53,5 +53,5 @@ objectAssign($AbortController.prototype, {
 })
 
 /* eslint-disable no-undef */
-export var XEAbortSignal = typeof AbortSignal === 'function' ? AbortSignal : $AbortSignal
-export var XEAbortController = typeof AbortController === 'function' ? AbortController : $AbortController
+export var XEAbortSignal = typeof AbortSignal === 'function' ? AbortSignal : AbortSignalPolyfill
+export var XEAbortController = typeof AbortController === 'function' ? AbortController : AbortControllerPolyfill

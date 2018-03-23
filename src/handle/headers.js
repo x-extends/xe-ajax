@@ -1,6 +1,6 @@
 import { objectEach, objectAssign } from '../core/utils'
 
-function toKey (name) {
+function toHeaderKey (name) {
   return String(name).toLowerCase()
 }
 
@@ -28,9 +28,9 @@ function XEIterator (iterator, value) {
   }
 }
 
-function $Headers (headers) {
+function HeadersPolyfill (headers) {
   this._map = {}
-  if (headers instanceof $Headers) {
+  if (headers instanceof HeadersPolyfill) {
     headers.forEach(function (value, name) {
       this.set(name, value)
     }, this)
@@ -41,16 +41,16 @@ function $Headers (headers) {
   }
 }
 
-objectAssign($Headers.prototype, {
+objectAssign(HeadersPolyfill.prototype, {
   set: function (name, value) {
-    this._map[toKey(name)] = value
+    this._map[toHeaderKey(name)] = value
   },
   get: function (name) {
-    var _key = toKey(name)
+    var _key = toHeaderKey(name)
     return this.has(_key) ? this._map[_key] : null
   },
   append: function (name, value) {
-    var _key = toKey(name)
+    var _key = toHeaderKey(name)
     if (this.has(_key)) {
       this._map[_key] = this._map[_key] + ', ' + value
     } else {
@@ -58,7 +58,7 @@ objectAssign($Headers.prototype, {
     }
   },
   has: function (name) {
-    return this._map.hasOwnProperty(toKey(name))
+    return this._map.hasOwnProperty(toHeaderKey(name))
   },
   keys: function () {
     return new XEIterator(this._map, 0)
@@ -70,7 +70,7 @@ objectAssign($Headers.prototype, {
     return new XEIterator(this._map, 2)
   },
   'delete': function (name) {
-    delete this._map[toKey(name)]
+    delete this._map[toHeaderKey(name)]
   },
   forEach: function (callback, context) {
     objectEach(this._map, function (value, name, state) {
@@ -79,4 +79,4 @@ objectAssign($Headers.prototype, {
   }
 })
 
-export var XEHeaders = typeof Headers === 'undefined' ? $Headers : Headers
+export var XEHeaders = typeof Headers === 'function' ? Headers : HeadersPolyfill

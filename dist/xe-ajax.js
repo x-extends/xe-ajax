@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.2.11
+ * xe-ajax.js v3.3.0
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -141,7 +141,7 @@
     XEAjax.$context = XEAjax.$Promise = null
   }
 
-  function toKey (name) {
+  function toHeaderKey (name) {
     return String(name).toLowerCase()
   }
 
@@ -169,9 +169,9 @@
     }
   }
 
-  function $Headers (headers) {
+  function HeadersPolyfill (headers) {
     this._map = {}
-    if (headers instanceof $Headers) {
+    if (headers instanceof HeadersPolyfill) {
       headers.forEach(function (value, name) {
         this.set(name, value)
       }, this)
@@ -182,16 +182,16 @@
     }
   }
 
-  objectAssign($Headers.prototype, {
+  objectAssign(HeadersPolyfill.prototype, {
     set: function (name, value) {
-      this._map[toKey(name)] = value
+      this._map[toHeaderKey(name)] = value
     },
     get: function (name) {
-      var _key = toKey(name)
+      var _key = toHeaderKey(name)
       return this.has(_key) ? this._map[_key] : null
     },
     append: function (name, value) {
-      var _key = toKey(name)
+      var _key = toHeaderKey(name)
       if (this.has(_key)) {
         this._map[_key] = this._map[_key] + ', ' + value
       } else {
@@ -199,7 +199,7 @@
       }
     },
     has: function (name) {
-      return this._map.hasOwnProperty(toKey(name))
+      return this._map.hasOwnProperty(toHeaderKey(name))
     },
     keys: function () {
       return new XEIterator(this._map, 0)
@@ -211,7 +211,7 @@
       return new XEIterator(this._map, 2)
     },
     'delete': function (name) {
-      delete this._map[toKey(name)]
+      delete this._map[toHeaderKey(name)]
     },
     forEach: function (callback, context) {
       objectEach(this._map, function (value, name, state) {
@@ -220,7 +220,7 @@
     }
   })
 
-  var XEHeaders = typeof Headers === 'undefined' ? $Headers : Headers
+  var XEHeaders = typeof Headers === 'function' ? Headers : HeadersPolyfill
 
   function XEReadableStream (body, request) {
     this.locked = false
@@ -249,18 +249,18 @@
     }
   }
 
-  function $AbortSignal () {
+  function AbortSignalPolyfill () {
     this.onaborted = null
     this._abortSignal = { aborted: false }
   }
 
-  Object.defineProperty($AbortSignal.prototype, 'aborted', {
+  Object.defineProperty(AbortSignalPolyfill.prototype, 'aborted', {
     get: function () {
       return this._abortSignal.aborted
     }
   })
 
-  objectAssign($AbortSignal.prototype, {
+  objectAssign(AbortSignalPolyfill.prototype, {
     install: function (request) {
       if (request.signal) {
         var index = getSignalIndex(request.signal)
@@ -273,11 +273,11 @@
     }
   })
 
-  function $AbortController () {
+  function AbortControllerPolyfill () {
     this.signal = new XEAbortSignal()
   }
 
-  objectAssign($AbortController.prototype, {
+  objectAssign(AbortControllerPolyfill.prototype, {
     // Abort Request
     abort: function () {
       var index = getSignalIndex(this.signal)
@@ -292,8 +292,8 @@
   })
 
   /* eslint-disable no-undef */
-  var XEAbortSignal = typeof AbortSignal === 'function' ? AbortSignal : $AbortSignal
-  var XEAbortController = typeof AbortController === 'function' ? AbortController : $AbortController
+  var XEAbortSignal = typeof AbortSignal === 'function' ? AbortSignal : AbortSignalPolyfill
+  var XEAbortController = typeof AbortController === 'function' ? AbortController : AbortControllerPolyfill
 
   /**
    * interceptor queue
@@ -927,7 +927,7 @@
     AbortController: XEAbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.2.11',
+    version: '3.3.0',
     $name: 'XEAjax'
   })
 
