@@ -366,12 +366,13 @@ import XEAjax from 'xe-ajax'
 XEAjax.interceptors.request.use((request, next) => {
   // Can be used for unified permission intercept, set request header, Token authentication, parameters, etc.
 
-  // 设置参数
-  request.params.version = 1
-  // 设置 Token 验证，预防 XSRF/CSRF 攻击
+  // set params
+  // request.params.version = Date.now()
+
+  // Set Token validation to prevent XSRF/CSRF attacks.
   request.headers.set('X-Token', cookie('x-id'))
 
-  // 调用 next(),继续执行下一个拦截器
+  // Call next(), execute the next interceptor.
   next()
 })
 ```
@@ -387,6 +388,7 @@ XEAjax.interceptors.response.use((response, next) => {
   // Example: check login failover.
   if (response.status === 403) {
     router.replace({path: '/login'}) 
+    // break up
   } else {
     // Call next(), execute the next interceptor.
     next()
