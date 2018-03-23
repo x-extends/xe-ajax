@@ -13,11 +13,11 @@ xe-ajax depends on a native ES6 Promise implementation to be supported. If your 
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## Installation
-### You can install with npm.
+### npm
 ``` shell
 npm install xe-ajax --save
 ```
-### You can install with CDN.
+### CDN
 View all [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 ``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
@@ -26,7 +26,7 @@ View all [unpkg](https://unpkg.com/xe-ajax/)
 ``` shell
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
-### You can install with AMD.
+### AMD
 ``` shell
 require.config({
   paths: {
