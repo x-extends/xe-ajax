@@ -18,11 +18,11 @@
 npm install xe-ajax --save
 ```
 ### You can install with CDN.
-[cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
+View all [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 ``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
-[unpkg](https://unpkg.com/xe-ajax/)
+View all [unpkg](https://unpkg.com/xe-ajax/)
 ``` shell
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
@@ -254,16 +254,20 @@ XEAjax.postJSON('/api/user/save', formBody)
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// URL: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
-// Response: jsonp_xeajax_1({message: 'success'})
+// Case 1:
+// Set JSONP callback parameter name, default is 'callback'
+// http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
+// jsonp_xeajax_1521272815608_1({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}).then(response => {
   response.json().then(data => {
     // {message: 'success'}
   })
 })-
 
-// URL: http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_1521272815608_2
-// Response: jsonp_xeajax_2({message: 'success'})
+// Case 2:
+// Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
+// http://xuliangzhan.com/jsonp/user/message?cb=jsonp_xeajax_1521272815608_2
+// jsonp_xeajax_1521272815608_2({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
   jsonp: 'cb'
 }).then(response => {
@@ -272,18 +276,20 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
   })
 })
 
-// URL: http://xuliangzhan.com/jsonp/user/message?cb=custom3
-// Response: custom3({message: 'success'})
+// Case 3:
+// Set JSONP callback parameter name and callback function name
+// http://xuliangzhan.com/jsonp/user/message?cb=customCallback
+// customCallback({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 1}, {
   jsonp: 'cb', 
-  jsonpCallback: 'custom3'
+  jsonpCallback: 'customCallback'
 }).then(response => {
   response.json().then(data => {
     // {message: 'success'}
   })
 })
 ```
-### 并发多个请求
+### Multiple requests
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -291,27 +297,27 @@ const iterable1 = []
 iterable1.push(XEAjax.fetchGet('/api/user/list'))
 iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
-  // 所有异步完成之后执行
+  // all finish
 }).catch(e => {
-  // 请求失败时执行
+  // error
 })
 
-// doAll 使用对象参数, 用法和 Promise.all 一致
+// doAll Use object parameters, The use is consistent with that of Promise.
 const iterable2 = []
 iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
-### 嵌套请求
+### Nested requests
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 相互依赖的嵌套请求(项目中应该避免这种情况)
+// This should be avoided in the project.
 XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data => {
   return fetchGet('/api/user/details', {id: data.id})
 }).then(response => {
   response.json().then(data => {
-    // 获取 data
+    // data
   })
 })
 ```
@@ -338,7 +344,7 @@ define([
 ```
 
 ## Cancel request
-### AbortController 控制器对象
+### AbortController
 允许控制一个或多个取消指令请求
 ``` shell
 import XEAjax from 'xe-ajax'
@@ -416,7 +422,7 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## functions of mixing
+## Functions of mixing
 ### ./customs.js
 ``` shell
 import XEAjax from 'xe-ajax'
@@ -452,11 +458,7 @@ XEAjax.getText('/api/user/message')
 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock)
 
 ## Demo
-ES6 + Vue + VXEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock1)  
-ES6 + Vue + XEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock2)  
-ES6 + React + XEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/react-mock1)  
-RequireJS + Vue + XEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock3)  
-RequireJS + Vue + VXEAjax + Mock 项目 [view](https://github.com/xuliangzhan/examples/tree/master/vue-mock4)  
+[project examples.](https://github.com/xuliangzhan/examples)  
 
 ## License
 Copyright (c) 2017-present, Xu Liangzhan
