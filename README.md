@@ -3,10 +3,10 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-基于 Promise 的异步请求函数；支持 xhr、fetch、jsonp 以及 mock，更简洁的 API、轻封装、高扩展。
+The asynchronous request function based on Promise, Support xhr、fetch、jsonp and Mock，Simple API, lightweight encapsulation, high expansion.
 
 ## Browser Support
-依赖原生 Promise，低版本浏览器使用 polyfill es6-promise.js  
+xe-ajax depends on a native ES6 Promise implementation to be supported. If your environment doesn't support ES6 Promises, you can polyfill.
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- | --- |
@@ -37,7 +37,6 @@ require.config({
 ```
 
 ## API:
-### 提供常用便捷方法:
 * doAll ( iterable )
 * ajax ( options )
 * 
@@ -59,9 +58,9 @@ require.config({
 * patchJSON ( url, body, options )
 
 ### Arguments
-* url（字符串） 请求地址，可被自定义 options 属性覆盖
-* params/body（可选，对象/数组） 要发送的数据，可被自定义 options 属性覆盖
-* options （可选，对象） 参数
+* url [String] is the url to fetch
+* params/body [Object/Array] The data to be sent.
+* options [Object] is an optional options object
 
 ### Options
 | 参数 | 类型 | 描述 | 默认值 |
@@ -103,7 +102,7 @@ require.config({
 | body | ReadableStream | 数据流 |
 | bodyUsed | Boolean | 内容是否已被读取 |
 | headers | Headers | 响应头 |
-| status | Number | 状态码 |
+| status | Number | HTTP status code |
 | statusText | String | 状态信息 |
 | url | String | 返回请求路径 |
 | ok | Boolean | 请求完成还是失败 |
@@ -160,9 +159,9 @@ XEAjax.ajax({
   method: 'GET',
   params: {id: 1}
 }).then(response => {
-  // 请求完成
+  // finish
 }).catch(e => {
-  // 发生错误
+  // error
 })
 
 ```
@@ -174,43 +173,43 @@ XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
-  // 请求完成
+  // finish
 }).catch(e => {
-  // 发生错误
+  // error
 })
 
 // Response Text
 XEAjax.fetchGet('/api/user/list').then(response => {
   response.text().then(text => {
-    // 获取 text
+    // get text
   })
 })
 
 // Response JSON
 XEAjax.fetchGet('/api/user/list').then(response => {
   response.json().then(data => {
-    // 获取 data
+    // get data
   })
 })
 
 // Response Blob
 XEAjax.fetchGet('/api/user/list').then(response => {
   response.blob().then(blob => {
-    // 获取 blob
+    // get blob
   })
 })
 
 // Response ArrayBuffer
 XEAjax.fetchGet('/api/user/list').then(response => {
   response.arrayBuffer().then(arrayBuffer => {
-    // 获取 arrayBuffer
+    // get arrayBuffer
   })
 })
 
 // Response FormData
 XEAjax.fetchGet('/api/user/list').then(response => {
   response.formData().then(formData => {
-    // 获取 formData
+    // get formData
   })
 })
 
@@ -314,9 +313,7 @@ import XEAjax from 'xe-ajax'
 XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data => {
   return fetchGet('/api/user/details', {id: data.id})
 }).then(response => {
-  response.json().then(data => {
-    // data
-  })
+  // finish
 })
 ```
 ### AMD
@@ -326,9 +323,7 @@ define([
 ], function (XEAjax) {
 
   XEAjax.fetchGet('/api/user/list').then(response => {
-    response.json().then(data => {
-      // 获取 data
-    })
+    // finish
   })
 
   XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
@@ -343,34 +338,32 @@ define([
 
 ## Cancel request
 ### AbortController
-允许控制一个或多个取消指令请求
+Allows control of one or more cancellation requests.
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 创建一个控制器
+// Create a controller.
 const controller = new XEAjax.AbortController()
-// 获取 signal
+// get signal
 const signal = controller.signal
-// 将信号和控制器与获取请求相关联
+// Associate the signal and controller with the fetch request.
 XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
-  // success
+  // finish
 }).catch(function (e) {
   // error
 })
 setTimeout(() => {
   controller.abort()
-}, 10)
+}, 100)
 ```
 
 ## Interceptor
 ### Request interceptor
-| 属性 | 类型 | 描述 |
-|------|------|-----|
-| interceptors.request.use | Function ( request, next ) | 请求发送之前触发 |
+Function ( request, next )
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 请求之前拦截器
+// Trigger before the request is sent.
 XEAjax.interceptors.request.use((request, next) => {
   // 可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
 
@@ -384,13 +377,11 @@ XEAjax.interceptors.request.use((request, next) => {
 })
 ```
 ### Response interceptor
-| 属性 | 类型 | 描述 |
-|------|------|-----|
-| interceptors.response.use | Function ( response, next, request ) | 请求完成之后响应之前触发 |
+Function ( response, next, request )
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// 请求完成之后拦截
+// Intercept when the request is complete.
 XEAjax.interceptors.response.use((response, next) => {
   // 请求完成之后统一处理，例如校验登录是否失效、消息提示，特殊场景处理等...
 
@@ -403,7 +394,7 @@ XEAjax.interceptors.response.use((response, next) => {
   }
 })
 
-// 请求完成之后重置响应数据
+// Intercept and reset the response data after the request is complete.
 XEAjax.interceptors.response.use((response, next) => {
   // 请求完成之后对返回的数据进行统一的处理...
   // 格式: {status: 200, statusText: 'OK', body: {}, headers: {}}
@@ -455,7 +446,7 @@ XEAjax.getText('/api/user/message')
 ### Mock services
 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock)
 
-## Demo
+## Project Demos
 [project examples.](https://github.com/xuliangzhan/examples)  
 
 ## License
