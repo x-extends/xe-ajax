@@ -68,8 +68,8 @@ require.config({
 | url | String | is the url to fetch |  |
 | baseURL | String | base URL | defaults to context path |
 | method | String | request method | defaults to 'GET' |
-| params | Object/Array | request params |  |
-| body | Object/Array | request body |  |
+| params | Object | request params |  |
+| body | Object | request body |  |
 | bodyType | String | submit type, You can set [**'json-data'**,**'form-data'**] | defaults to 'json-data' |
 | cache | String | handling cache mode, You can set [**'default'**,**'no-store'**,**'no-cache'**,**'reload'**,**'force-cache'**,**'only-if-cached'**] | defaults to 'default' |
 | credentials | String | set the cookie to be sent along with the request, You can set [**'omit'**,**'same-origin'**,**'include'**] | defaults to 'same-origin' |
@@ -144,7 +144,7 @@ XEAjax.setup({
 })
 ```
 
-## Example
+## Examples
 ### ajax
 ``` shell
 import XEAjax from 'xe-ajax'
