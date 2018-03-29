@@ -174,38 +174,38 @@ XEAjax.fetch('/api/user/list', {
 })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.text().then(text => {
-    // get text
-  })
+XEAjax.fetchGet('/api/user/list')
+.then(response => response.text())
+.then(text => {
+  // get text
 })
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.json().then(data => {
-    // get data
-  })
+XEAjax.fetchGet('/api/user/list')
+.then(response => response.json())
+.then(json => {
+  // get json
 })
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.blob().then(blob => {
-    // get blob
-  })
+XEAjax.fetchGet('/api/user/list')
+.then(response => response.blob())
+.then(blob => {
+  // get blob
 })
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.arrayBuffer().then(arrayBuffer => {
-    // get arrayBuffer
-  })
+XEAjax.fetchGet('/api/user/list')
+.then(response => response.arrayBuffer())
+.then(arrayBuffer => {
+  // get arrayBuffer
 })
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.formData().then(formData => {
-    // get formData
-  })
+XEAjax.fetchGet('/api/user/list')
+.then(response => response.formData())
+.then(formData => {
+  // get formData
 })
 
 // Submit application/json, default uses JSON.stringify(request.body)
@@ -250,11 +250,11 @@ import XEAjax from 'xe-ajax'
 // Set jsonp callback parameter name, default is 'callback'
 // http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
-  response.json().then(data => {
-    // {message: 'success'}
-  })
-})-
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message')
+.then(response => response.json())
+.then(data => {
+  // {message: 'success'}
+})
 
 // Case 2:
 // Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
@@ -262,10 +262,10 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message').then(response => 
 // jsonp_xeajax_1521272815608_2({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   jsonp: 'cb'
-}).then(response => {
-  response.json().then(data => {
-    // {message: 'success'}
-  })
+})
+.then(response => response.json())
+.then(data => {
+  // {message: 'success'}
 })
 
 // Case 3:
@@ -275,10 +275,10 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   jsonp: 'cb', 
   jsonpCallback: 'customCallback'
-}).then(response => {
-  response.json().then(data => {
-    // {message: 'success'}
-  })
+})
+.then(response => response.json())
+.then(data => {
+  // {message: 'success'}
 })
 ```
 ### Multiple requests
@@ -305,7 +305,9 @@ XEAjax.doAll(iterable2)
 import XEAjax from 'xe-ajax'
 
 // This should be avoided in the project.
-XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data => {
+XEAjax.fetchGet('/api/user/info')
+.then(response => response.json())
+.then(data => {
   return fetchGet('/api/user/details', {id: data.id})
 }).then(response => {
   // finish
