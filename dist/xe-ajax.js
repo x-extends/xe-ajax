@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.0
+ * xe-ajax.js v3.3.1
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -444,6 +444,7 @@
   })
 
   function XEResponse (body, options, request) {
+    this._body = body
     this._request = request
     this._response = {
       body: new XEReadableStream(body, request),
@@ -468,7 +469,7 @@
 
   objectAssign(XEResponse.prototype, {
     clone: function () {
-      return new XEResponse(this.body, { status: this.status, statusText: this.statusText, headers: this.headers }, this._request)
+      return new XEResponse(this._body, { status: this.status, statusText: this.statusText, headers: this.headers }, this._request)
     },
     json: function () {
       return this.text().then(function (text) {
@@ -927,7 +928,7 @@
     AbortController: XEAbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.3.0',
+    version: '3.3.1',
     $name: 'XEAjax'
   })
 

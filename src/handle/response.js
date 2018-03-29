@@ -3,6 +3,7 @@ import { XEReadableStream } from './readableStream'
 import { XEHeaders } from '../handle/headers'
 
 export function XEResponse (body, options, request) {
+  this._body = body
   this._request = request
   this._response = {
     body: new XEReadableStream(body, request),
@@ -27,7 +28,7 @@ arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', '
 
 objectAssign(XEResponse.prototype, {
   clone: function () {
-    return new XEResponse(this.body, {status: this.status, statusText: this.statusText, headers: this.headers}, this._request)
+    return new XEResponse(this._body, {status: this.status, statusText: this.statusText, headers: this.headers}, this._request)
   },
   json: function () {
     return this.text().then(function (text) {
