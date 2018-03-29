@@ -39,7 +39,10 @@ export function doAll (iterable) {
   var context = XEAjax.$context
   clearXEAjaxContext(XEAjax)
   return XEPromise.all(iterable.map(function (item) {
-    return isObject(item) ? XEAjax(objectAssign({$context: context, $Promise: XEPromise}, item)) : item
+    if (item instanceof XEPromise || item instanceof Promise) {
+      return item
+    }
+    return isObject(item) ? ajax(objectAssign({$context: context, $Promise: XEPromise}, item)) : item
   }), context)
 }
 
