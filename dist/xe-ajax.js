@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.4
+ * xe-ajax.js v3.3.5
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -40,6 +40,10 @@
     return obj && typeof obj === 'object'
   }
 
+  function isPlainObject (val) {
+    return val ? val.constructor === Object : false
+  }
+
   function isFunction (obj) {
     return typeof obj === 'function'
   }
@@ -78,7 +82,7 @@
   function parseParam (resultVal, resultKey, isArr) {
     var result = []
     objectEach(resultVal, function (item, key) {
-      if (isObject(item)) {
+      if (isPlainObject(item) || isArray(item)) {
         result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
       } else {
         result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
@@ -92,7 +96,7 @@
     var params = []
     objectEach(body, function (item, key) {
       if (item !== undefined) {
-        if (isObject(item)) {
+        if (isPlainObject(item) || isArray(item)) {
           params = params.concat(parseParam(item, key, isArray(item)))
         } else {
           params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
@@ -930,7 +934,7 @@
     AbortController: XEAbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.3.4',
+    version: '3.3.5',
     $name: 'XEAjax'
   })
 

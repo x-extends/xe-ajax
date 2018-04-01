@@ -27,6 +27,10 @@ export function isObject (obj) {
   return obj && typeof obj === 'object'
 }
 
+export function isPlainObject (val) {
+  return val ? val.constructor === Object : false
+}
+
 export function isFunction (obj) {
   return typeof obj === 'function'
 }
@@ -65,7 +69,7 @@ export function objectEach (obj, iteratee, context) {
 export function parseParam (resultVal, resultKey, isArr) {
   var result = []
   objectEach(resultVal, function (item, key) {
-    if (isObject(item)) {
+    if (isPlainObject(item) || isArray(item)) {
       result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
     } else {
       result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
@@ -79,7 +83,7 @@ export function serialize (body) {
   var params = []
   objectEach(body, function (item, key) {
     if (item !== undefined) {
-      if (isObject(item)) {
+      if (isPlainObject(item) || isArray(item)) {
         params = params.concat(parseParam(item, key, isArray(item)))
       } else {
         params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
