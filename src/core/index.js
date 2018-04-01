@@ -21,10 +21,9 @@ function requestToJSON (method) {
     var XEPromise = opts.$Promise || Promise
     return XEAjax(opts).then(function (response) {
       return new XEPromise(function (resolve, reject) {
-        response.json().then(function (data) {
-          (response.ok ? resolve : reject)(data)
-        }).catch(function (e) {
-          reject(null)
+        var finish = response.ok ? resolve : reject
+        response.clone().json().then(finish).catch(function (e) {
+          finish(response.clone().text())
         })
       }, this)
     })

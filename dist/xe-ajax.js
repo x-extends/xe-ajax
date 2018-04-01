@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.3
+ * xe-ajax.js v3.3.4
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -809,10 +809,9 @@
       var XEPromise = opts.$Promise || Promise
       return XEAjax(opts).then(function (response) {
         return new XEPromise(function (resolve, reject) {
-          response.json().then(function (data) {
-            (response.ok ? resolve : reject)(data)
-          }).catch(function (e) {
-            reject(null)
+          var finish = response.ok ? resolve : reject
+          response.clone().json().then(finish).catch(function (e) {
+            finish(response.clone().text())
           })
         }, this)
       })
@@ -931,7 +930,7 @@
     AbortController: XEAbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.3.3',
+    version: '3.3.4',
     $name: 'XEAjax'
   })
 
