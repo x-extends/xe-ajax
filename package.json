@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "description": "support fetch xhr jsonp.",
   "main": "index.js",
   "scripts": {

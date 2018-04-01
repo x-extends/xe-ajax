@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.2
+ * xe-ajax.js v3.3.3
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -540,9 +540,9 @@
     }
     var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
     if (isSupportAdvanced()) {
-      return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), options, request)
+      return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
     }
-    return new XEResponse(JSON.stringify(resp.body), options, request)
+    return new XEResponse(isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
   }
 
   /**
@@ -931,7 +931,7 @@
     AbortController: XEAbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.3.2',
+    version: '3.3.3',
     $name: 'XEAjax'
   })
 

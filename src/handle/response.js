@@ -1,4 +1,4 @@
-import { isSupportAdvanced, objectAssign, arrayEach } from '../core/utils'
+import { isString, isSupportAdvanced, objectAssign, arrayEach } from '../core/utils'
 import { XEReadableStream } from './readableStream'
 import { XEHeaders } from '../handle/headers'
 
@@ -99,7 +99,7 @@ export function toResponse (resp, request) {
   }
   var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
   if (isSupportAdvanced()) {
-    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([JSON.stringify(resp.body)]), options, request)
+    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
   }
-  return new XEResponse(JSON.stringify(resp.body), options, request)
+  return new XEResponse(isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
 }
