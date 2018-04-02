@@ -1,9 +1,9 @@
-export function XEReadableStream (body, request) {
+export function XEReadableStream (body, request, response) {
   this.locked = false
   this._getBody = function () {
     var that = this
     var XEPromise = request.$Promise || Promise
-    this.bodyUsed = true
+    response._response.bodyUsed = true
     return new XEPromise(function (resolve, reject) {
       if (that.locked) {
         reject(new TypeError('body stream already read'))

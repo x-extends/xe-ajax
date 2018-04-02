@@ -6,7 +6,7 @@ export function XEResponse (body, options, request) {
   this._body = body
   this._request = request
   this._response = {
-    body: new XEReadableStream(body, request),
+    body: new XEReadableStream(body, request, this),
     bodyUsed: false,
     url: request.url,
     status: options.status,
@@ -28,6 +28,9 @@ arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', '
 
 objectAssign(XEResponse.prototype, {
   clone: function () {
+    if (this.bodyUsed) {
+      throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
+    }
     return new XEResponse(this._body, {status: this.status, statusText: this.statusText, headers: this.headers}, this._request)
   },
   json: function () {
@@ -36,7 +39,7 @@ objectAssign(XEResponse.prototype, {
     })
   },
   text: function () {
-    return this.body._getBody()
+    return this.body._getBody(this)
   }
 })
 
@@ -52,7 +55,7 @@ if (isSupportAdvanced()) {
       })
     },
     blob: function () {
-      return this.body._getBody()
+      return this.body._getBody(this)
     },
     arrayBuffer: function () {
       var request = this._request

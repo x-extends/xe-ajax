@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.5
+ * xe-ajax.js v3.3.6
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -226,12 +226,12 @@
 
   var XEHeaders = typeof Headers === 'function' ? Headers : HeadersPolyfill
 
-  function XEReadableStream (body, request) {
+  function XEReadableStream (body, request, response) {
     this.locked = false
     this._getBody = function () {
       var that = this
       var XEPromise = request.$Promise || Promise
-      this.bodyUsed = true
+      response._response.bodyUsed = true
       return new XEPromise(function (resolve, reject) {
         if (that.locked) {
           reject(new TypeError('body stream already read'))
@@ -451,7 +451,7 @@
     this._body = body
     this._request = request
     this._response = {
-      body: new XEReadableStream(body, request),
+      body: new XEReadableStream(body, request, this),
       bodyUsed: false,
       url: request.url,
       status: options.status,
@@ -473,6 +473,9 @@
 
   objectAssign(XEResponse.prototype, {
     clone: function () {
+      if (this.bodyUsed) {
+        throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
+      }
       return new XEResponse(this._body, { status: this.status, statusText: this.statusText, headers: this.headers }, this._request)
     },
     json: function () {
@@ -481,7 +484,7 @@
       })
     },
     text: function () {
-      return this.body._getBody()
+      return this.body._getBody(this)
     }
   })
 
@@ -497,7 +500,7 @@
         })
       },
       blob: function () {
-        return this.body._getBody()
+        return this.body._getBody(this)
       },
       arrayBuffer: function () {
         var request = this._request
@@ -934,7 +937,7 @@
     AbortController: XEAbortController,
     serialize: serialize,
     interceptors: interceptors,
-    version: '3.3.5',
+    version: '3.3.6',
     $name: 'XEAjax'
   })
 
