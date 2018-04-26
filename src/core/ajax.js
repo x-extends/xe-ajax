@@ -1,11 +1,13 @@
-import { XERequest } from '../handle/request'
-import { objectAssign, getBaseURL } from '../core/utils'
-import { fetchRequest } from '../adapters/fetch'
-import { sendJSONP } from '../adapters/jsonp'
+'use strict'
 
-export var setupDefaults = {
+var utils = require('./utils')
+var XERequest = require('../handle/request')
+var fetchExports = require('../adapters/fetch')
+var jsonpExports = require('../adapters/jsonp')
+
+var setupDefaults = {
   method: 'GET',
-  baseURL: getBaseURL(),
+  baseURL: utils.getBaseURL(),
   cache: 'default',
   credentials: 'same-origin',
   bodyType: 'json-data',
@@ -17,22 +19,32 @@ export var setupDefaults = {
 }
 
 /**
-  * support: xhr、fetch、jsonp
+  * 支持: xhr、fetch、jsonp
   *
   * @param { Object} options
   * @return { Promise }
   */
-export function XEAjax (options) {
-  var opts = objectAssign({}, setupDefaults, {headers: objectAssign({}, setupDefaults.headers)}, options)
+function XEAjax (options) {
+  var opts = utils.objectAssign({}, setupDefaults, {headers: utils.objectAssign({}, setupDefaults.headers)}, options)
   var XEPromise = opts.$Promise || Promise
   return new XEPromise(function (resolve, reject) {
-    (opts.jsonp ? sendJSONP : fetchRequest)(new XERequest(opts), resolve, reject)
+    (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(new XERequest(opts), resolve, reject)
   }, opts.$context)
 }
 
+XEAjax.version = '3.3.6-beta.0'
+
 /**
- * required parameter
+ * installation
+ */
+XEAjax.use = function (plugin) {
+  plugin.install(XEAjax)
+}
+
+/**
+ * options
  *
+ * 基础参数
  * @param { String } url 请求地址
  * @param { String } baseURL 基础路径，默认上下文路径
  * @param { String } method 请求方法(默认GET)
@@ -50,13 +62,15 @@ export function XEAjax (options) {
  * @param { Function } transformBody(body, request) 用于改变提交数据
  * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
  * @param { Function } validateStatus(response) 自定义校验请求是否成功
- * advanced.
+ * 高级参数
  * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
  * @param { Function } $fetch 自定义 fetch 请求函数
  * @param { Function } $jsonp 自定义 jsonp 处理函数
  * @param { Function } $Promise 自定义 Promise 函数
  * @param { Function } $context 自定义上下文
  */
-export var setup = function setup (options) {
-  objectAssign(setupDefaults, options)
+XEAjax.setup = function (options) {
+  utils.objectAssign(setupDefaults, options)
 }
+
+module.exports = XEAjax

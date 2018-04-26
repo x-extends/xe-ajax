@@ -1,17 +1,19 @@
-import { isString, isFunction, isFormData, arrayIncludes, serialize, objectAssign, getLocatOrigin } from '../core/utils'
-import { XEHeaders } from '../handle/headers'
+'use strict'
 
-export function XERequest (options) {
-  objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
+var utils = require('../core/utils')
+var XEHeaders = require('./headers')
+
+function XERequest (options) {
+  utils.objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
   this.headers = new XEHeaders(options.headers)
   this.method = String(this.method).toLocaleUpperCase()
   this.bodyType = String(this.bodyType).toLowerCase()
-  if (this.signal && isFunction(this.signal.install)) {
+  if (this.signal && utils.isFunction(this.signal.install)) {
     this.signal.install(this)
   }
 }
 
-objectAssign(XERequest.prototype, {
+utils.objectAssign(XERequest.prototype, {
   abort: function () {
     if (this.xhr) {
       this.xhr.abort()
@@ -22,12 +24,12 @@ objectAssign(XERequest.prototype, {
     var url = this.url
     var params = ''
     if (url) {
-      if (isFunction(this.transformParams)) {
+      if (utils.isFunction(this.transformParams)) {
         this.params = this.transformParams(this.params || {}, this)
       }
-      if (this.params && !isFormData(this.params)) {
-        var _param = arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? {_t: Date.now()} : {}
-        params = isString(this.params) ? this.params : (isFunction(this.paramsSerializer) ? this.paramsSerializer : serialize)(objectAssign(_param, this.params), this)
+      if (this.params && !utils.isFormData(this.params)) {
+        var _param = utils.arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? {_t: Date.now()} : {}
+        params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
       }
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -36,7 +38,7 @@ objectAssign(XERequest.prototype, {
         return url
       }
       if (url.indexOf('/') === 0) {
-        return getLocatOrigin() + url
+        return utils.getLocatOrigin() + url
       }
       return this.baseURL.replace(/\/$/, '') + '/' + url
     }
@@ -47,16 +49,16 @@ objectAssign(XERequest.prototype, {
     var body = this.body
     if (body && this.method !== 'GET' && this.method !== 'HEAD') {
       try {
-        if (isFunction(this.transformBody)) {
+        if (utils.isFunction(this.transformBody)) {
           body = this.body = this.transformBody(body, this) || body
         }
-        if (isFunction(this.stringifyBody)) {
+        if (utils.isFunction(this.stringifyBody)) {
           result = this.stringifyBody(body, this) || null
         } else {
-          if (isFormData(body)) {
+          if (utils.isFormData(body)) {
             result = body
           } else {
-            result = isString(body) ? body : (this.bodyType === 'form-data' || this.bodyType === 'form_data' ? serialize(body) : JSON.stringify(body))
+            result = utils.isString(body) ? body : (this.bodyType === 'form-data' || this.bodyType === 'form_data' ? utils.serialize(body) : JSON.stringify(body))
           }
         }
       } catch (e) {
@@ -66,3 +68,5 @@ objectAssign(XERequest.prototype, {
     return result
   }
 })
+
+module.exports = XERequest

@@ -1,4 +1,6 @@
-import { objectEach, objectAssign } from '../core/utils'
+'use strict'
+
+var utils = require('../core/utils')
 
 function toHeaderKey (name) {
   return String(name).toLowerCase()
@@ -28,20 +30,20 @@ function XEIterator (iterator, value) {
   }
 }
 
-function HeadersPolyfill (headers) {
+function XEHeadersPolyfill (headers) {
   this._map = {}
-  if (headers instanceof HeadersPolyfill) {
+  if (headers instanceof XEHeaders) {
     headers.forEach(function (value, name) {
       this.set(name, value)
     }, this)
   } else {
-    objectEach(headers, function (value, name) {
+    utils.objectEach(headers, function (value, name) {
       this.set(name, value)
     }, this)
   }
 }
 
-objectAssign(HeadersPolyfill.prototype, {
+utils.objectAssign(XEHeadersPolyfill.prototype, {
   set: function (name, value) {
     this._map[toHeaderKey(name)] = value
   },
@@ -73,10 +75,12 @@ objectAssign(HeadersPolyfill.prototype, {
     delete this._map[toHeaderKey(name)]
   },
   forEach: function (callback, context) {
-    objectEach(this._map, function (value, name, state) {
+    utils.objectEach(this._map, function (value, name, state) {
       callback.call(context, value, name, this)
     }, this)
   }
 })
 
-export var XEHeaders = typeof Headers === 'function' ? Headers : HeadersPolyfill
+var XEHeaders = typeof Headers === 'function' ? Headers : XEHeadersPolyfill
+
+module.exports = XEHeaders

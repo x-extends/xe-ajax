@@ -1,6 +1,8 @@
-import { isSupportAdvanced, isFunction, arrayEach } from '../core/utils'
-import { XEResponse } from '../handle/response'
-import { responseInterceptor } from '../handle/interceptor'
+'use strict'
+
+var utils = require('../core/utils')
+var XEResponse = require('../handle/response')
+var interceptorExports = require('../handle/interceptor')
 
 /**
  * xhr
@@ -8,8 +10,8 @@ import { responseInterceptor } from '../handle/interceptor'
  * @param { Promise.resolve } resolve
  * @param { Promise.reject } reject
  */
-export function sendXHR (request, resolve, reject) {
-  var $XMLHttpRequest = isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
+function sendXHR (request, resolve, reject) {
+  var $XMLHttpRequest = utils.isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
   var xhr = request.xhr = new $XMLHttpRequest()
   xhr._request = request
   xhr.open(request.method, request.getUrl(), true)
@@ -22,7 +24,7 @@ export function sendXHR (request, resolve, reject) {
     xhr.setRequestHeader(name, value)
   })
   xhr.onload = function () {
-    responseInterceptor(request, new XEResponse(xhr.response, {
+    interceptorExports.responseInterceptor(request, new XEResponse(xhr.response, {
       status: xhr.status,
       statusText: xhr.statusText,
       headers: parseXHRHeaders(xhr)
@@ -37,7 +39,7 @@ export function sendXHR (request, resolve, reject) {
   xhr.onabort = function () {
     reject(new TypeError('The user aborted a request.'))
   }
-  if (isSupportAdvanced()) {
+  if (utils.isSupportAdvanced()) {
     xhr.responseType = 'blob'
   }
   if (request.credentials === 'include') {
@@ -56,7 +58,7 @@ function parseXHRHeaders (options) {
   if (options.getAllResponseHeaders) {
     var allResponseHeaders = options.getAllResponseHeaders().trim()
     if (allResponseHeaders) {
-      arrayEach(allResponseHeaders.split('\n'), function (row) {
+      utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
         var index = row.indexOf(':')
         headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
       })
@@ -64,3 +66,9 @@ function parseXHRHeaders (options) {
   }
   return headers
 }
+
+var xhrExports = {
+  sendXHR: sendXHR
+}
+
+module.exports = xhrExports

@@ -1,8 +1,10 @@
-import { isString, isSupportAdvanced, objectAssign, arrayEach } from '../core/utils'
-import { XEReadableStream } from './readableStream'
-import { XEHeaders } from '../handle/headers'
+'use strict'
 
-export function XEResponse (body, options, request) {
+var utils = require('../core/utils')
+var XEReadableStream = require('./readableStream')
+var XEHeaders = require('./headers')
+
+function XEResponse (body, options, request) {
   this._body = body
   this._request = request
   this._response = {
@@ -18,7 +20,7 @@ export function XEResponse (body, options, request) {
   this._response.ok = request.validateStatus(this)
 }
 
-arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+utils.arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
   Object.defineProperty(XEResponse.prototype, name, {
     get: function () {
       return this._response[name]
@@ -26,7 +28,7 @@ arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', '
   })
 })
 
-objectAssign(XEResponse.prototype, {
+utils.objectAssign(XEResponse.prototype, {
   clone: function () {
     if (this.bodyUsed) {
       throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
@@ -43,8 +45,8 @@ objectAssign(XEResponse.prototype, {
   }
 })
 
-if (isSupportAdvanced()) {
-  objectAssign(XEResponse.prototype, {
+if (utils.isSupportAdvanced()) {
+  utils.objectAssign(XEResponse.prototype, {
     text: function () {
       var request = this._request
       return this.blob().then(function (blob) {
@@ -95,14 +97,4 @@ function fileReaderReady (request, reader) {
   }, request.$context)
 }
 
-// result to Response
-export function toResponse (resp, request) {
-  if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
-    return resp
-  }
-  var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
-  if (isSupportAdvanced()) {
-    return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
-  }
-  return new XEResponse(isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
-}
+module.exports = XEResponse

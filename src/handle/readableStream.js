@@ -1,4 +1,6 @@
-export function XEReadableStream (body, request, response) {
+'use strict'
+
+function XEReadableStream (body, request, response) {
   this.locked = false
   this._getBody = function () {
     var that = this
@@ -14,3 +16,5 @@ export function XEReadableStream (body, request, response) {
     }, request.$context)
   }
 }
+
+module.exports = XEReadableStream

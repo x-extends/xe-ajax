@@ -1,7 +1,8 @@
-import { isFunction } from '../core/utils'
-import { sendXHR } from './xhr'
-import { toResponse } from '../handle/response'
-import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
+'use strict'
+
+var utils = require('../core/utils')
+var xhrExports = require('./xhr')
+var interceptorExports = require('../handle/interceptor')
 
 /**
  * fetch
@@ -10,7 +11,7 @@ import { requestInterceptor, responseInterceptor } from '../handle/interceptor'
  * @param { Promise.reject } reject
  */
 function sendFetch (request, resolve, reject) {
-  var $fetch = isFunction(request.$fetch) ? request.$fetch : self.fetch
+  var $fetch = utils.isFunction(request.$fetch) ? request.$fetch : self.fetch
   var options = {
     _request: request,
     method: request.method,
@@ -28,21 +29,21 @@ function sendFetch (request, resolve, reject) {
     reject(new TypeError('The user aborted a request.'))
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
-      responseInterceptor(request, toResponse(resp, request)).then(resolve)
+      interceptorExports.responseInterceptor(request, utils.toResponse(resp, request)).then(resolve)
     }).catch(reject)
   }
 }
 
 function getRequest (request) {
   if (request.$fetch) {
-    return request.signal ? sendXHR : sendFetch
+    return request.signal ? xhrExports.sendXHR : sendFetch
   } else if (self.fetch) {
     if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
       return sendFetch
     }
-    return request.signal ? sendXHR : sendFetch
+    return request.signal ? xhrExports.sendXHR : sendFetch
   }
-  return sendXHR
+  return xhrExports.sendXHR
 }
 
 function createRequestFactory () {
@@ -51,13 +52,19 @@ function createRequestFactory () {
       return getRequest(request).apply(this, arguments)
     }
   }
-  return sendXHR
+  return xhrExports.sendXHR
 }
 
 var sendRequest = createRequestFactory()
 
-export function fetchRequest (request, resolve, reject) {
-  return requestInterceptor(request).then(function () {
+function fetchRequest (request, resolve, reject) {
+  return interceptorExports.requestInterceptor(request).then(function () {
     return sendRequest(request, resolve, reject)
   })
 }
+
+var fetchExports = {
+  fetchRequest: fetchRequest
+}
+
+module.exports = fetchExports
