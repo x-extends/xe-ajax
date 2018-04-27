@@ -160,6 +160,19 @@
     return result
   }
 
+  var setupDefaults = {
+    method: 'GET',
+    baseURL: utils.getBaseURL(),
+    cache: 'default',
+    credentials: 'same-origin',
+    bodyType: 'json-data',
+    log: 'development' !== 'production',
+    headers: {},
+    validateStatus: function (response) {
+      return response.status >= 200 && response.status < 300
+    }
+  }
+
   function toHeaderKey (name) {
     return String(name).toLowerCase()
   }
@@ -423,12 +436,14 @@
       var url = this.url
       var params = ''
       if (url) {
+        var _param = utils.arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
         if (utils.isFunction(this.transformParams)) {
           this.params = this.transformParams(this.params || {}, this)
         }
         if (this.params && !utils.isFormData(this.params)) {
-          var _param = utils.arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
           params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
+        } else {
+          params = _param
         }
         if (params) {
           url += (url.indexOf('?') === -1 ? '?' : '&') + params
@@ -757,19 +772,6 @@
 
   var jsonpExports = {
     sendJSONP: sendJSONP
-  }
-
-  var setupDefaults = {
-    method: 'GET',
-    baseURL: utils.getBaseURL(),
-    cache: 'default',
-    credentials: 'same-origin',
-    bodyType: 'json-data',
-    log: 'development' !== 'production',
-    headers: {},
-    validateStatus: function (response) {
-      return response.status >= 200 && response.status < 300
-    }
   }
 
   /**

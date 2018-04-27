@@ -4,19 +4,7 @@ var utils = require('./utils')
 var XERequest = require('../handle/request')
 var fetchExports = require('../adapters/fetch')
 var jsonpExports = require('../adapters/jsonp')
-
-var setupDefaults = {
-  method: 'GET',
-  baseURL: utils.getBaseURL(),
-  cache: 'default',
-  credentials: 'same-origin',
-  bodyType: 'json-data',
-  log: 'development' !== 'production',
-  headers: {},
-  validateStatus: function (response) {
-    return response.status >= 200 && response.status < 300
-  }
-}
+var setupDefaults = require('./setup')
 
 /**
   * 支持: xhr、fetch、jsonp
