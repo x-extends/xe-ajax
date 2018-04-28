@@ -11,9 +11,11 @@ var utils = {
   },
 
   isCrossOrigin: function (url) {
-    if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
-      if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
-        return true
+    if (typeof location !== 'undefined') {
+      if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
+        if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
+          return true
+        }
       }
     }
     return false
@@ -40,10 +42,13 @@ var utils = {
   },
 
   getLocatOrigin: function () {
-    return location.origin || (location.protocol + '//' + location.host)
+    return typeof location === 'undefined' ? '' : (location.origin || (location.protocol + '//' + location.host))
   },
 
   getBaseURL: function () {
+    if (typeof location === 'undefined') {
+      return ''
+    }
     var pathname = location.pathname
     var lastIndex = utils.lastIndexOf(pathname, '/') + 1
     return utils.getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
