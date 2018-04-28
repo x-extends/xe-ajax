@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.6-beta.1
+ * xe-ajax.js v3.3.6-beta.2
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -678,7 +678,7 @@
   function getRequest (request) {
     if (request.$fetch) {
       return request.signal ? xhrExports.sendXHR : sendFetch
-    } else if (self.fetch) {
+    } else if (typeof self !== 'undefined' && self.fetch) {
       if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
         return sendFetch
       }
@@ -688,7 +688,7 @@
   }
 
   function createRequestFactory () {
-    if (self.fetch) {
+    if (typeof self !== 'undefined' && self.fetch) {
       return function (request, resolve, reject) {
         return getRequest(request).apply(this, arguments)
       }
@@ -790,7 +790,7 @@
     }, opts.$context)
   }
 
-  XEAjax.version = '3.3.6-beta.1'
+  XEAjax.version = '3.3.6-beta.2'
 
   /**
    * installation
