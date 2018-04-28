@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.6-beta.0
+ * xe-ajax.js v3.3.6-beta.1
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -133,18 +133,6 @@
 
     clearXEAjaxContext: function (XEAjax) {
       XEAjax.$context = XEAjax.$Promise = null
-    },
-
-    // result to Response
-    toResponse: function (resp, request) {
-      if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
-        return resp
-      }
-      var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
-      if (utils.isSupportAdvanced()) {
-        return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
-      }
-      return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
     }
   }
 
@@ -371,7 +359,7 @@
         return new XEPromise(function (resolve) {
           callback(response, function (resp) {
             if (resp && resp.body && resp.status) {
-              resolve(utils.toResponse(resp, request))
+              resolve(handleExports.toResponse(resp, request))
             } else {
               resolve(response)
             }
@@ -576,6 +564,20 @@
     }, request.$context)
   }
 
+  var handleExports = {
+    // result to Response
+    toResponse: function (resp, request) {
+      if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
+        return resp
+      }
+      var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
+      if (utils.isSupportAdvanced()) {
+        return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
+      }
+      return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
+    }
+  }
+
   /**
    * xhr
    * @param { XERequest } request
@@ -668,7 +670,7 @@
       reject(new TypeError('The user aborted a request.'))
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
-        interceptorExports.responseInterceptor(request, utils.toResponse(resp, request)).then(resolve)
+        interceptorExports.responseInterceptor(request, handleExports.toResponse(resp, request)).then(resolve)
       }).catch(reject)
     }
   }
@@ -724,7 +726,7 @@
       }
       if (utils.isFunction(request.$jsonp)) {
         return request.$jsonp(script, request).then(function (resp) {
-          interceptorExports.responseInterceptor(request, utils.toResponse({ status: 200, body: resp }, request)).then(resolve)
+          interceptorExports.responseInterceptor(request, handleExports.toResponse({ status: 200, body: resp }, request)).then(resolve)
         }).catch(function (e) {
           reject(e)
         })
@@ -762,7 +764,7 @@
 
   function jsonpSuccess (request, response, resolve) {
     jsonpClear(request)
-    interceptorExports.responseInterceptor(request, utils.toResponse(response, request)).then(resolve)
+    interceptorExports.responseInterceptor(request, handleExports.toResponse(response, request)).then(resolve)
   }
 
   function jsonpError (request, reject) {
@@ -788,7 +790,7 @@
     }, opts.$context)
   }
 
-  XEAjax.version = '3.3.6-beta.0'
+  XEAjax.version = '3.3.6-beta.1'
 
   /**
    * installation

@@ -2,6 +2,7 @@
 
 var utils = require('../core/utils')
 var interceptorExports = require('../handle/interceptor')
+var handleExports = require('../handle')
 
 var jsonpIndex = 0
 var $global = typeof window === 'undefined' ? this : window
@@ -21,7 +22,7 @@ function sendJSONP (request, resolve, reject) {
     }
     if (utils.isFunction(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
-        interceptorExports.responseInterceptor(request, utils.toResponse({status: 200, body: resp}, request)).then(resolve)
+        interceptorExports.responseInterceptor(request, handleExports.toResponse({status: 200, body: resp}, request)).then(resolve)
       }).catch(function (e) {
         reject(e)
       })
@@ -59,7 +60,7 @@ function jsonpClear (request) {
 
 function jsonpSuccess (request, response, resolve) {
   jsonpClear(request)
-  interceptorExports.responseInterceptor(request, utils.toResponse(response, request)).then(resolve)
+  interceptorExports.responseInterceptor(request, handleExports.toResponse(response, request)).then(resolve)
 }
 
 function jsonpError (request, reject) {

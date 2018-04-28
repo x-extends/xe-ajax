@@ -3,6 +3,7 @@
 var utils = require('../core/utils')
 var xhrExports = require('./xhr')
 var interceptorExports = require('../handle/interceptor')
+var handleExports = require('../handle')
 
 /**
  * fetch
@@ -29,7 +30,7 @@ function sendFetch (request, resolve, reject) {
     reject(new TypeError('The user aborted a request.'))
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
-      interceptorExports.responseInterceptor(request, utils.toResponse(resp, request)).then(resolve)
+      interceptorExports.responseInterceptor(request, handleExports.toResponse(resp, request)).then(resolve)
     }).catch(reject)
   }
 }
@@ -37,7 +38,7 @@ function sendFetch (request, resolve, reject) {
 function getRequest (request) {
   if (request.$fetch) {
     return request.signal ? xhrExports.sendXHR : sendFetch
-  } else if (self.fetch) {
+  } else if (typeof self !== 'undefined' && self.fetch) {
     if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
       return sendFetch
     }
@@ -47,7 +48,7 @@ function getRequest (request) {
 }
 
 function createRequestFactory () {
-  if (self.fetch) {
+  if (typeof self !== 'undefined' && self.fetch) {
     return function (request, resolve, reject) {
       return getRequest(request).apply(this, arguments)
     }

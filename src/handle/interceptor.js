@@ -1,6 +1,7 @@
 'use strict'
 
 var utils = require('../core/utils')
+var handleExports = require('../handle')
 
 /**
  * interceptor queue
@@ -46,7 +47,7 @@ function responseInterceptor (request, response) {
       return new XEPromise(function (resolve) {
         callback(response, function (resp) {
           if (resp && resp.body && resp.status) {
-            resolve(utils.toResponse(resp, request))
+            resolve(handleExports.toResponse(resp, request))
           } else {
             resolve(response)
           }
