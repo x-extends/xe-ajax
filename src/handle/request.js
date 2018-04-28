@@ -31,7 +31,7 @@ utils.objectAssign(XERequest.prototype, {
       if (this.params && !utils.isFormData(this.params)) {
         params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
       } else {
-        params = _param
+        params = utils.serialize(_param)
       }
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
