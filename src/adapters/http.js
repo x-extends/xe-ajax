@@ -84,9 +84,16 @@ function getHttp (urlLocat) {
 
 function sendHttp (request, resolve, reject) {
   if (utils.isFunction(request.$http)) {
+    var timer = null
+    if (request.timeout) {
+      timer = setTimeout(function () {
+        reject(new TypeError('The user aborted a request.'))
+      }, request.timeout)
+    }
     return request.$http(request, function () {
       return httpRequest(request, resolve, reject)
     }, function (resp) {
+      clearTimeout(timer)
       interceptorExports.responseInterceptor(request, handleExports.toResponse(resp, request)).then(resolve)
     })
   }

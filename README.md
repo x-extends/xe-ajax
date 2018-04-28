@@ -58,6 +58,14 @@ import XEAjax from 'xe-ajax'
 * fetchPut ( url, body, options )
 * fetchPatch ( url, body, options )
 * 
+* doHead ( url, options )
+* doDelete ( url, options )
+* doJsonp ( url, params, options )
+* doGet ( url, params, options )
+* doPost ( url, body, options )
+* doPut ( url, body, options )
+* doPatch ( url, body, options )
+* 
 * headJSON ( url, options )
 * deleteJSON ( url, options )
 * jsonp ( url, params, options )
@@ -183,37 +191,27 @@ XEAjax.fetch('/api/user/list', {
 })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list')
-.then(response => response.text())
-.then(text => {
+XEAjax.fetchGet('/api/user/list').then(response => response.text()).then(text => {
   // get text
 })
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list')
-.then(response => response.json())
-.then(json => {
+XEAjax.fetchGet('/api/user/list').then(response => response.json()).then(json => {
   // get json
 })
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list')
-.then(response => response.blob())
-.then(blob => {
+XEAjax.fetchGet('/api/user/list').then(response => response.blob()).then(blob => {
   // get blob
 })
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list')
-.then(response => response.arrayBuffer())
-.then(arrayBuffer => {
+XEAjax.fetchGet('/api/user/list').then(response => response.arrayBuffer()).then(arrayBuffer => {
   // get arrayBuffer
 })
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list')
-.then(response => response.formData())
-.then(formData => {
+XEAjax.fetchGet('/api/user/list').then(response => response.formData()).then(formData => {
   // get formData
 })
 
@@ -229,6 +227,29 @@ const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 ```
+### fetch to Response Schema
+``` shell
+import XEAjax from 'xe-ajax'
+
+// The response for a request contains the following information.
+// {ok, data, status, statusText, headers}
+
+// The completion or failure is based on state check.
+XEAjax.doGet('/api/user/list').then(response => {
+  // success
+}).catch(response => {
+  // failed
+})
+
+XEAjax.doPost('/api/user/save', {name: 'test'})
+XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+
+const file = document.querySelector('#myFile').files[0]
+const formBody = new FormData()
+formBody.append('file', file)
+XEAjax.doPost('/api/user/save', formBody)
+```
 ### fetch to JSON
 ``` shell
 import XEAjax from 'xe-ajax'
@@ -241,9 +262,7 @@ XEAjax.getJSON('/api/user/list').then(data => {
 })
 
 XEAjax.postJSON('/api/user/save', {name: 'test'})
-
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 const file = document.querySelector('#myFile').files[0]

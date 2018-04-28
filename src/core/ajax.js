@@ -20,7 +20,7 @@ function XEAjax (options) {
   }, opts.$context)
 }
 
-XEAjax.version = '3.3.6-beta.4'
+XEAjax.version = '3.4.0'
 
 /**
  * installation
@@ -52,6 +52,7 @@ XEAjax.use = function (plugin) {
  * @param { Function } validateStatus(response) 自定义校验请求是否成功
  * 高级参数
  * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
+ * @param { Function } $http 自定义 http 请求函数
  * @param { Function } $fetch 自定义 fetch 请求函数
  * @param { Function } $jsonp 自定义 jsonp 处理函数
  * @param { Function } $Promise 自定义 Promise 函数

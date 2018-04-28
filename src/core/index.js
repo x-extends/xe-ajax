@@ -11,15 +11,23 @@ function getOptions (method, def, options) {
   return opts
 }
 
-// to response
-function requestToResponse (method) {
+function responseHeaders (response) {
+  var result = {}
+  response.headers.forEach(function (value, key) {
+    result[key] = value
+  })
+  return result
+}
+
+// to fetch response
+function requestToFetchResponse (method) {
   return function () {
     return XEAjax(method.apply(this, arguments))
   }
 }
 
-// to json
-function requestToJSON (method) {
+// to response
+function requestToResponse (method) {
   return function () {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
@@ -28,8 +36,27 @@ function requestToJSON (method) {
         var finish = response.ok ? resolve : reject
         response.clone().json().catch(function (e) {
           return response.clone().text()
-        }).then(finish)
+        }).then(function (data) {
+          finish({
+            data: data,
+            ok: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+            headers: responseHeaders(response)
+          })
+        })
       }, this)
+    })
+  }
+}
+
+// to json
+function requestToJSON (method) {
+  return function () {
+    return method.apply(this, arguments).then(function (response) {
+      return response.data
+    }).catch(function (response) {
+      return response.data
     })
   }
 }
@@ -77,17 +104,26 @@ var requestPost = createBodyFetch('POST')
 var requestPut = createBodyFetch('PUT')
 var requestPatch = createBodyFetch('PATCH')
 
-var fetchHead = requestToResponse(requestHead)
-var fetchDelete = requestToResponse(requestDelete)
-var fetchJsonp = requestToResponse(requestJsonp)
-var fetchGet = requestToResponse(requestGet)
-var fetchPost = requestToResponse(requestPost)
-var fetchPut = requestToResponse(requestPut)
-var fetchPatch = requestToResponse(requestPatch)
+var fetchHead = requestToFetchResponse(requestHead)
+var fetchDelete = requestToFetchResponse(requestDelete)
+var fetchJsonp = requestToFetchResponse(requestJsonp)
+var fetchGet = requestToFetchResponse(requestGet)
+var fetchPost = requestToFetchResponse(requestPost)
+var fetchPut = requestToFetchResponse(requestPut)
+var fetchPatch = requestToFetchResponse(requestPatch)
+
+var doGet = requestToResponse(requestGet)
+var doPost = requestToResponse(requestPost)
+var doPut = requestToResponse(requestPut)
+var doDelete = requestToResponse(requestDelete)
+var doPatch = requestToResponse(requestPatch)
+var doHead = requestToResponse(requestHead)
+var doJsonp = requestToResponse(requestJsonp)
 
 var ajaxExports = {
   doAll: doAll,
   ajax: XEAjax,
+
   fetch: ajaxFetch,
   fetchGet: fetchGet,
   fetchPost: fetchPost,
@@ -96,13 +132,22 @@ var ajaxExports = {
   fetchPatch: fetchPatch,
   fetchHead: fetchHead,
   fetchJsonp: fetchJsonp,
-  getJSON: requestToJSON(requestGet),
-  postJSON: requestToJSON(requestPost),
-  putJSON: requestToJSON(requestPut),
-  deleteJSON: requestToJSON(requestDelete),
-  patchJSON: requestToJSON(requestPatch),
-  headJSON: requestToJSON(requestHead),
-  jsonp: requestToJSON(requestJsonp)
+
+  doGet: doGet,
+  doPost: doPost,
+  doPut: doPut,
+  doDelete: doDelete,
+  doPatch: doPatch,
+  doHead: doHead,
+  doJsonp: doJsonp,
+
+  getJSON: requestToJSON(doGet),
+  postJSON: requestToJSON(doPost),
+  putJSON: requestToJSON(doPut),
+  deleteJSON: requestToJSON(doDelete),
+  patchJSON: requestToJSON(doPatch),
+  headJSON: requestToJSON(doHead),
+  jsonp: requestToJSON(doJsonp)
 }
 
 /**
