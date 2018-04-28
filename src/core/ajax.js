@@ -20,7 +20,7 @@ function XEAjax (options) {
   }, opts.$context)
 }
 
-XEAjax.version = '3.3.6-beta.3'
+XEAjax.version = '3.3.6-beta.4'
 
 /**
  * installation

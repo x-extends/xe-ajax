@@ -9,7 +9,9 @@ var setupDefaults = {
   credentials: 'same-origin',
   bodyType: 'json-data',
   log: 'development' !== 'production',
-  headers: {},
+  headers: {
+    'Accept': 'application/json, text/plain, */*'
+  },
   validateStatus: function (response) {
     return response.status >= 200 && response.status < 300
   }

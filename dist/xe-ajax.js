@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.3.6-beta.3
+ * xe-ajax.js v3.3.6-beta.4
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -160,7 +160,9 @@
     credentials: 'same-origin',
     bodyType: 'json-data',
     log: 'development' !== 'production',
-    headers: {},
+    headers: {
+      'Accept': 'application/json, text/plain, */*'
+    },
     validateStatus: function (response) {
       return response.status >= 200 && response.status < 300
     }
@@ -657,6 +659,7 @@
    * @param { Promise.reject } reject
    */
   function sendFetch (request, resolve, reject) {
+    var timer = null
     var $fetch = utils.isFunction(request.$fetch) ? request.$fetch : self.fetch
     var options = {
       _request: request,
@@ -667,7 +670,7 @@
       headers: request.headers
     }
     if (request.timeout) {
-      setTimeout(function () {
+      timer = setTimeout(function () {
         reject(new TypeError('Request timeout.'))
       }, request.timeout)
     }
@@ -675,6 +678,7 @@
       reject(new TypeError('The user aborted a request.'))
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
+        clearTimeout(timer)
         interceptorExports.responseInterceptor(request, handleExports.toResponse(resp, request)).then(resolve)
       }).catch(reject)
     }
@@ -693,7 +697,9 @@
   }
 
   function createRequestFactory () {
-    if (typeof self !== 'undefined' && self.fetch) {
+    if (typeof XMLHttpRequest === 'undefined' && typeof process !== 'undefined') {
+      return httpExports.sendHttp
+    } else if (typeof self !== 'undefined' && self.fetch) {
       return function (request, resolve, reject) {
         return getRequest(request).apply(this, arguments)
       }
@@ -795,7 +801,7 @@
     }, opts.$context)
   }
 
-  XEAjax.version = '3.3.6-beta.3'
+  XEAjax.version = '3.3.6-beta.4'
 
   /**
    * installation
