@@ -441,17 +441,6 @@ XEAjax.interceptors.response.use((response, next) => {
 ``` shell
 import XEAjax from 'xe-ajax'
 
-export function doGet () {
-  return XEAjax.fetchGet.apply(this, arguments)
-  .then(response => response.json())
-  .then(body => {
-    return {
-      body: body, 
-      status: response.status, 
-      headers: response.headers
-    }
-  })
-} 
 export function getText () {
   return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
 } 
@@ -463,7 +452,6 @@ import customs from './customs'
 
 XEAjax.mixin(customs)
 
-XEAjax.doGet('/api/user/list')
 XEAjax.getText('/api/user/message')
 ```
 
