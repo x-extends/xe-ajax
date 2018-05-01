@@ -430,7 +430,7 @@ XEAjax.interceptors.response.use((response, next) => {
 XEAjax.interceptors.response.use((response, next) => {
   response.json().then(data => {
     const body = {
-      status: response.status === 200 ? 'success' : 'error', 
+      message: response.status === 200 ? 'success' : 'error', 
       result: data
     }
     // Reset the response data and continue with the next interceptor.
@@ -439,7 +439,7 @@ XEAjax.interceptors.response.use((response, next) => {
 }, (e, next) => {
   // Turn all the exception errors to finish.
   const body = {
-    status: 'error', 
+    message: 'error', 
     result: null
   }
   // Reset the response data and continue with the next interceptor.
