@@ -1,17 +1,19 @@
 'use strict'
 
+var encode = encodeURIComponent
+var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
 var utils = {
 
-  isArray: Array.isArray || function (obj) {
-    return obj ? obj.constructor === Array : false
-  },
+  isNodeJS: isNodeJS,
+  isFetch: isNodeJS ? false : self.fetch !== 'undefined',
+  isSupportAdvanced: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'),
 
   isFormData: function (obj) {
     return typeof FormData !== 'undefined' && obj instanceof FormData
   },
 
   isCrossOrigin: function (url) {
-    if (typeof location !== 'undefined') {
+    if (!isNodeJS) {
       if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
         if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
           return true
@@ -19,10 +21,6 @@ var utils = {
       }
     }
     return false
-  },
-
-  isSupportAdvanced: function () {
-    return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
   },
 
   isString: function (val) {
@@ -42,29 +40,16 @@ var utils = {
   },
 
   getLocatOrigin: function () {
-    return typeof location === 'undefined' ? '' : (location.origin || (location.protocol + '//' + location.host))
+    return isNodeJS ? '' : (location.origin || (location.protocol + '//' + location.host))
   },
 
   getBaseURL: function () {
-    if (typeof location === 'undefined') {
+    if (isNodeJS) {
       return ''
     }
     var pathname = location.pathname
-    var lastIndex = utils.lastIndexOf(pathname, '/') + 1
+    var lastIndex = lastIndexOf(pathname, '/') + 1
     return utils.getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
-  },
-
-  lastIndexOf: function (str, val) {
-    if (utils.isFunction(str.lastIndexOf)) {
-      return str.lastIndexOf(val)
-    } else {
-      for (var len = str.length - 1; len >= 0; len--) {
-        if (val === str[len]) {
-          return len
-        };
-      }
-    }
-    return -1
   },
 
   objectEach: function (obj, iteratee, context) {
@@ -80,10 +65,10 @@ var utils = {
     var params = []
     utils.objectEach(body, function (item, key) {
       if (item !== undefined) {
-        if (utils.isPlainObject(item) || utils.isArray(item)) {
-          params = params.concat(parseParam(item, key, utils.isArray(item)))
+        if (utils.isPlainObject(item) || isArray(item)) {
+          params = params.concat(parseParam(item, key, isArray(item)))
         } else {
-          params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
+          params.push(encode(key) + '=' + encode(item))
         }
       }
     })
@@ -102,41 +87,54 @@ var utils = {
     return target
   },
 
+  arrayIndexOf: function (array, val) {
+    if (array.indexOf) {
+      return array.indexOf(val)
+    } else {
+      for (var index = 0, len = array.length; index < len; index++) {
+        if (val === array[index]) {
+          return index
+        }
+      }
+    }
+    return -1
+  },
+
   arrayEach: function (array, callback, context) {
     if (array.forEach) {
       array.forEach(callback, context)
     } else {
-      for (var index = 0, len = array.length || 0; index < len; index++) {
+      for (var index = 0, len = array.length; index < len; index++) {
         callback.call(context, array[index], index, array)
       }
     }
   },
 
-  arrayIncludes: function (array, value) {
-    if (array.includes) {
-      return array.includes(value)
-    } else {
-      for (var index = 0, len = array.length || 0; index < len; index++) {
-        if (array[index] === value) {
-          return true
-        }
-      }
-    }
-    return false
-  },
-
-  clearXEAjaxContext: function (XEAjax) {
+  clearContext: function (XEAjax) {
     XEAjax.$context = XEAjax.$Promise = null
   }
+}
+
+function isArray (obj) {
+  return obj ? obj.constructor === Array : false
+}
+
+function lastIndexOf (str, val) {
+  for (var len = str.length - 1; len >= 0; len--) {
+    if (val === str[len]) {
+      return len
+    };
+  }
+  return -1
 }
 
 function parseParam (resultVal, resultKey, isArr) {
   var result = []
   utils.objectEach(resultVal, function (item, key) {
-    if (utils.isPlainObject(item) || utils.isArray(item)) {
-      result = result.concat(parseParam(item, resultKey + '[' + key + ']', utils.isArray(item)))
+    if (utils.isPlainObject(item) || isArray(item)) {
+      result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
     } else {
-      result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
+      result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item))
     }
   })
   return result

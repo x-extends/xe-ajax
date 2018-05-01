@@ -7,7 +7,7 @@ var XEResponse = require('./response')
 var handleExports = {
   isResponse: function (obj) {
     if (obj) {
-      return (typeof Response === 'function' && obj.constructor === Response) || obj.constructor === XEResponse
+      return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
     }
     return false
   },
@@ -17,7 +17,7 @@ var handleExports = {
       return resp
     }
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
-    if (utils.isSupportAdvanced()) {
+    if (utils.isSupportAdvanced) {
       return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
     }
     return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)

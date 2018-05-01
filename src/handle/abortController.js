@@ -12,37 +12,34 @@ function getSignalIndex (item) {
   }
 }
 
-utils.objectAssign(XEAbortSignalPolyfill.prototype, {
-  install: function (request) {
-    if (request.signal) {
-      var index = getSignalIndex(request.signal)
-      if (index === undefined) {
-        requestList.push([request.signal, [request]])
-      } else {
-        requestList[index][1].push(request)
-      }
+XEAbortSignalPolyfill.prototype.install = function (request) {
+  if (request.signal) {
+    var index = getSignalIndex(request.signal)
+    if (index === undefined) {
+      requestList.push([request.signal, [request]])
+    } else {
+      requestList[index][1].push(request)
     }
   }
-})
+}
 
 function XEAbortControllerPolyfill () {
   this.signal = new XEAbortSignalPolyfill()
 }
 
-utils.objectAssign(XEAbortControllerPolyfill.prototype, {
-  // Abort Request
-  abort: function () {
-    var index = getSignalIndex(this.signal)
-    if (index !== undefined) {
-      utils.arrayEach(requestList[index][1], function (request) {
-        request.abort()
-        requestList[index][0]._abortSignal.aborted = true
-      })
-      requestList.splice(index, 1)
-    }
+// Abort Request
+XEAbortControllerPolyfill.prototype.abort = function () {
+  var index = getSignalIndex(this.signal)
+  if (index !== undefined) {
+    utils.arrayEach(requestList[index][1], function (request) {
+      request.abort()
+      requestList[index][0]._abortSignal.aborted = true
+    })
+    requestList.splice(index, 1)
   }
-})
+}
 
-var XEAbortController = typeof AbortController === 'function' ? AbortController : XEAbortControllerPolyfill
+/* eslint-disable no-undef */
+var XEAbortController = typeof AbortController === 'undefined' ? XEAbortControllerPolyfill : AbortController
 
 module.exports = XEAbortController

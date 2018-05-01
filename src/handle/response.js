@@ -28,61 +28,60 @@ utils.arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', '
   })
 })
 
-utils.objectAssign(XEResponse.prototype, {
-  clone: function () {
-    if (this.bodyUsed) {
-      throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
-    }
-    return new XEResponse(this._body, {status: this.status, statusText: this.statusText, headers: this.headers}, this._request)
-  },
-  json: function () {
-    return this.text().then(function (text) {
-      return JSON.parse(text)
+var decode = decodeURIComponent
+var responsePro = XEResponse.prototype
+
+responsePro.clone = function () {
+  if (this.bodyUsed) {
+    throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
+  }
+  return new XEResponse(this._body, this, this._request)
+}
+responsePro.json = function () {
+  return this.text().then(function (text) {
+    return JSON.parse(text)
+  })
+}
+responsePro.text = function () {
+  return this.body._getBody(this)
+}
+
+if (utils.isSupportAdvanced) {
+  responsePro.text = function () {
+    var request = this._request
+    return this.blob().then(function (blob) {
+      var fileReader = new FileReader()
+      var result = fileReaderReady(request, fileReader)
+      fileReader.readAsText(blob)
+      return result
     })
-  },
-  text: function () {
+  }
+  responsePro.blob = function () {
     return this.body._getBody(this)
   }
-})
-
-if (utils.isSupportAdvanced()) {
-  utils.objectAssign(XEResponse.prototype, {
-    text: function () {
-      var request = this._request
-      return this.blob().then(function (blob) {
-        var fileReader = new FileReader()
-        var result = fileReaderReady(request, fileReader)
-        fileReader.readAsText(blob)
-        return result
+  responsePro.arrayBuffer = function () {
+    var request = this._request
+    return this.blob().then(function (blob) {
+      var fileReader = new FileReader()
+      var result = fileReaderReady(request, fileReader)
+      fileReader.readAsArrayBuffer(blob)
+      return result
+    })
+  }
+  responsePro.formData = function () {
+    return this.text().then(function (text) {
+      var formData = new FormData()
+      text.trim().split('&').forEach(function (bytes) {
+        if (bytes) {
+          var split = bytes.split('=')
+          var name = split.shift().replace(/\+/g, ' ')
+          var value = split.join('=').replace(/\+/g, ' ')
+          formData.append(decode(name), decode(value))
+        }
       })
-    },
-    blob: function () {
-      return this.body._getBody(this)
-    },
-    arrayBuffer: function () {
-      var request = this._request
-      return this.blob().then(function (blob) {
-        var fileReader = new FileReader()
-        var result = fileReaderReady(request, fileReader)
-        fileReader.readAsArrayBuffer(blob)
-        return result
-      })
-    },
-    formData: function () {
-      return this.text().then(function (text) {
-        var formData = new FormData()
-        text.trim().split('&').forEach(function (bytes) {
-          if (bytes) {
-            var split = bytes.split('=')
-            var name = split.shift().replace(/\+/g, ' ')
-            var value = split.join('=').replace(/\+/g, ' ')
-            formData.append(decodeURIComponent(name), decodeURIComponent(value))
-          }
-        })
-        return formData
-      })
-    }
-  })
+      return formData
+    })
+  }
 }
 
 function fileReaderReady (request, reader) {

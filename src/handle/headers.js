@@ -43,44 +43,44 @@ function XEHeadersPolyfill (headers) {
   }
 }
 
-utils.objectAssign(XEHeadersPolyfill.prototype, {
-  set: function (name, value) {
-    this._map[toHeaderKey(name)] = value
-  },
-  get: function (name) {
-    var _key = toHeaderKey(name)
-    return this.has(_key) ? this._map[_key] : null
-  },
-  append: function (name, value) {
-    var _key = toHeaderKey(name)
-    if (this.has(_key)) {
-      this._map[_key] = this._map[_key] + ', ' + value
-    } else {
-      this._map[_key] = '' + value
-    }
-  },
-  has: function (name) {
-    return this._map.hasOwnProperty(toHeaderKey(name))
-  },
-  keys: function () {
-    return new XEIterator(this._map, 0)
-  },
-  values: function () {
-    return new XEIterator(this._map, 1)
-  },
-  entries: function () {
-    return new XEIterator(this._map, 2)
-  },
-  'delete': function (name) {
-    delete this._map[toHeaderKey(name)]
-  },
-  forEach: function (callback, context) {
-    utils.objectEach(this._map, function (value, name, state) {
-      callback.call(context, value, name, this)
-    }, this)
-  }
-})
+var headersPro = XEHeadersPolyfill.prototype
 
-var XEHeaders = typeof Headers === 'function' ? Headers : XEHeadersPolyfill
+headersPro.set = function (name, value) {
+  this._map[toHeaderKey(name)] = value
+}
+headersPro.get = function (name) {
+  var _key = toHeaderKey(name)
+  return this.has(_key) ? this._map[_key] : null
+}
+headersPro.append = function (name, value) {
+  var _key = toHeaderKey(name)
+  if (this.has(_key)) {
+    this._map[_key] = this._map[_key] + ', ' + value
+  } else {
+    this._map[_key] = '' + value
+  }
+}
+headersPro.has = function (name) {
+  return this._map.hasOwnProperty(toHeaderKey(name))
+}
+headersPro.keys = function () {
+  return new XEIterator(this._map, 0)
+}
+headersPro.values = function () {
+  return new XEIterator(this._map, 1)
+}
+headersPro.entries = function () {
+  return new XEIterator(this._map, 2)
+}
+headersPro['delete'] = function (name) {
+  delete this._map[toHeaderKey(name)]
+}
+headersPro.forEach = function (callback, context) {
+  utils.objectEach(this._map, function (value, name, state) {
+    callback.call(context, value, name, state)
+  })
+}
+
+var XEHeaders = typeof Headers === 'undefined' ? XEHeadersPolyfill : Headers
 
 module.exports = XEHeaders

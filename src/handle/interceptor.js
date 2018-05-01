@@ -6,29 +6,29 @@ var handleExports = require('../handle')
 /**
  * interceptor queue
  */
-var iState = {
-  reqQueue: {resolves: [], rejects: []},
-  respQueue: {resolves: [], rejects: []}
+var reqQueue = {resolves: [], rejects: []}
+var respQueue = {resolves: [], rejects: []}
+
+function addCheckQueue (calls, callback) {
+  if (utils.arrayIndexOf(calls, callback) === -1) {
+    calls.push(callback)
+  }
 }
 
 function useInterceptors (queue) {
   return function (finish, failed) {
-    if (queue.resolves.indexOf(finish) === -1) {
-      queue.resolves.push(finish)
-    }
-    if (queue.rejects.indexOf(failed) === -1) {
-      queue.rejects.push(failed)
-    }
+    addCheckQueue(queue.resolves, finish)
+    addCheckQueue(queue.rejects, failed)
   }
 }
 
 /**
  * request interceptor
  */
-function requestInterceptor (request) {
+function requests (request) {
   var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(request, request.$context)
-  utils.arrayEach(iState.reqQueue.resolves, function (callback) {
+  utils.arrayEach(reqQueue.resolves, function (callback) {
     thenInterceptor = thenInterceptor.then(function (req) {
       return new XEPromise(function (resolve) {
         callback(req, function () {
@@ -68,10 +68,10 @@ function responseInterceptor (calls, request, response) {
 
 var interceptors = {
   request: {
-    use: useInterceptors(iState.reqQueue)
+    use: useInterceptors(reqQueue)
   },
   response: {
-    use: useInterceptors(iState.respQueue)
+    use: useInterceptors(respQueue)
   }
 }
 
@@ -80,7 +80,7 @@ interceptors.request.use(function (request, next) {
   if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
     if (!utils.isFormData(request.body)) {
       request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-      if (request.bodyType === 'json-data' || request.bodyType === 'json_data') {
+      if (request.bodyType === 'json-data') {
         request.headers.set('Content-Type', 'application/json; charset=utf-8')
       }
     }
@@ -93,12 +93,12 @@ interceptors.request.use(function (request, next) {
 
 var interceptorExports = {
   interceptors: interceptors,
-  requestInterceptor: requestInterceptor,
-  responseResolveInterceptor: function (request, response, resolve, reject) {
-    responseInterceptor(iState.respQueue.resolves, request, response).then(resolve)
+  requests: requests,
+  responseResolves: function (request, response, resolve, reject) {
+    responseInterceptor(respQueue.resolves, request, response).then(resolve)
   },
-  responseRejectInterceptor: function (request, response, resolve, reject) {
-    responseInterceptor(iState.respQueue.rejects, request, response).then(function (e) {
+  responseRejects: function (request, response, resolve, reject) {
+    responseInterceptor(respQueue.rejects, request, response).then(function (e) {
       (handleExports.isResponse(e) ? resolve : reject)(e)
     })
   }

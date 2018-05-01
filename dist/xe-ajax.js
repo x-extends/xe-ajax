@@ -11,18 +11,20 @@
 }(this, function () {
   'use strict'
 
+  var encode = encodeURIComponent
+  var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
   var utils = {
 
-    isArray: Array.isArray || function (obj) {
-      return obj ? obj.constructor === Array : false
-    },
+    isNodeJS: isNodeJS,
+    isFetch: isNodeJS ? false : self.fetch !== 'undefined',
+    isSupportAdvanced: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'),
 
     isFormData: function (obj) {
       return typeof FormData !== 'undefined' && obj instanceof FormData
     },
 
     isCrossOrigin: function (url) {
-      if (typeof location !== 'undefined') {
+      if (!isNodeJS) {
         if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
           if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
             return true
@@ -30,10 +32,6 @@
         }
       }
       return false
-    },
-
-    isSupportAdvanced: function () {
-      return typeof Blob === 'function' && typeof FormData === 'function' && typeof FileReader === 'function'
     },
 
     isString: function (val) {
@@ -53,29 +51,16 @@
     },
 
     getLocatOrigin: function () {
-      return typeof location === 'undefined' ? '' : (location.origin || (location.protocol + '//' + location.host))
+      return isNodeJS ? '' : (location.origin || (location.protocol + '//' + location.host))
     },
 
     getBaseURL: function () {
-      if (typeof location === 'undefined') {
+      if (isNodeJS) {
         return ''
       }
       var pathname = location.pathname
-      var lastIndex = utils.lastIndexOf(pathname, '/') + 1
+      var lastIndex = lastIndexOf(pathname, '/') + 1
       return utils.getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
-    },
-
-    lastIndexOf: function (str, val) {
-      if (utils.isFunction(str.lastIndexOf)) {
-        return str.lastIndexOf(val)
-      } else {
-        for (var len = str.length - 1; len >= 0; len--) {
-          if (val === str[len]) {
-            return len
-          };
-        }
-      }
-      return -1
     },
 
     objectEach: function (obj, iteratee, context) {
@@ -91,10 +76,10 @@
       var params = []
       utils.objectEach(body, function (item, key) {
         if (item !== undefined) {
-          if (utils.isPlainObject(item) || utils.isArray(item)) {
-            params = params.concat(parseParam(item, key, utils.isArray(item)))
+          if (utils.isPlainObject(item) || isArray(item)) {
+            params = params.concat(parseParam(item, key, isArray(item)))
           } else {
-            params.push(encodeURIComponent(key) + '=' + encodeURIComponent(item))
+            params.push(encode(key) + '=' + encode(item))
           }
         }
       })
@@ -113,41 +98,54 @@
       return target
     },
 
+    arrayIndexOf: function (array, val) {
+      if (array.indexOf) {
+        return array.indexOf(val)
+      } else {
+        for (var index = 0, len = array.length; index < len; index++) {
+          if (val === array[index]) {
+            return index
+          }
+        }
+      }
+      return -1
+    },
+
     arrayEach: function (array, callback, context) {
       if (array.forEach) {
         array.forEach(callback, context)
       } else {
-        for (var index = 0, len = array.length || 0; index < len; index++) {
+        for (var index = 0, len = array.length; index < len; index++) {
           callback.call(context, array[index], index, array)
         }
       }
     },
 
-    arrayIncludes: function (array, value) {
-      if (array.includes) {
-        return array.includes(value)
-      } else {
-        for (var index = 0, len = array.length || 0; index < len; index++) {
-          if (array[index] === value) {
-            return true
-          }
-        }
-      }
-      return false
-    },
-
-    clearXEAjaxContext: function (XEAjax) {
+    clearContext: function (XEAjax) {
       XEAjax.$context = XEAjax.$Promise = null
     }
+  }
+
+  function isArray (obj) {
+    return obj ? obj.constructor === Array : false
+  }
+
+  function lastIndexOf (str, val) {
+    for (var len = str.length - 1; len >= 0; len--) {
+      if (val === str[len]) {
+        return len
+      };
+    }
+    return -1
   }
 
   function parseParam (resultVal, resultKey, isArr) {
     var result = []
     utils.objectEach(resultVal, function (item, key) {
-      if (utils.isPlainObject(item) || utils.isArray(item)) {
-        result = result.concat(parseParam(item, resultKey + '[' + key + ']', utils.isArray(item)))
+      if (utils.isPlainObject(item) || isArray(item)) {
+        result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
       } else {
-        result.push(encodeURIComponent(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encodeURIComponent(item))
+        result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item))
       }
     })
     return result
@@ -209,45 +207,45 @@
     }
   }
 
-  utils.objectAssign(XEHeadersPolyfill.prototype, {
-    set: function (name, value) {
-      this._map[toHeaderKey(name)] = value
-    },
-    get: function (name) {
-      var _key = toHeaderKey(name)
-      return this.has(_key) ? this._map[_key] : null
-    },
-    append: function (name, value) {
-      var _key = toHeaderKey(name)
-      if (this.has(_key)) {
-        this._map[_key] = this._map[_key] + ', ' + value
-      } else {
-        this._map[_key] = '' + value
-      }
-    },
-    has: function (name) {
-      return this._map.hasOwnProperty(toHeaderKey(name))
-    },
-    keys: function () {
-      return new XEIterator(this._map, 0)
-    },
-    values: function () {
-      return new XEIterator(this._map, 1)
-    },
-    entries: function () {
-      return new XEIterator(this._map, 2)
-    },
-    'delete': function (name) {
-      delete this._map[toHeaderKey(name)]
-    },
-    forEach: function (callback, context) {
-      utils.objectEach(this._map, function (value, name, state) {
-        callback.call(context, value, name, this)
-      }, this)
-    }
-  })
+  var headersPro = XEHeadersPolyfill.prototype
 
-  var XEHeaders = typeof Headers === 'function' ? Headers : XEHeadersPolyfill
+  headersPro.set = function (name, value) {
+    this._map[toHeaderKey(name)] = value
+  }
+  headersPro.get = function (name) {
+    var _key = toHeaderKey(name)
+    return this.has(_key) ? this._map[_key] : null
+  }
+  headersPro.append = function (name, value) {
+    var _key = toHeaderKey(name)
+    if (this.has(_key)) {
+      this._map[_key] = this._map[_key] + ', ' + value
+    } else {
+      this._map[_key] = '' + value
+    }
+  }
+  headersPro.has = function (name) {
+    return this._map.hasOwnProperty(toHeaderKey(name))
+  }
+  headersPro.keys = function () {
+    return new XEIterator(this._map, 0)
+  }
+  headersPro.values = function () {
+    return new XEIterator(this._map, 1)
+  }
+  headersPro.entries = function () {
+    return new XEIterator(this._map, 2)
+  }
+  headersPro['delete'] = function (name) {
+    delete this._map[toHeaderKey(name)]
+  }
+  headersPro.forEach = function (callback, context) {
+    utils.objectEach(this._map, function (value, name, state) {
+      callback.call(context, value, name, state)
+    })
+  }
+
+  var XEHeaders = typeof Headers === 'undefined' ? XEHeadersPolyfill : Headers
 
   function XEReadableStream (body, request, response) {
     this.locked = false
@@ -277,8 +275,6 @@
     }
   })
 
-  /* eslint-disable no-undef */
-
   var requestList = []
 
   function getSignalIndex (item) {
@@ -289,65 +285,62 @@
     }
   }
 
-  utils.objectAssign(XEAbortSignalPolyfill.prototype, {
-    install: function (request) {
-      if (request.signal) {
-        var index = getSignalIndex(request.signal)
-        if (index === undefined) {
-          requestList.push([request.signal, [request]])
-        } else {
-          requestList[index][1].push(request)
-        }
+  XEAbortSignalPolyfill.prototype.install = function (request) {
+    if (request.signal) {
+      var index = getSignalIndex(request.signal)
+      if (index === undefined) {
+        requestList.push([request.signal, [request]])
+      } else {
+        requestList[index][1].push(request)
       }
     }
-  })
+  }
 
   function XEAbortControllerPolyfill () {
     this.signal = new XEAbortSignalPolyfill()
   }
 
-  utils.objectAssign(XEAbortControllerPolyfill.prototype, {
-    // Abort Request
-    abort: function () {
-      var index = getSignalIndex(this.signal)
-      if (index !== undefined) {
-        utils.arrayEach(requestList[index][1], function (request) {
-          request.abort()
-          requestList[index][0]._abortSignal.aborted = true
-        })
-        requestList.splice(index, 1)
-      }
+  // Abort Request
+  XEAbortControllerPolyfill.prototype.abort = function () {
+    var index = getSignalIndex(this.signal)
+    if (index !== undefined) {
+      utils.arrayEach(requestList[index][1], function (request) {
+        request.abort()
+        requestList[index][0]._abortSignal.aborted = true
+      })
+      requestList.splice(index, 1)
     }
-  })
+  }
 
-  var XEAbortController = typeof AbortController === 'function' ? AbortController : XEAbortControllerPolyfill
+  /* eslint-disable no-undef */
+  var XEAbortController = typeof AbortController === 'undefined' ? XEAbortControllerPolyfill : AbortController
 
   /**
    * interceptor queue
    */
-  var iState = {
-    reqQueue: { resolves: [], rejects: [] },
-    respQueue: { resolves: [], rejects: [] }
+  var reqQueue = { resolves: [], rejects: [] }
+  var respQueue = { resolves: [], rejects: [] }
+
+  function addCheckQueue (calls, callback) {
+    if (utils.arrayIndexOf(calls, callback) === -1) {
+      calls.push(callback)
+    }
   }
 
   function useInterceptors (queue) {
     return function (finish, failed) {
-      if (queue.resolves.indexOf(finish) === -1) {
-        queue.resolves.push(finish)
-      }
-      if (queue.rejects.indexOf(failed) === -1) {
-        queue.rejects.push(failed)
-      }
+      addCheckQueue(queue.resolves, finish)
+      addCheckQueue(queue.rejects, failed)
     }
   }
 
   /**
    * request interceptor
    */
-  function requestInterceptor (request) {
+  function requests (request) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(request, request.$context)
-    utils.arrayEach(iState.reqQueue.resolves, function (callback) {
+    utils.arrayEach(reqQueue.resolves, function (callback) {
       thenInterceptor = thenInterceptor.then(function (req) {
         return new XEPromise(function (resolve) {
           callback(req, function () {
@@ -387,10 +380,10 @@
 
   var interceptors = {
     request: {
-      use: useInterceptors(iState.reqQueue)
+      use: useInterceptors(reqQueue)
     },
     response: {
-      use: useInterceptors(iState.respQueue)
+      use: useInterceptors(respQueue)
     }
   }
 
@@ -399,7 +392,7 @@
     if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
       if (!utils.isFormData(request.body)) {
         request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-        if (request.bodyType === 'json-data' || request.bodyType === 'json_data') {
+        if (request.bodyType === 'json-data') {
           request.headers.set('Content-Type', 'application/json; charset=utf-8')
         }
       }
@@ -412,12 +405,12 @@
 
   var interceptorExports = {
     interceptors: interceptors,
-    requestInterceptor: requestInterceptor,
-    responseResolveInterceptor: function (request, response, resolve, reject) {
-      responseInterceptor(iState.respQueue.resolves, request, response).then(resolve)
+    requests: requests,
+    responseResolves: function (request, response, resolve, reject) {
+      responseInterceptor(respQueue.resolves, request, response).then(resolve)
     },
-    responseRejectInterceptor: function (request, response, resolve, reject) {
-      responseInterceptor(iState.respQueue.rejects, request, response).then(function (e) {
+    responseRejects: function (request, response, resolve, reject) {
+      responseInterceptor(respQueue.rejects, request, response).then(function (e) {
         (handleExports.isResponse(e) ? resolve : reject)(e)
       })
     }
@@ -433,63 +426,66 @@
     }
   }
 
-  utils.objectAssign(XERequest.prototype, {
-    abort: function () {
-      if (this.xhr) {
-        this.xhr.abort()
-      }
-      this.$abort = true
-    },
-    getUrl: function () {
-      var url = this.url
-      var params = ''
-      if (url) {
-        var _param = utils.arrayIncludes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
-        if (utils.isFunction(this.transformParams)) {
-          this.params = this.transformParams(this.params || {}, this)
-        }
-        if (this.params && !utils.isFormData(this.params)) {
-          params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
-        } else {
-          params = utils.serialize(_param)
-        }
-        if (params) {
-          url += (url.indexOf('?') === -1 ? '?' : '&') + params
-        }
-        if (/\w+:\/{2}.*/.test(url)) {
-          return url
-        }
-        if (url.indexOf('/') === 0) {
-          return utils.getLocatOrigin() + url
-        }
-        return this.baseURL.replace(/\/$/, '') + '/' + url
-      }
-      return url
-    },
-    getBody: function () {
-      var result = null
-      var body = this.body
-      if (body && this.method !== 'GET' && this.method !== 'HEAD') {
-        try {
-          if (utils.isFunction(this.transformBody)) {
-            body = this.body = this.transformBody(body, this) || body
-          }
-          if (utils.isFunction(this.stringifyBody)) {
-            result = this.stringifyBody(body, this) || null
-          } else {
-            if (utils.isFormData(body)) {
-              result = body
-            } else {
-              result = utils.isString(body) ? body : (this.bodyType === 'form-data' || this.bodyType === 'form_data' ? utils.serialize(body) : JSON.stringify(body))
-            }
-          }
-        } catch (e) {
-          console.error(e)
-        }
-      }
-      return result
+  var requestPro = XERequest.prototype
+
+  requestPro.abort = function () {
+    if (this.xhr) {
+      this.xhr.abort()
     }
-  })
+    this.$abort = true
+  }
+  requestPro.getUrl = function () {
+    var url = this.url
+    var params = ''
+    if (url) {
+      var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
+      if (utils.isFunction(this.transformParams)) {
+        this.params = this.transformParams(this.params || {}, this)
+      }
+      if (this.params && !utils.isFormData(this.params)) {
+        params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
+      } else {
+        params = utils.serialize(_param)
+      }
+      if (params) {
+        url += (url.indexOf('?') === -1 ? '?' : '&') + params
+      }
+      if (/\w+:\/{2}.*/.test(url)) {
+        return url
+      }
+      if (url.indexOf('//') === 0) {
+        return (utils.isNodeJS ? '' : location.protocol) + url
+      }
+      if (url.indexOf('/') === 0) {
+        return utils.getLocatOrigin() + url
+      }
+      return this.baseURL.replace(/\/$/, '') + '/' + url
+    }
+    return url
+  }
+  requestPro.getBody = function () {
+    var result = null
+    var body = this.body
+    if (body && this.method !== 'GET' && this.method !== 'HEAD') {
+      try {
+        if (utils.isFunction(this.transformBody)) {
+          body = this.body = this.transformBody(body, this) || body
+        }
+        if (utils.isFunction(this.stringifyBody)) {
+          result = this.stringifyBody(body, this) || null
+        } else {
+          if (utils.isFormData(body)) {
+            result = body
+          } else {
+            result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
+          }
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    return result
+  }
 
   function XEResponse (body, options, request) {
     this._body = body
@@ -515,61 +511,60 @@
     })
   })
 
-  utils.objectAssign(XEResponse.prototype, {
-    clone: function () {
-      if (this.bodyUsed) {
-        throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
-      }
-      return new XEResponse(this._body, { status: this.status, statusText: this.statusText, headers: this.headers }, this._request)
-    },
-    json: function () {
-      return this.text().then(function (text) {
-        return JSON.parse(text)
+  var decode = decodeURIComponent
+  var responsePro = XEResponse.prototype
+
+  responsePro.clone = function () {
+    if (this.bodyUsed) {
+      throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
+    }
+    return new XEResponse(this._body, this, this._request)
+  }
+  responsePro.json = function () {
+    return this.text().then(function (text) {
+      return JSON.parse(text)
+    })
+  }
+  responsePro.text = function () {
+    return this.body._getBody(this)
+  }
+
+  if (utils.isSupportAdvanced) {
+    responsePro.text = function () {
+      var request = this._request
+      return this.blob().then(function (blob) {
+        var fileReader = new FileReader()
+        var result = fileReaderReady(request, fileReader)
+        fileReader.readAsText(blob)
+        return result
       })
-    },
-    text: function () {
+    }
+    responsePro.blob = function () {
       return this.body._getBody(this)
     }
-  })
-
-  if (utils.isSupportAdvanced()) {
-    utils.objectAssign(XEResponse.prototype, {
-      text: function () {
-        var request = this._request
-        return this.blob().then(function (blob) {
-          var fileReader = new FileReader()
-          var result = fileReaderReady(request, fileReader)
-          fileReader.readAsText(blob)
-          return result
+    responsePro.arrayBuffer = function () {
+      var request = this._request
+      return this.blob().then(function (blob) {
+        var fileReader = new FileReader()
+        var result = fileReaderReady(request, fileReader)
+        fileReader.readAsArrayBuffer(blob)
+        return result
+      })
+    }
+    responsePro.formData = function () {
+      return this.text().then(function (text) {
+        var formData = new FormData()
+        text.trim().split('&').forEach(function (bytes) {
+          if (bytes) {
+            var split = bytes.split('=')
+            var name = split.shift().replace(/\+/g, ' ')
+            var value = split.join('=').replace(/\+/g, ' ')
+            formData.append(decode(name), decode(value))
+          }
         })
-      },
-      blob: function () {
-        return this.body._getBody(this)
-      },
-      arrayBuffer: function () {
-        var request = this._request
-        return this.blob().then(function (blob) {
-          var fileReader = new FileReader()
-          var result = fileReaderReady(request, fileReader)
-          fileReader.readAsArrayBuffer(blob)
-          return result
-        })
-      },
-      formData: function () {
-        return this.text().then(function (text) {
-          var formData = new FormData()
-          text.trim().split('&').forEach(function (bytes) {
-            if (bytes) {
-              var split = bytes.split('=')
-              var name = split.shift().replace(/\+/g, ' ')
-              var value = split.join('=').replace(/\+/g, ' ')
-              formData.append(decodeURIComponent(name), decodeURIComponent(value))
-            }
-          })
-          return formData
-        })
-      }
-    })
+        return formData
+      })
+    }
   }
 
   function fileReaderReady (request, reader) {
@@ -587,7 +582,7 @@
   var handleExports = {
     isResponse: function (obj) {
       if (obj) {
-        return (typeof Response === 'function' && obj.constructor === Response) || obj.constructor === XEResponse
+        return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
       }
       return false
     },
@@ -597,10 +592,26 @@
         return resp
       }
       var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
-      if (utils.isSupportAdvanced()) {
+      if (utils.isSupportAdvanced) {
         return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
       }
       return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
+    }
+  }
+
+  function getErrorMessage (message) {
+    return new TypeError(message)
+  }
+
+  var errorExports = {
+    aborted: function () {
+      return getErrorMessage('The user aborted a request.')
+    },
+    timeout: function () {
+      return getErrorMessage('Request timeout.')
+    },
+    failed: function () {
+      return getErrorMessage('Network request failed.')
     }
   }
 
@@ -611,7 +622,7 @@
    * @param { Promise.reject } reject
    */
   function sendXHR (request, resolve, reject) {
-    var $XMLHttpRequest = utils.isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
+    var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
     xhr._request = request
     xhr.open(request.method, request.getUrl(), true)
@@ -624,22 +635,22 @@
       xhr.setRequestHeader(name, value)
     })
     xhr.onload = function () {
-      interceptorExports.responseResolveInterceptor(request, new XEResponse(xhr.response, {
+      interceptorExports.responseResolves(request, new XEResponse(xhr.response, {
         status: xhr.status,
         statusText: xhr.statusText,
         headers: parseXHRHeaders(xhr)
       }, request), resolve, reject)
     }
     xhr.onerror = function () {
-      interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
+      interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
     }
     xhr.ontimeout = function () {
-      interceptorExports.responseRejectInterceptor(request, new TypeError('Request timeout.'), resolve, reject)
+      interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
     }
     xhr.onabort = function () {
-      interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
+      interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
     }
-    if (utils.isSupportAdvanced()) {
+    if (utils.isSupportAdvanced) {
       xhr.responseType = 'blob'
     }
     if (request.credentials === 'include') {
@@ -653,16 +664,14 @@
     }
   }
 
-  function parseXHRHeaders (options) {
+  function parseXHRHeaders (xhr) {
     var headers = {}
-    if (options.getAllResponseHeaders) {
-      var allResponseHeaders = options.getAllResponseHeaders().trim()
-      if (allResponseHeaders) {
-        utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
-          var index = row.indexOf(':')
-          headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
-        })
-      }
+    var allResponseHeaders = xhr.getAllResponseHeaders().trim()
+    if (allResponseHeaders) {
+      utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
+        var index = row.indexOf(':')
+        headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+      })
     }
     return headers
   }
@@ -679,7 +688,7 @@
    */
   function sendFetch (request, resolve, reject) {
     var timer = null
-    var $fetch = utils.isFunction(request.$fetch) ? request.$fetch : self.fetch
+    var $fetch = request.$fetch || self.fetch
     var options = {
       _request: request,
       method: request.method,
@@ -690,18 +699,18 @@
     }
     if (request.timeout) {
       timer = setTimeout(function () {
-        interceptorExports.responseRejectInterceptor(request, new TypeError('Request timeout.'), resolve, reject)
+        interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
       }, request.timeout)
     }
     if (request.signal && request.signal.aborted) {
-      interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
+      interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
         clearTimeout(timer)
-        interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(resp, request), resolve, reject)
+        interceptorExports.responseResolves(request, handleExports.toResponse(resp, request), resolve, reject)
       }).catch(function (e) {
         clearTimeout(timer)
-        interceptorExports.responseRejectInterceptor(request, e, resolve, reject)
+        interceptorExports.responseRejects(request, e, resolve, reject)
       })
     }
   }
@@ -709,8 +718,8 @@
   function getRequest (request) {
     if (request.$fetch) {
       return request.signal ? xhrExports.sendXHR : sendFetch
-    } else if (typeof self !== 'undefined' && self.fetch) {
-      if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
+    } else if (utils.isFetch) {
+      if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
         return sendFetch
       }
       return request.signal ? xhrExports.sendXHR : sendFetch
@@ -719,9 +728,9 @@
   }
 
   function createRequestFactory () {
-    if (typeof XMLHttpRequest === 'undefined' && typeof process !== 'undefined') {
+    if (utils.isNodeJS) {
       return httpExports.sendHttp
-    } else if (typeof self !== 'undefined' && self.fetch) {
+    } else if (utils.isFetch) {
       return function (request, resolve, reject) {
         return getRequest(request).apply(this, arguments)
       }
@@ -732,7 +741,7 @@
   var sendRequest = createRequestFactory()
 
   function fetchRequest (request, resolve, reject) {
-    return interceptorExports.requestInterceptor(request).then(function () {
+    return interceptorExports.requests(request).then(function () {
       return sendRequest(request, resolve, reject)
     })
   }
@@ -752,16 +761,16 @@
    */
   function sendJSONP (request, resolve, reject) {
     request.script = document.createElement('script')
-    interceptorExports.requestInterceptor(request).then(function () {
+    interceptorExports.requests(request).then(function () {
       var script = request.script
       if (!request.jsonpCallback) {
         request.jsonpCallback = 'jsonp_xeajax_' + Date.now() + '_' + (++jsonpIndex)
       }
       if (utils.isFunction(request.$jsonp)) {
         return request.$jsonp(script, request).then(function (resp) {
-          interceptorExports.responseResolveInterceptor(request, handleExports.toResponse({ status: 200, body: resp }, request), resolve, reject)
+          interceptorExports.responseResolves(request, handleExports.toResponse({ status: 200, body: resp }, request), resolve, reject)
         }).catch(function (e) {
-          interceptorExports.responseRejectInterceptor(request, e, resolve, reject)
+          interceptorExports.responseRejects(request, e, resolve, reject)
         })
       } else {
         var url = request.getUrl()
@@ -771,11 +780,11 @@
         script.type = 'text/javascript'
         script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
         script.onerror = function (evnt) {
-          jsonpError(request, resolve, reject)
+          jsonpError(request, errorExports.failed(), resolve, reject)
         }
         if (request.timeout) {
           setTimeout(function () {
-            jsonpError(request, resolve, reject)
+            jsonpError(request, errorExports.timeout(), resolve, reject)
           }, request.timeout)
         }
         document.body.appendChild(script)
@@ -797,12 +806,12 @@
 
   function jsonpSuccess (request, response, resolve, reject) {
     jsonpClear(request)
-    interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(response, request), resolve, reject)
+    interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
   }
 
-  function jsonpError (request, resolve, reject) {
+  function jsonpError (request, response, resolve, reject) {
     jsonpClear(request)
-    interceptorExports.responseRejectInterceptor(request, new TypeError('JSONP request failed'), resolve, reject)
+    interceptorExports.responseRejects(request, response, resolve, reject)
   }
 
   var jsonpExports = {
@@ -868,7 +877,7 @@
 
   function getOptions (method, def, options) {
     var opts = utils.objectAssign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
-    utils.clearXEAjaxContext(XEAjax)
+    utils.clearContext(XEAjax)
     return opts
   }
 
@@ -887,31 +896,28 @@
     }
   }
 
+  function getResponseSchema (isRespSchema, data, status, statusText, headers) {
+    return isRespSchema ? {
+      data: data,
+      status: status,
+      statusText: statusText,
+      headers: headers
+    } : data
+  }
+
   function createResponseSchema (method, isRespSchema) {
     return function () {
       var opts = method.apply(this, arguments)
       var XEPromise = opts.$Promise || Promise
       return XEAjax(opts).catch(function (e) {
-        return XEPromise.reject(isRespSchema ? {
-          data: null,
-          ok: false,
-          status: 'failed',
-          statusText: e.message || e,
-          headers: {}
-        } : null, this)
+        return XEPromise.reject(getResponseSchema(isRespSchema, null, 'failed', e.message || e, {}), this)
       }).then(function (response) {
         return new XEPromise(function (resolve, reject) {
           var finish = response.ok ? resolve : reject
           response.clone().json().catch(function (e) {
             return response.clone().text()
           }).then(function (data) {
-            finish(isRespSchema ? {
-              data: data,
-              ok: response.ok,
-              status: response.status,
-              statusText: response.statusText,
-              headers: responseHeaders(response)
-            } : data)
+            finish(getResponseSchema(isRespSchema, data, response.status, response.statusText, responseHeaders(response)))
           })
         }, this)
       })
@@ -932,7 +938,7 @@
   function doAll (iterable) {
     var XEPromise = XEAjax.$Promise || Promise
     var context = XEAjax.$context
-    utils.clearXEAjaxContext(XEAjax)
+    utils.clearContext(XEAjax)
     return XEPromise.all(iterable.map(function (item) {
       if (item instanceof XEPromise || item instanceof Promise) {
         return item
@@ -959,10 +965,6 @@
     }
   }
 
-  function ajaxFetch (url, options) {
-    return fetchGet(url, null, options)
-  }
-
   var requestHead = createFetch('HEAD')
   var requestDelete = createFetch('DELETE')
   var requestJsonp = createParamsFetch('GET', { jsonp: 'callback' })
@@ -971,26 +973,18 @@
   var requestPut = createBodyFetch('PUT')
   var requestPatch = createBodyFetch('PATCH')
 
-  var fetchHead = requestToFetchResponse(requestHead)
-  var fetchDelete = requestToFetchResponse(requestDelete)
-  var fetchJsonp = requestToFetchResponse(requestJsonp)
-  var fetchGet = requestToFetchResponse(requestGet)
-  var fetchPost = requestToFetchResponse(requestPost)
-  var fetchPut = requestToFetchResponse(requestPut)
-  var fetchPatch = requestToFetchResponse(requestPatch)
-
   var ajaxExports = {
     doAll: doAll,
     ajax: XEAjax,
 
-    fetch: ajaxFetch,
-    fetchGet: fetchGet,
-    fetchPost: fetchPost,
-    fetchPut: fetchPut,
-    fetchDelete: fetchDelete,
-    fetchPatch: fetchPatch,
-    fetchHead: fetchHead,
-    fetchJsonp: fetchJsonp,
+    fetch: requestToFetchResponse(createFetch('GET')),
+    fetchGet: requestToFetchResponse(requestGet),
+    fetchPost: requestToFetchResponse(requestPost),
+    fetchPut: requestToFetchResponse(requestPut),
+    fetchDelete: requestToFetchResponse(requestDelete),
+    fetchPatch: requestToFetchResponse(requestPatch),
+    fetchHead: requestToFetchResponse(requestHead),
+    fetchJsonp: requestToFetchResponse(requestJsonp),
 
     doGet: requestToResponse(requestGet),
     doPost: requestToResponse(requestPost),
@@ -1018,17 +1012,15 @@
     utils.objectEach(methods, function (fn, name) {
       XEAjax[name] = utils.isFunction(fn) ? function () {
         var result = fn.apply(XEAjax.$context, arguments)
-        utils.clearXEAjaxContext(XEAjax)
+        utils.clearContext(XEAjax)
         return result
       } : fn
     })
   }
 
-  utils.objectAssign(XEAjax, {
-    serialize: utils.serialize,
-    interceptors: interceptorExports.interceptors,
-    AbortController: XEAbortController
-  })
+  XEAjax.serialize = utils.serialize
+  XEAjax.interceptors = interceptorExports.interceptors
+  XEAjax.AbortController = XEAbortController
 
   XEAjax.mixin(ajaxExports)
 

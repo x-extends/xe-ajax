@@ -11,5 +11,4 @@ Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
   }
 })
 
-/* eslint-disable no-undef */
 module.exports = XEAbortSignalPolyfill

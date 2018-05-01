@@ -5,6 +5,7 @@ var xhrExports = require('./xhr')
 var httpExports = require('./http')
 var interceptorExports = require('../handle/interceptor')
 var handleExports = require('../handle')
+var errorExports = require('./error')
 
 /**
  * fetch
@@ -14,7 +15,7 @@ var handleExports = require('../handle')
  */
 function sendFetch (request, resolve, reject) {
   var timer = null
-  var $fetch = utils.isFunction(request.$fetch) ? request.$fetch : self.fetch
+  var $fetch = request.$fetch || self.fetch
   var options = {
     _request: request,
     method: request.method,
@@ -25,18 +26,18 @@ function sendFetch (request, resolve, reject) {
   }
   if (request.timeout) {
     timer = setTimeout(function () {
-      interceptorExports.responseRejectInterceptor(request, new TypeError('Request timeout.'), resolve, reject)
+      interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
     }, request.timeout)
   }
   if (request.signal && request.signal.aborted) {
-    interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
+    interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeout(timer)
-      interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(resp, request), resolve, reject)
+      interceptorExports.responseResolves(request, handleExports.toResponse(resp, request), resolve, reject)
     }).catch(function (e) {
       clearTimeout(timer)
-      interceptorExports.responseRejectInterceptor(request, e, resolve, reject)
+      interceptorExports.responseRejects(request, e, resolve, reject)
     })
   }
 }
@@ -44,8 +45,8 @@ function sendFetch (request, resolve, reject) {
 function getRequest (request) {
   if (request.$fetch) {
     return request.signal ? xhrExports.sendXHR : sendFetch
-  } else if (typeof self !== 'undefined' && self.fetch) {
-    if (typeof AbortController === 'function' && typeof AbortSignal === 'function') {
+  } else if (utils.isFetch) {
+    if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
       return sendFetch
     }
     return request.signal ? xhrExports.sendXHR : sendFetch
@@ -54,9 +55,9 @@ function getRequest (request) {
 }
 
 function createRequestFactory () {
-  if (typeof XMLHttpRequest === 'undefined' && typeof process !== 'undefined') {
+  if (utils.isNodeJS) {
     return httpExports.sendHttp
-  } else if (typeof self !== 'undefined' && self.fetch) {
+  } else if (utils.isFetch) {
     return function (request, resolve, reject) {
       return getRequest(request).apply(this, arguments)
     }
@@ -67,7 +68,7 @@ function createRequestFactory () {
 var sendRequest = createRequestFactory()
 
 function fetchRequest (request, resolve, reject) {
-  return interceptorExports.requestInterceptor(request).then(function () {
+  return interceptorExports.requests(request).then(function () {
     return sendRequest(request, resolve, reject)
   })
 }

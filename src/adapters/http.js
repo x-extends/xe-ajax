@@ -7,6 +7,7 @@ var utils = require('../core/utils')
 var interceptorExports = require('../handle/interceptor')
 var XEResponse = require('../handle/response')
 var handleExports = require('../handle')
+var errorExports = require('./error')
 
 function httpRequest (request, resolve, reject) {
   var timer = null
@@ -46,7 +47,7 @@ function httpRequest (request, resolve, reject) {
 
     res.on('end', function () {
       var responseData = Buffer.concat(chunks, chunkSize)
-      interceptorExports.responseResolveInterceptor(request, new XEResponse(responseData.toString('utf8'), {
+      interceptorExports.responseResolves(request, new XEResponse(responseData.toString('utf8'), {
         status: res.statusCode,
         statusText: res.statusMessage,
         headers: res.headers
@@ -55,13 +56,13 @@ function httpRequest (request, resolve, reject) {
 
     res.on('error', function (e) {
       if (!req.aborted) {
-        interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
+        interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
       }
     })
   })
 
   req.on('error', function (e) {
-    interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
+    interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
   })
 
   if (body) {
@@ -71,7 +72,7 @@ function httpRequest (request, resolve, reject) {
   if (request.timeout) {
     timer = setTimeout(function () {
       req.abort()
-      interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
+      interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
     }, request.timeout)
   }
 
@@ -87,14 +88,18 @@ function sendHttp (request, resolve, reject) {
     var timer = null
     if (request.timeout) {
       timer = setTimeout(function () {
-        interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
+        interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
       }, request.timeout)
     }
     return request.$http(request, function () {
+      clearTimeout(timer)
       return httpRequest(request, resolve, reject)
     }, function (resp) {
       clearTimeout(timer)
-      interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(resp, request), resolve, reject)
+      interceptorExports.responseResolves(request, handleExports.toResponse(resp, request), resolve, reject)
+    }, function (e) {
+      clearTimeout(timer)
+      interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
     })
   }
   return httpRequest(request, resolve, reject)

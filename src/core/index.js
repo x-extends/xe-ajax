@@ -7,7 +7,7 @@ var interceptorExports = require('../handle/interceptor')
 
 function getOptions (method, def, options) {
   var opts = utils.objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
-  utils.clearXEAjaxContext(XEAjax)
+  utils.clearContext(XEAjax)
   return opts
 }
 
@@ -26,31 +26,28 @@ function requestToFetchResponse (method) {
   }
 }
 
+function getResponseSchema (isRespSchema, data, status, statusText, headers) {
+  return isRespSchema ? {
+    data: data,
+    status: status,
+    statusText: statusText,
+    headers: headers
+  } : data
+}
+
 function createResponseSchema (method, isRespSchema) {
   return function () {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
     return XEAjax(opts).catch(function (e) {
-      return XEPromise.reject(isRespSchema ? {
-        data: null,
-        ok: false,
-        status: 'failed',
-        statusText: e.message || e,
-        headers: {}
-      } : null, this)
+      return XEPromise.reject(getResponseSchema(isRespSchema, null, 'failed', e.message || e, {}), this)
     }).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         var finish = response.ok ? resolve : reject
         response.clone().json().catch(function (e) {
           return response.clone().text()
         }).then(function (data) {
-          finish(isRespSchema ? {
-            data: data,
-            ok: response.ok,
-            status: response.status,
-            statusText: response.statusText,
-            headers: responseHeaders(response)
-          } : data)
+          finish(getResponseSchema(isRespSchema, data, response.status, response.statusText, responseHeaders(response)))
         })
       }, this)
     })
@@ -71,7 +68,7 @@ function requestToJSON (method) {
 function doAll (iterable) {
   var XEPromise = XEAjax.$Promise || Promise
   var context = XEAjax.$context
-  utils.clearXEAjaxContext(XEAjax)
+  utils.clearContext(XEAjax)
   return XEPromise.all(iterable.map(function (item) {
     if (item instanceof XEPromise || item instanceof Promise) {
       return item
@@ -98,10 +95,6 @@ function createBodyFetch (method) {
   }
 }
 
-function ajaxFetch (url, options) {
-  return fetchGet(url, null, options)
-}
-
 var requestHead = createFetch('HEAD')
 var requestDelete = createFetch('DELETE')
 var requestJsonp = createParamsFetch('GET', {jsonp: 'callback'})
@@ -110,26 +103,18 @@ var requestPost = createBodyFetch('POST')
 var requestPut = createBodyFetch('PUT')
 var requestPatch = createBodyFetch('PATCH')
 
-var fetchHead = requestToFetchResponse(requestHead)
-var fetchDelete = requestToFetchResponse(requestDelete)
-var fetchJsonp = requestToFetchResponse(requestJsonp)
-var fetchGet = requestToFetchResponse(requestGet)
-var fetchPost = requestToFetchResponse(requestPost)
-var fetchPut = requestToFetchResponse(requestPut)
-var fetchPatch = requestToFetchResponse(requestPatch)
-
 var ajaxExports = {
   doAll: doAll,
   ajax: XEAjax,
 
-  fetch: ajaxFetch,
-  fetchGet: fetchGet,
-  fetchPost: fetchPost,
-  fetchPut: fetchPut,
-  fetchDelete: fetchDelete,
-  fetchPatch: fetchPatch,
-  fetchHead: fetchHead,
-  fetchJsonp: fetchJsonp,
+  fetch: requestToFetchResponse(createFetch('GET')),
+  fetchGet: requestToFetchResponse(requestGet),
+  fetchPost: requestToFetchResponse(requestPost),
+  fetchPut: requestToFetchResponse(requestPut),
+  fetchDelete: requestToFetchResponse(requestDelete),
+  fetchPatch: requestToFetchResponse(requestPatch),
+  fetchHead: requestToFetchResponse(requestHead),
+  fetchJsonp: requestToFetchResponse(requestJsonp),
 
   doGet: requestToResponse(requestGet),
   doPost: requestToResponse(requestPost),
@@ -157,17 +142,15 @@ XEAjax.mixin = function (methods) {
   utils.objectEach(methods, function (fn, name) {
     XEAjax[name] = utils.isFunction(fn) ? function () {
       var result = fn.apply(XEAjax.$context, arguments)
-      utils.clearXEAjaxContext(XEAjax)
+      utils.clearContext(XEAjax)
       return result
     } : fn
   })
 }
 
-utils.objectAssign(XEAjax, {
-  serialize: utils.serialize,
-  interceptors: interceptorExports.interceptors,
-  AbortController: XEAbortController
-})
+XEAjax.serialize = utils.serialize
+XEAjax.interceptors = interceptorExports.interceptors
+XEAjax.AbortController = XEAbortController
 
 XEAjax.mixin(ajaxExports)
 

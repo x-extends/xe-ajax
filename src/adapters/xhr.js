@@ -3,6 +3,7 @@
 var utils = require('../core/utils')
 var XEResponse = require('../handle/response')
 var interceptorExports = require('../handle/interceptor')
+var errorExports = require('./error')
 
 /**
  * xhr
@@ -11,7 +12,7 @@ var interceptorExports = require('../handle/interceptor')
  * @param { Promise.reject } reject
  */
 function sendXHR (request, resolve, reject) {
-  var $XMLHttpRequest = utils.isFunction(request.$XMLHttpRequest) ? request.$XMLHttpRequest : XMLHttpRequest
+  var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
   var xhr = request.xhr = new $XMLHttpRequest()
   xhr._request = request
   xhr.open(request.method, request.getUrl(), true)
@@ -24,22 +25,22 @@ function sendXHR (request, resolve, reject) {
     xhr.setRequestHeader(name, value)
   })
   xhr.onload = function () {
-    interceptorExports.responseResolveInterceptor(request, new XEResponse(xhr.response, {
+    interceptorExports.responseResolves(request, new XEResponse(xhr.response, {
       status: xhr.status,
       statusText: xhr.statusText,
       headers: parseXHRHeaders(xhr)
     }, request), resolve, reject)
   }
   xhr.onerror = function () {
-    interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
+    interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
   }
   xhr.ontimeout = function () {
-    interceptorExports.responseRejectInterceptor(request, new TypeError('Request timeout.'), resolve, reject)
+    interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
   }
   xhr.onabort = function () {
-    interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
+    interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
   }
-  if (utils.isSupportAdvanced()) {
+  if (utils.isSupportAdvanced) {
     xhr.responseType = 'blob'
   }
   if (request.credentials === 'include') {
@@ -53,16 +54,14 @@ function sendXHR (request, resolve, reject) {
   }
 }
 
-function parseXHRHeaders (options) {
+function parseXHRHeaders (xhr) {
   var headers = {}
-  if (options.getAllResponseHeaders) {
-    var allResponseHeaders = options.getAllResponseHeaders().trim()
-    if (allResponseHeaders) {
-      utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
-        var index = row.indexOf(':')
-        headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
-      })
-    }
+  var allResponseHeaders = xhr.getAllResponseHeaders().trim()
+  if (allResponseHeaders) {
+    utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
+      var index = row.indexOf(':')
+      headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+    })
   }
   return headers
 }

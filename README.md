@@ -232,7 +232,7 @@ XEAjax.fetchPost('/api/user/save', formBody)
 import XEAjax from 'xe-ajax'
 
 // The response for a request contains the following information.
-// {ok, data, status, statusText, headers}
+// {data, status, statusText, headers}
 
 // The completion or failure is based on state check.
 XEAjax.doGet('/api/user/list').then(response => {
