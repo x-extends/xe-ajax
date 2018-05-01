@@ -22,9 +22,9 @@ function sendJSONP (request, resolve, reject) {
     }
     if (utils.isFunction(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
-        interceptorExports.responseInterceptor(request, handleExports.toResponse({status: 200, body: resp}, request)).then(resolve)
+        interceptorExports.responseResolveInterceptor(request, handleExports.toResponse({status: 200, body: resp}, request), resolve, reject)
       }).catch(function (e) {
-        reject(e)
+        interceptorExports.responseRejectInterceptor(request, e, resolve, reject)
       })
     } else {
       var url = request.getUrl()
@@ -34,11 +34,11 @@ function sendJSONP (request, resolve, reject) {
       script.type = 'text/javascript'
       script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
       script.onerror = function (evnt) {
-        jsonpError(request, reject)
+        jsonpError(request, resolve, reject)
       }
       if (request.timeout) {
         setTimeout(function () {
-          jsonpError(request, reject)
+          jsonpError(request, resolve, reject)
         }, request.timeout)
       }
       document.body.appendChild(script)
@@ -58,14 +58,14 @@ function jsonpClear (request) {
   }
 }
 
-function jsonpSuccess (request, response, resolve) {
+function jsonpSuccess (request, response, resolve, reject) {
   jsonpClear(request)
-  interceptorExports.responseInterceptor(request, handleExports.toResponse(response, request)).then(resolve)
+  interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(response, request), resolve, reject)
 }
 
-function jsonpError (request, reject) {
+function jsonpError (request, resolve, reject) {
   jsonpClear(request)
-  reject(new TypeError('JSONP request failed'))
+  interceptorExports.responseRejectInterceptor(request, new TypeError('JSONP request failed'), resolve, reject)
 }
 
 var jsonpExports = {

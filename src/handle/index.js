@@ -5,9 +5,15 @@ var utils = require('../core/utils')
 var XEResponse = require('./response')
 
 var handleExports = {
+  isResponse: function (obj) {
+    if (obj) {
+      return (typeof Response === 'function' && obj.constructor === Response) || obj.constructor === XEResponse
+    }
+    return false
+  },
   // result to Response
   toResponse: function (resp, request) {
-    if ((typeof Response === 'function' && resp.constructor === Response) || resp.constructor === XEResponse) {
+    if (handleExports.isResponse(resp)) {
       return resp
     }
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}

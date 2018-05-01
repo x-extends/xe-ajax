@@ -384,7 +384,7 @@ setTimeout(() => {
 
 ## Interceptor
 ### Request interceptor
-Function ( request, next )
+use (finish)
 ``` shell
 import XEAjax from 'xe-ajax'
 
@@ -392,7 +392,7 @@ import XEAjax from 'xe-ajax'
 XEAjax.interceptors.request.use((request, next) => {
   // Can be used for unified permission intercept, set request header, Token authentication, parameters, etc.
 
-  // set params
+  // Set params
   // request.params.version = Date.now()
 
   // Set Token validation to prevent XSRF/CSRF attacks.
@@ -403,13 +403,13 @@ XEAjax.interceptors.request.use((request, next) => {
 })
 ```
 ### Response interceptor
-Function ( response, next, request )
+use (finish, failed)
 ``` shell
 import XEAjax from 'xe-ajax'
 
-// Intercept when the request is complete.
+// Intercept when the request is finish.
 XEAjax.interceptors.response.use((response, next) => {
-  // It can be used for unified processing after a request is completed, such as checking for invalidation, message prompt, special scenario processing, etc.
+  // It can be used for unified processing after a request is finish, such as checking for invalidation, message prompt, special scenario processing, etc.
 
   // Example: check login failover.
   if (response.status === 403) {
@@ -419,20 +419,31 @@ XEAjax.interceptors.response.use((response, next) => {
     // Call next(), execute the next interceptor.
     next()
   }
+}, (e, next) => {
+  // failed
+  // Call next(), execute the next interceptor.
+  next()
 })
 
 // Intercept and reset the response data after the request is complete.
+// Format: {status: 200, statusText: 'OK', body: {}, headers: {}}
 XEAjax.interceptors.response.use((response, next) => {
-  // format: {status: 200, statusText: 'OK', body: {}, headers: {}}
-
   response.json().then(data => {
     const body = {
       status: response.status === 200 ? 'success' : 'error', 
       result: data
     }
     // Reset the response data and continue with the next interceptor.
-    next({status: response.status, body: body})
+    next({status: 200, body: body})
   })
+}, (e, next) => {
+  // Turn all the exception errors to finish.
+  const body = {
+    status: 'error', 
+    result: null
+  }
+  // Reset the response data and continue with the next interceptor.
+  next({status: 200, body: body})
 })
 ```
 

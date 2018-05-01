@@ -25,16 +25,19 @@ function sendFetch (request, resolve, reject) {
   }
   if (request.timeout) {
     timer = setTimeout(function () {
-      reject(new TypeError('Request timeout.'))
+      interceptorExports.responseRejectInterceptor(request, new TypeError('Request timeout.'), resolve, reject)
     }, request.timeout)
   }
   if (request.signal && request.signal.aborted) {
-    reject(new TypeError('The user aborted a request.'))
+    interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeout(timer)
-      interceptorExports.responseInterceptor(request, handleExports.toResponse(resp, request)).then(resolve)
-    }).catch(reject)
+      interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(resp, request), resolve, reject)
+    }).catch(function (e) {
+      clearTimeout(timer)
+      interceptorExports.responseRejectInterceptor(request, e, resolve, reject)
+    })
   }
 }
 

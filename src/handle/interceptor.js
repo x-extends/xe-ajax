@@ -6,12 +6,18 @@ var handleExports = require('../handle')
 /**
  * interceptor queue
  */
-var state = {reqQueue: [], respQueue: []}
+var iState = {
+  reqQueue: {resolves: [], rejects: []},
+  respQueue: {resolves: [], rejects: []}
+}
 
-function useInterceptors (calls) {
-  return function (callback) {
-    if (calls.indexOf(callback) === -1) {
-      calls.push(callback)
+function useInterceptors (queue) {
+  return function (finish, failed) {
+    if (queue.resolves.indexOf(finish) === -1) {
+      queue.resolves.push(finish)
+    }
+    if (queue.rejects.indexOf(failed) === -1) {
+      queue.rejects.push(failed)
     }
   }
 }
@@ -22,7 +28,7 @@ function useInterceptors (calls) {
 function requestInterceptor (request) {
   var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(request, request.$context)
-  utils.arrayEach(state.reqQueue, function (callback) {
+  utils.arrayEach(iState.reqQueue.resolves, function (callback) {
     thenInterceptor = thenInterceptor.then(function (req) {
       return new XEPromise(function (resolve) {
         callback(req, function () {
@@ -39,10 +45,10 @@ function requestInterceptor (request) {
 /**
  * response interceptor
  */
-function responseInterceptor (request, response) {
+function responseInterceptor (calls, request, response) {
   var XEPromise = request.$Promise || Promise
   var thenInterceptor = XEPromise.resolve(response, request.$context)
-  utils.arrayEach(state.respQueue, function (callback) {
+  utils.arrayEach(calls, function (callback) {
     thenInterceptor = thenInterceptor.then(function (response) {
       return new XEPromise(function (resolve) {
         callback(response, function (resp) {
@@ -62,10 +68,10 @@ function responseInterceptor (request, response) {
 
 var interceptors = {
   request: {
-    use: useInterceptors(state.reqQueue)
+    use: useInterceptors(iState.reqQueue)
   },
   response: {
-    use: useInterceptors(state.respQueue)
+    use: useInterceptors(iState.respQueue)
   }
 }
 
@@ -88,7 +94,14 @@ interceptors.request.use(function (request, next) {
 var interceptorExports = {
   interceptors: interceptors,
   requestInterceptor: requestInterceptor,
-  responseInterceptor: responseInterceptor
+  responseResolveInterceptor: function (request, response, resolve, reject) {
+    responseInterceptor(iState.respQueue.resolves, request, response).then(resolve)
+  },
+  responseRejectInterceptor: function (request, response, resolve, reject) {
+    responseInterceptor(iState.respQueue.rejects, request, response).then(function (e) {
+      (handleExports.isResponse(e) ? resolve : reject)(e)
+    })
+  }
 }
 
 module.exports = interceptorExports

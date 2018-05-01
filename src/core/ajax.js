@@ -20,7 +20,7 @@ function XEAjax (options) {
   }, opts.$context)
 }
 
-XEAjax.version = '3.4.0'
+XEAjax.version = '3.4.1'
 
 /**
  * installation
@@ -57,6 +57,7 @@ XEAjax.use = function (plugin) {
  * @param { Function } $jsonp 自定义 jsonp 处理函数
  * @param { Function } $Promise 自定义 Promise 函数
  * @param { Function } $context 自定义上下文
+ * @param { Function } $options 自定义参数
  */
 XEAjax.setup = function (options) {
   utils.objectAssign(setupDefaults, options)

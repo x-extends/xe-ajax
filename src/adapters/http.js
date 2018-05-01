@@ -46,22 +46,22 @@ function httpRequest (request, resolve, reject) {
 
     res.on('end', function () {
       var responseData = Buffer.concat(chunks, chunkSize)
-      interceptorExports.responseInterceptor(request, new XEResponse(responseData.toString('utf8'), {
+      interceptorExports.responseResolveInterceptor(request, new XEResponse(responseData.toString('utf8'), {
         status: res.statusCode,
         statusText: res.statusMessage,
         headers: res.headers
-      }, request)).then(resolve)
+      }), request, resolve, reject)
     })
 
     res.on('error', function (e) {
       if (!req.aborted) {
-        reject(new TypeError('Network request failed'))
+        interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
       }
     })
   })
 
   req.on('error', function (e) {
-    reject(new TypeError('Network request failed'))
+    interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
   })
 
   if (body) {
@@ -71,7 +71,7 @@ function httpRequest (request, resolve, reject) {
   if (request.timeout) {
     timer = setTimeout(function () {
       req.abort()
-      reject(new TypeError('The user aborted a request.'))
+      interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
     }, request.timeout)
   }
 
@@ -87,14 +87,14 @@ function sendHttp (request, resolve, reject) {
     var timer = null
     if (request.timeout) {
       timer = setTimeout(function () {
-        reject(new TypeError('The user aborted a request.'))
+        interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
       }, request.timeout)
     }
     return request.$http(request, function () {
       return httpRequest(request, resolve, reject)
     }, function (resp) {
       clearTimeout(timer)
-      interceptorExports.responseInterceptor(request, handleExports.toResponse(resp, request)).then(resolve)
+      interceptorExports.responseResolveInterceptor(request, handleExports.toResponse(resp, request), resolve, reject)
     })
   }
   return httpRequest(request, resolve, reject)

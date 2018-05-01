@@ -26,39 +26,45 @@ function requestToFetchResponse (method) {
   }
 }
 
-// to response
-function requestToResponse (method) {
+function createResponseSchema (method, isRespSchema) {
   return function () {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
-    return XEAjax(opts).then(function (response) {
+    return XEAjax(opts).catch(function (e) {
+      return XEPromise.reject(isRespSchema ? {
+        data: null,
+        ok: false,
+        status: 'failed',
+        statusText: e.message || e,
+        headers: {}
+      } : null, this)
+    }).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         var finish = response.ok ? resolve : reject
         response.clone().json().catch(function (e) {
           return response.clone().text()
         }).then(function (data) {
-          finish({
+          finish(isRespSchema ? {
             data: data,
             ok: response.ok,
             status: response.status,
             statusText: response.statusText,
             headers: responseHeaders(response)
-          })
+          } : data)
         })
       }, this)
     })
   }
 }
 
+// to response
+function requestToResponse (method) {
+  return createResponseSchema(method, true)
+}
+
 // to json
 function requestToJSON (method) {
-  return function () {
-    return method.apply(this, arguments).then(function (response) {
-      return response.data
-    }).catch(function (response) {
-      return response.data
-    })
-  }
+  return createResponseSchema(method)
 }
 
 // Promise.all
@@ -112,14 +118,6 @@ var fetchPost = requestToFetchResponse(requestPost)
 var fetchPut = requestToFetchResponse(requestPut)
 var fetchPatch = requestToFetchResponse(requestPatch)
 
-var doGet = requestToResponse(requestGet)
-var doPost = requestToResponse(requestPost)
-var doPut = requestToResponse(requestPut)
-var doDelete = requestToResponse(requestDelete)
-var doPatch = requestToResponse(requestPatch)
-var doHead = requestToResponse(requestHead)
-var doJsonp = requestToResponse(requestJsonp)
-
 var ajaxExports = {
   doAll: doAll,
   ajax: XEAjax,
@@ -133,21 +131,21 @@ var ajaxExports = {
   fetchHead: fetchHead,
   fetchJsonp: fetchJsonp,
 
-  doGet: doGet,
-  doPost: doPost,
-  doPut: doPut,
-  doDelete: doDelete,
-  doPatch: doPatch,
-  doHead: doHead,
-  doJsonp: doJsonp,
+  doGet: requestToResponse(requestGet),
+  doPost: requestToResponse(requestPost),
+  doPut: requestToResponse(requestPut),
+  doDelete: requestToResponse(requestDelete),
+  doPatch: requestToResponse(requestPatch),
+  doHead: requestToResponse(requestHead),
+  doJsonp: requestToResponse(requestJsonp),
 
-  getJSON: requestToJSON(doGet),
-  postJSON: requestToJSON(doPost),
-  putJSON: requestToJSON(doPut),
-  deleteJSON: requestToJSON(doDelete),
-  patchJSON: requestToJSON(doPatch),
-  headJSON: requestToJSON(doHead),
-  jsonp: requestToJSON(doJsonp)
+  getJSON: requestToJSON(requestGet),
+  postJSON: requestToJSON(requestPost),
+  putJSON: requestToJSON(requestPut),
+  deleteJSON: requestToJSON(requestDelete),
+  patchJSON: requestToJSON(requestPatch),
+  headJSON: requestToJSON(requestHead),
+  jsonp: requestToJSON(requestJsonp)
 }
 
 /**

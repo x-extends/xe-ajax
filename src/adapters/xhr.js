@@ -24,20 +24,20 @@ function sendXHR (request, resolve, reject) {
     xhr.setRequestHeader(name, value)
   })
   xhr.onload = function () {
-    interceptorExports.responseInterceptor(request, new XEResponse(xhr.response, {
+    interceptorExports.responseResolveInterceptor(request, new XEResponse(xhr.response, {
       status: xhr.status,
       statusText: xhr.statusText,
       headers: parseXHRHeaders(xhr)
-    }, request)).then(resolve)
+    }, request), resolve, reject)
   }
   xhr.onerror = function () {
-    reject(new TypeError('Network request failed'))
+    interceptorExports.responseRejectInterceptor(request, new TypeError('Network request failed'), resolve, reject)
   }
   xhr.ontimeout = function () {
-    reject(new TypeError('Request timeout.'))
+    interceptorExports.responseRejectInterceptor(request, new TypeError('Request timeout.'), resolve, reject)
   }
   xhr.onabort = function () {
-    reject(new TypeError('The user aborted a request.'))
+    interceptorExports.responseRejectInterceptor(request, new TypeError('The user aborted a request.'), resolve, reject)
   }
   if (utils.isSupportAdvanced()) {
     xhr.responseType = 'blob'
