@@ -168,7 +168,7 @@
   }
 
   function toHeaderKey (name) {
-    return String(name).toLowerCase()
+    return ('' + name).toLowerCase()
   }
 
   function getObjectIterators (obj, getIndex) {
@@ -472,12 +472,12 @@
         body = this.body = this.transformBody(body, this) || body
       }
       if (this.stringifyBody) {
-        result = this.stringifyBody(body, this) || null
+        result = this.stringifyBody(body, this)
       } else {
-        if (utils.isFormData(body)) {
+        if (utils.isFormData(body) || utils.isString(body)) {
           result = body
         } else {
-          result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
+          result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
         }
       }
     }
@@ -576,16 +576,18 @@
     }, request.$context)
   }
 
+  function isResponse (obj) {
+    if (obj) {
+      return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
+    }
+    return false
+  }
+
   var handleExports = {
-    isResponse: function (obj) {
-      if (obj) {
-        return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
-      }
-      return false
-    },
+    isResponse: isResponse,
     // result to Response
     toResponse: function (resp, request) {
-      if (handleExports.isResponse(resp)) {
+      if (isResponse(resp)) {
         return resp
       }
       var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }

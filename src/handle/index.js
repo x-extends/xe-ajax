@@ -4,16 +4,18 @@
 var utils = require('../core/utils')
 var XEResponse = require('./response')
 
+function isResponse (obj) {
+  if (obj) {
+    return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
+  }
+  return false
+}
+
 var handleExports = {
-  isResponse: function (obj) {
-    if (obj) {
-      return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
-    }
-    return false
-  },
+  isResponse: isResponse,
   // result to Response
   toResponse: function (resp, request) {
-    if (handleExports.isResponse(resp)) {
+    if (isResponse(resp)) {
       return resp
     }
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}

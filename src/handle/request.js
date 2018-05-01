@@ -58,12 +58,12 @@ requestPro.getBody = function () {
       body = this.body = this.transformBody(body, this) || body
     }
     if (this.stringifyBody) {
-      result = this.stringifyBody(body, this) || null
+      result = this.stringifyBody(body, this)
     } else {
-      if (utils.isFormData(body)) {
+      if (utils.isFormData(body) || utils.isString(body)) {
         result = body
       } else {
-        result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
+        result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
       }
     }
   }

@@ -3,7 +3,7 @@
 var utils = require('../core/utils')
 
 function toHeaderKey (name) {
-  return String(name).toLowerCase()
+  return ('' + name).toLowerCase()
 }
 
 function getObjectIterators (obj, getIndex) {
