@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-The asynchronous request function based on Promise, Support node、xhr、fetch、jsonp and Mock，Simple API, lightweight encapsulation, high expansion.
+The asynchronous fetch function based on Promise, Support the node、browser environment, Simple API, lightweight encapsulation, high expansion.
 
 ## Browser Support
 xe-ajax depends on a native ES6 Promise implementation to be supported. If your environment doesn't support ES6 Promises, you can polyfill.
