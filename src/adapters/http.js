@@ -51,7 +51,7 @@ function httpRequest (request, resolve, reject) {
         status: res.statusCode,
         statusText: res.statusMessage,
         headers: res.headers
-      }), request, resolve, reject)
+      }, request), resolve, reject)
     })
 
     res.on('error', function (e) {
