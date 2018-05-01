@@ -17,8 +17,10 @@ function sendFetch (request, finish, failed) {
   var options = {
     _request: request,
     method: request.method,
+    mode: request.mode,
     cache: request.cache,
     credentials: request.credentials,
+    redirect: request.redirect,
     body: request.getBody(),
     headers: request.headers
   }

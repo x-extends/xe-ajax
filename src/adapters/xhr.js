@@ -10,6 +10,12 @@ var XEResponse = require('../handle/response')
  * @param { Function } failed
  */
 function sendXHR (request, finish, failed) {
+  if (request.mode === 'same-origin') {
+    if (utils.isCrossOrigin(request.getUrl())) {
+      failed()
+      throw new TypeError('Fetch API cannot load ' + request.getUrl() + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getLocatOrigin() + '.')
+    }
+  }
   var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
   var xhr = request.xhr = new $XMLHttpRequest()
   xhr._request = request

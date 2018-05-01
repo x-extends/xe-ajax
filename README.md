@@ -88,8 +88,10 @@ import XEAjax from 'xe-ajax'
 | params | Object | request params |  |
 | body | Object | request body |  |
 | bodyType | String | submit type, You can set [**'json-data'**,**'form-data'**] | defaults to 'json-data' |
+| mode | String | The mode you want to use for the request, You can set [**'cors'**,**'no-cors'**,**'same-origin'**] | defaults to 'cors' |
 | cache | String | handling cache mode, You can set [**'default'**,**'no-store'**,**'no-cache'**,**'reload'**,**'force-cache'**,**'only-if-cached'**] | defaults to 'default' |
 | credentials | String | set the cookie to be sent along with the request, You can set [**'omit'**,**'same-origin'**,**'include'**] | defaults to 'same-origin' |
+| redirect | String | The redirect mode to use, You can set [**'follow'**,**'error'**,**'manual'**] | defaults to 'follow' |
 | jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |

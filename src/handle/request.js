@@ -25,7 +25,7 @@ requestPro.getUrl = function () {
   var url = this.url
   var params = ''
   if (url) {
-    var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) ? {_t: Date.now()} : {}
+    var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) === -1 ? {} : {_t: Date.now()}
     if (utils.isFunction(this.transformParams)) {
       this.params = this.transformParams(this.params || {}, this)
     }

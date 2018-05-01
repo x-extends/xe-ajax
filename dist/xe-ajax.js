@@ -154,8 +154,10 @@
   var setupDefaults = {
     method: 'GET',
     baseURL: utils.getBaseURL(),
+    mode: 'cors',
     cache: 'default',
     credentials: 'same-origin',
+    redirect: 'follow',
     bodyType: 'json-data',
     headers: {
       'Accept': 'application/json, text/plain, */*'
@@ -437,7 +439,7 @@
     var url = this.url
     var params = ''
     if (url) {
-      var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
+      var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) === -1 ? {} : { _t: Date.now() }
       if (utils.isFunction(this.transformParams)) {
         this.params = this.transformParams(this.params || {}, this)
       }
@@ -601,6 +603,12 @@
    * @param { Function } failed
    */
   function sendXHR (request, finish, failed) {
+    if (request.mode === 'same-origin') {
+      if (utils.isCrossOrigin(request.getUrl())) {
+        failed()
+        throw new TypeError('Fetch API cannot load ' + request.getUrl() + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getLocatOrigin() + '.')
+      }
+    }
     var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
     xhr._request = request
@@ -667,8 +675,10 @@
     var options = {
       _request: request,
       method: request.method,
+      mode: request.mode,
       cache: request.cache,
       credentials: request.credentials,
+      redirect: request.redirect,
       body: request.getBody(),
       headers: request.headers
     }
