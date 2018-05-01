@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-The asynchronous fetch function based on Promise, Support the node、browser environment, Simple API, lightweight encapsulation, high expansion.
+The asynchronous fetch function based on Promise, Support the node.js、browser environment, Simple API, lightweight encapsulation, high expansion.
 
 ## Browser Support
 xe-ajax depends on a native ES6 Promise implementation to be supported. If your environment doesn't support ES6 Promises, you can polyfill.
@@ -93,7 +93,7 @@ import XEAjax from 'xe-ajax'
 | jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |
-| headers | Object | optional header fields |  |
+| headers | Object | optional header fields | {'Accept': 'application/json, text/plain, */*'} |
 | transformParams | Function ( params, request ) | change the URL parameter before sending the request. |  |
 | paramsSerializer | Function ( params, request ) | the custom URL serialization function is finally spliced in the URL. |  |
 | transformBody | Function ( body, request ) | change the commit body before sending the request. |  |
