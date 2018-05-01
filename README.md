@@ -95,9 +95,9 @@ import XEAjax from 'xe-ajax'
 | timeout | Number | set a timeout in ms |  |
 | headers | Object | optional header fields | {'Accept': 'application/json, text/plain, */*'} |
 | transformParams | Function ( params, request ) | change the URL parameter before sending the request. |  |
-| paramsSerializer | Function ( params, request ) | the custom URL serialization function is finally spliced in the URL. |  |
+| paramsSerializer | Function ( params, request ) | the custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
 | transformBody | Function ( body, request ) | change the commit body before sending the request. |  |
-| stringifyBody | Function ( body, request ) | customize the body stringify function. |  |
+| stringifyBody | Function ( body, request ) | customize the body stringify function. | JSON.stringify |
 | validateStatus | Function ( response ) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
 
 ### Headers
