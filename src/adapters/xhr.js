@@ -64,8 +64,4 @@ function parseXHRHeaders (xhr) {
   return headers
 }
 
-var xhrExports = {
-  sendXHR: sendXHR
-}
-
-module.exports = xhrExports
+module.exports = sendXHR

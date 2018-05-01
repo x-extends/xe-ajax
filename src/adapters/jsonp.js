@@ -58,8 +58,4 @@ function jsonpClear (request) {
   }
 }
 
-var jsonpExports = {
-  sendJSONP: sendJSONP
-}
-
-module.exports = jsonpExports
+module.exports = sendJSONP

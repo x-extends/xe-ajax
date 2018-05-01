@@ -655,10 +655,6 @@
     return headers
   }
 
-  var xhrExports = {
-    sendXHR: sendXHR
-  }
-
   /**
    * fetch
    * @param { XERequest } request
@@ -696,30 +692,28 @@
 
   function getRequest (request) {
     if (request.$fetch) {
-      return request.signal ? xhrExports.sendXHR : sendFetch
+      return request.signal ? sendXHR : sendFetch
     } else if (utils.isFetch) {
       if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
         return sendFetch
       }
-      return request.signal ? xhrExports.sendXHR : sendFetch
+      return request.signal ? sendXHR : sendFetch
     }
-    return xhrExports.sendXHR
+    return sendXHR
   }
 
   function createRequestFactory () {
     if (utils.isNodeJS) {
-      return httpExports.sendHttp
+      return sendHttp
     } else if (utils.isFetch) {
       return function (request, finish, failed) {
         return getRequest(request).apply(this, arguments)
       }
     }
-    return xhrExports.sendXHR
+    return sendXHR
   }
 
-  var fetchExports = {
-    fetchRequest: createRequestFactory()
-  }
+  var fetchRequest = createRequestFactory()
 
   var jsonpIndex = 0
   var $global = typeof window === 'undefined' ? this : window
@@ -776,10 +770,6 @@
     }
   }
 
-  var jsonpExports = {
-    sendJSONP: sendJSONP
-  }
-
   var errorType = {
     aborted: 'The user aborted a request.',
     timeout: 'Request timeout.',
@@ -795,16 +785,16 @@
   function XEAjax (options) {
     var opts = utils.objectAssign({}, setupDefaults, { headers: utils.objectAssign({}, setupDefaults.headers) }, options)
     var request = new XERequest(opts)
-    var XEPromise = opts.$Promise || Promise
+    var XEPromise = request.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       return interceptorExports.requests(request).then(function () {
-        (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(request, function (response) {
+        (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
           interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
         }, function (type) {
           interceptorExports.responseRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
         })
       })
-    }, opts.$context)
+    }, request.$context)
   }
 
   XEAjax.version = '3.4.1'

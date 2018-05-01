@@ -3,10 +3,10 @@
 var utils = require('./utils')
 var XEAbortController = require('../handle/abortController')
 var XERequest = require('../handle/request')
-var fetchExports = require('../adapters/fetch')
-var jsonpExports = require('../adapters/jsonp')
+var fetchRequest = require('../adapters/fetch')
+var sendJSONP = require('../adapters/jsonp')
 var setupDefaults = require('./setup')
-var handleExports = require('./index')
+var handleExports = require('../handle')
 var interceptorExports = require('../handle/interceptor')
 
 var errorType = {
@@ -24,16 +24,16 @@ var errorType = {
 function XEAjax (options) {
   var opts = utils.objectAssign({}, setupDefaults, {headers: utils.objectAssign({}, setupDefaults.headers)}, options)
   var request = new XERequest(opts)
-  var XEPromise = opts.$Promise || Promise
+  var XEPromise = request.$Promise || Promise
   return new XEPromise(function (resolve, reject) {
     return interceptorExports.requests(request).then(function () {
-      (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(request, function (response) {
+      (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
         interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
       }, function (type) {
         interceptorExports.responseRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
       })
     })
-  }, opts.$context)
+  }, request.$context)
 }
 
 XEAjax.version = '3.4.1'

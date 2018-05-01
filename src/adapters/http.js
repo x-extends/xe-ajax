@@ -109,8 +109,4 @@ function sendHttp (request, finish, failed) {
   return httpRequest(request, finish, failed)
 }
 
-var httpExports = {
-  sendHttp: sendHttp
-}
-
-module.exports = httpExports
+module.exports = sendHttp

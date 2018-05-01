@@ -1,8 +1,8 @@
 'use strict'
 
 var utils = require('../core/utils')
-var xhrExports = require('./xhr')
-var httpExports = require('./http')
+var sendXHR = require('./xhr')
+var sendHttp = require('./http')
 var handleExports = require('../handle')
 
 /**
@@ -42,29 +42,27 @@ function sendFetch (request, finish, failed) {
 
 function getRequest (request) {
   if (request.$fetch) {
-    return request.signal ? xhrExports.sendXHR : sendFetch
+    return request.signal ? sendXHR : sendFetch
   } else if (utils.isFetch) {
     if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
       return sendFetch
     }
-    return request.signal ? xhrExports.sendXHR : sendFetch
+    return request.signal ? sendXHR : sendFetch
   }
-  return xhrExports.sendXHR
+  return sendXHR
 }
 
 function createRequestFactory () {
   if (utils.isNodeJS) {
-    return httpExports.sendHttp
+    return sendHttp
   } else if (utils.isFetch) {
     return function (request, finish, failed) {
       return getRequest(request).apply(this, arguments)
     }
   }
-  return xhrExports.sendXHR
+  return sendXHR
 }
 
-var fetchExports = {
-  fetchRequest: createRequestFactory()
-}
+var fetchRequest = createRequestFactory()
 
-module.exports = fetchExports
+module.exports = fetchRequest
