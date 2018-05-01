@@ -5,7 +5,7 @@ var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
 var utils = {
 
   isNodeJS: isNodeJS,
-  isFetch: isNodeJS ? false : self.fetch !== 'undefined',
+  isFetch: isNodeJS ? false : !!self.fetch,
   isSupportAdvanced: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'),
 
   isFormData: function (obj) {

@@ -3,17 +3,15 @@
 var utils = require('../core/utils')
 var xhrExports = require('./xhr')
 var httpExports = require('./http')
-var interceptorExports = require('../handle/interceptor')
 var handleExports = require('../handle')
-var errorExports = require('./error')
 
 /**
  * fetch
  * @param { XERequest } request
- * @param { Promise.resolve } resolve
- * @param { Promise.reject } reject
+ * @param { Function } finish
+ * @param { Function } failed
  */
-function sendFetch (request, resolve, reject) {
+function sendFetch (request, finish, failed) {
   var timer = null
   var $fetch = request.$fetch || self.fetch
   var options = {
@@ -26,18 +24,18 @@ function sendFetch (request, resolve, reject) {
   }
   if (request.timeout) {
     timer = setTimeout(function () {
-      interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
+      failed('timeout')
     }, request.timeout)
   }
   if (request.signal && request.signal.aborted) {
-    interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
+    failed('aborted')
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeout(timer)
-      interceptorExports.responseResolves(request, handleExports.toResponse(resp, request), resolve, reject)
+      finish(handleExports.toResponse(resp, request))
     }).catch(function (e) {
       clearTimeout(timer)
-      interceptorExports.responseRejects(request, e, resolve, reject)
+      failed()
     })
   }
 }
@@ -58,23 +56,15 @@ function createRequestFactory () {
   if (utils.isNodeJS) {
     return httpExports.sendHttp
   } else if (utils.isFetch) {
-    return function (request, resolve, reject) {
+    return function (request, finish, failed) {
       return getRequest(request).apply(this, arguments)
     }
   }
   return xhrExports.sendXHR
 }
 
-var sendRequest = createRequestFactory()
-
-function fetchRequest (request, resolve, reject) {
-  return interceptorExports.requests(request).then(function () {
-    return sendRequest(request, resolve, reject)
-  })
-}
-
 var fetchExports = {
-  fetchRequest: fetchRequest
+  fetchRequest: createRequestFactory()
 }
 
 module.exports = fetchExports

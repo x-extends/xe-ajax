@@ -16,7 +16,7 @@
   var utils = {
 
     isNodeJS: isNodeJS,
-    isFetch: isNodeJS ? false : self.fetch !== 'undefined',
+    isFetch: isNodeJS ? false : !!self.fetch,
     isSupportAdvanced: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'),
 
     isFormData: function (obj) {
@@ -157,7 +157,6 @@
     cache: 'default',
     credentials: 'same-origin',
     bodyType: 'json-data',
-    log: 'development' !== 'production',
     headers: {
       'Accept': 'application/json, text/plain, */*'
     },
@@ -419,8 +418,8 @@
   function XERequest (options) {
     utils.objectAssign(this, { url: '', body: null, params: null, signal: null }, options)
     this.headers = new XEHeaders(options.headers)
-    this.method = String(this.method).toLocaleUpperCase()
-    this.bodyType = String(this.bodyType).toLowerCase()
+    this.method = this.method.toLocaleUpperCase()
+    this.bodyType = this.bodyType.toLowerCase()
     if (this.signal && utils.isFunction(this.signal.install)) {
       this.signal.install(this)
     }
@@ -443,7 +442,7 @@
         this.params = this.transformParams(this.params || {}, this)
       }
       if (this.params && !utils.isFormData(this.params)) {
-        params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
+        params = utils.isString(this.params) ? this.params : (this.paramsSerializer || utils.serialize)(utils.objectAssign(_param, this.params), this)
       } else {
         params = utils.serialize(_param)
       }
@@ -467,21 +466,17 @@
     var result = null
     var body = this.body
     if (body && this.method !== 'GET' && this.method !== 'HEAD') {
-      try {
-        if (utils.isFunction(this.transformBody)) {
-          body = this.body = this.transformBody(body, this) || body
-        }
-        if (utils.isFunction(this.stringifyBody)) {
-          result = this.stringifyBody(body, this) || null
+      if (this.transformBody) {
+        body = this.body = this.transformBody(body, this) || body
+      }
+      if (this.stringifyBody) {
+        result = this.stringifyBody(body, this) || null
+      } else {
+        if (utils.isFormData(body)) {
+          result = body
         } else {
-          if (utils.isFormData(body)) {
-            result = body
-          } else {
-            result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
-          }
+          result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
         }
-      } catch (e) {
-        console.error(e)
       }
     }
     return result
@@ -599,29 +594,13 @@
     }
   }
 
-  function getErrorMessage (message) {
-    return new TypeError(message)
-  }
-
-  var errorExports = {
-    aborted: function () {
-      return getErrorMessage('The user aborted a request.')
-    },
-    timeout: function () {
-      return getErrorMessage('Request timeout.')
-    },
-    failed: function () {
-      return getErrorMessage('Network request failed.')
-    }
-  }
-
   /**
    * xhr
    * @param { XERequest } request
-   * @param { Promise.resolve } resolve
-   * @param { Promise.reject } reject
+   * @param { Function } finish
+   * @param { Function } failed
    */
-  function sendXHR (request, resolve, reject) {
+  function sendXHR (request, finish, failed) {
     var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
     xhr._request = request
@@ -635,20 +614,20 @@
       xhr.setRequestHeader(name, value)
     })
     xhr.onload = function () {
-      interceptorExports.responseResolves(request, new XEResponse(xhr.response, {
+      finish(new XEResponse(xhr.response, {
         status: xhr.status,
         statusText: xhr.statusText,
         headers: parseXHRHeaders(xhr)
-      }, request), resolve, reject)
+      }, request))
     }
     xhr.onerror = function () {
-      interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
+      failed()
     }
     xhr.ontimeout = function () {
-      interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
+      failed('timeout')
     }
     xhr.onabort = function () {
-      interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
+      failed('aborted')
     }
     if (utils.isSupportAdvanced) {
       xhr.responseType = 'blob'
@@ -683,10 +662,10 @@
   /**
    * fetch
    * @param { XERequest } request
-   * @param { Promise.resolve } resolve
-   * @param { Promise.reject } reject
+   * @param { Function } finish
+   * @param { Function } failed
    */
-  function sendFetch (request, resolve, reject) {
+  function sendFetch (request, finish, failed) {
     var timer = null
     var $fetch = request.$fetch || self.fetch
     var options = {
@@ -699,18 +678,18 @@
     }
     if (request.timeout) {
       timer = setTimeout(function () {
-        interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
+        failed('timeout')
       }, request.timeout)
     }
     if (request.signal && request.signal.aborted) {
-      interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
+      failed('aborted')
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
         clearTimeout(timer)
-        interceptorExports.responseResolves(request, handleExports.toResponse(resp, request), resolve, reject)
+        finish(handleExports.toResponse(resp, request))
       }).catch(function (e) {
         clearTimeout(timer)
-        interceptorExports.responseRejects(request, e, resolve, reject)
+        failed()
       })
     }
   }
@@ -731,23 +710,15 @@
     if (utils.isNodeJS) {
       return httpExports.sendHttp
     } else if (utils.isFetch) {
-      return function (request, resolve, reject) {
+      return function (request, finish, failed) {
         return getRequest(request).apply(this, arguments)
       }
     }
     return xhrExports.sendXHR
   }
 
-  var sendRequest = createRequestFactory()
-
-  function fetchRequest (request, resolve, reject) {
-    return interceptorExports.requests(request).then(function () {
-      return sendRequest(request, resolve, reject)
-    })
-  }
-
   var fetchExports = {
-    fetchRequest: fetchRequest
+    fetchRequest: createRequestFactory()
   }
 
   var jsonpIndex = 0
@@ -756,40 +727,41 @@
   /**
    * jsonp
    * @param { XERequest } request
-   * @param { Promise.resolve } resolve
-   * @param { Promise.reject } reject
+   * @param { Function } finish
+   * @param { Function } failed
    */
-  function sendJSONP (request, resolve, reject) {
+  function sendJSONP (request, finish, failed) {
     request.script = document.createElement('script')
-    interceptorExports.requests(request).then(function () {
-      var script = request.script
-      if (!request.jsonpCallback) {
-        request.jsonpCallback = 'jsonp_xeajax_' + Date.now() + '_' + (++jsonpIndex)
+    var script = request.script
+    if (!request.jsonpCallback) {
+      request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
+    }
+    if (utils.isFunction(request.$jsonp)) {
+      return request.$jsonp(script, request).then(function (resp) {
+        finish(handleExports.toResponse({ status: 200, body: resp }, request))
+      }).catch(function () {
+        failed()
+      })
+    } else {
+      var url = request.getUrl()
+      $global[request.jsonpCallback] = function (body) {
+        jsonpClear(request)
+        finish({ status: 200, body: body })
       }
-      if (utils.isFunction(request.$jsonp)) {
-        return request.$jsonp(script, request).then(function (resp) {
-          interceptorExports.responseResolves(request, handleExports.toResponse({ status: 200, body: resp }, request), resolve, reject)
-        }).catch(function (e) {
-          interceptorExports.responseRejects(request, e, resolve, reject)
-        })
-      } else {
-        var url = request.getUrl()
-        $global[request.jsonpCallback] = function (body) {
-          jsonpSuccess(request, { status: 200, body: body }, resolve)
-        }
-        script.type = 'text/javascript'
-        script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
-        script.onerror = function (evnt) {
-          jsonpError(request, errorExports.failed(), resolve, reject)
-        }
-        if (request.timeout) {
-          setTimeout(function () {
-            jsonpError(request, errorExports.timeout(), resolve, reject)
-          }, request.timeout)
-        }
-        document.body.appendChild(script)
+      script.type = 'text/javascript'
+      script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
+      script.onerror = function (evnt) {
+        jsonpClear(request)
+        finish()
       }
-    })
+      if (request.timeout) {
+        setTimeout(function () {
+          jsonpClear(request)
+          finish('timeout')
+        }, request.timeout)
+      }
+      document.body.appendChild(script)
+    }
   }
 
   function jsonpClear (request) {
@@ -804,35 +776,41 @@
     }
   }
 
-  function jsonpSuccess (request, response, resolve, reject) {
-    jsonpClear(request)
-    interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
-  }
-
-  function jsonpError (request, response, resolve, reject) {
-    jsonpClear(request)
-    interceptorExports.responseRejects(request, response, resolve, reject)
-  }
-
   var jsonpExports = {
     sendJSONP: sendJSONP
   }
 
+  var errorType = {
+    aborted: 'The user aborted a request.',
+    timeout: 'Request timeout.',
+    failed: 'Network request failed.'
+  }
+
   /**
-    * 支持: xhr、fetch、jsonp
+    * 支持: nodejs和浏览器 fetch
     *
     * @param { Object} options
     * @return { Promise }
     */
   function XEAjax (options) {
     var opts = utils.objectAssign({}, setupDefaults, { headers: utils.objectAssign({}, setupDefaults.headers) }, options)
+    var request = new XERequest(opts)
     var XEPromise = opts.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
-      (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(new XERequest(opts), resolve, reject)
+      return interceptorExports.requests(request).then(function () {
+        (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(request, function (response) {
+          interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
+        }, function (type) {
+          interceptorExports.responseRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
+        })
+      })
     }, opts.$context)
   }
 
   XEAjax.version = '3.4.1'
+  XEAjax.interceptors = interceptorExports.interceptors
+  XEAjax.serialize = utils.serialize
+  XEAjax.AbortController = XEAbortController
 
   /**
    * installation
@@ -856,7 +834,6 @@
    * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param { Number } timeout 设置超时
    * @param { Object } headers 请求头
-   * @param { Boolean } log 控制台输出日志
    * @param { Function } transformParams(params, request) 用于改变URL参数
    * @param { Function } paramsSerializer(params, request) 自定义URL序列化函数
    * @param { Function } transformBody(body, request) 用于改变提交数据
@@ -1017,10 +994,6 @@
       } : fn
     })
   }
-
-  XEAjax.serialize = utils.serialize
-  XEAjax.interceptors = interceptorExports.interceptors
-  XEAjax.AbortController = XEAbortController
 
   XEAjax.mixin(ajaxExports)
 

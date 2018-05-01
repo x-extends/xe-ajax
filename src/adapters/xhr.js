@@ -2,16 +2,14 @@
 
 var utils = require('../core/utils')
 var XEResponse = require('../handle/response')
-var interceptorExports = require('../handle/interceptor')
-var errorExports = require('./error')
 
 /**
  * xhr
  * @param { XERequest } request
- * @param { Promise.resolve } resolve
- * @param { Promise.reject } reject
+ * @param { Function } finish
+ * @param { Function } failed
  */
-function sendXHR (request, resolve, reject) {
+function sendXHR (request, finish, failed) {
   var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
   var xhr = request.xhr = new $XMLHttpRequest()
   xhr._request = request
@@ -25,20 +23,20 @@ function sendXHR (request, resolve, reject) {
     xhr.setRequestHeader(name, value)
   })
   xhr.onload = function () {
-    interceptorExports.responseResolves(request, new XEResponse(xhr.response, {
+    finish(new XEResponse(xhr.response, {
       status: xhr.status,
       statusText: xhr.statusText,
       headers: parseXHRHeaders(xhr)
-    }, request), resolve, reject)
+    }, request))
   }
   xhr.onerror = function () {
-    interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
+    failed()
   }
   xhr.ontimeout = function () {
-    interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
+    failed('timeout')
   }
   xhr.onabort = function () {
-    interceptorExports.responseRejects(request, errorExports.aborted(), resolve, reject)
+    failed('aborted')
   }
   if (utils.isSupportAdvanced) {
     xhr.responseType = 'blob'

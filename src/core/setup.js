@@ -8,7 +8,6 @@ var setupDefaults = {
   cache: 'default',
   credentials: 'same-origin',
   bodyType: 'json-data',
-  log: 'development' !== 'production',
   headers: {
     'Accept': 'application/json, text/plain, */*'
   },

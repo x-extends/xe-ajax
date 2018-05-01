@@ -6,8 +6,8 @@ var XEHeaders = require('./headers')
 function XERequest (options) {
   utils.objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
   this.headers = new XEHeaders(options.headers)
-  this.method = String(this.method).toLocaleUpperCase()
-  this.bodyType = String(this.bodyType).toLowerCase()
+  this.method = this.method.toLocaleUpperCase()
+  this.bodyType = this.bodyType.toLowerCase()
   if (this.signal && utils.isFunction(this.signal.install)) {
     this.signal.install(this)
   }
@@ -30,7 +30,7 @@ requestPro.getUrl = function () {
       this.params = this.transformParams(this.params || {}, this)
     }
     if (this.params && !utils.isFormData(this.params)) {
-      params = utils.isString(this.params) ? this.params : (utils.isFunction(this.paramsSerializer) ? this.paramsSerializer : utils.serialize)(utils.objectAssign(_param, this.params), this)
+      params = utils.isString(this.params) ? this.params : (this.paramsSerializer || utils.serialize)(utils.objectAssign(_param, this.params), this)
     } else {
       params = utils.serialize(_param)
     }
@@ -54,21 +54,17 @@ requestPro.getBody = function () {
   var result = null
   var body = this.body
   if (body && this.method !== 'GET' && this.method !== 'HEAD') {
-    try {
-      if (utils.isFunction(this.transformBody)) {
-        body = this.body = this.transformBody(body, this) || body
-      }
-      if (utils.isFunction(this.stringifyBody)) {
-        result = this.stringifyBody(body, this) || null
+    if (this.transformBody) {
+      body = this.body = this.transformBody(body, this) || body
+    }
+    if (this.stringifyBody) {
+      result = this.stringifyBody(body, this) || null
+    } else {
+      if (utils.isFormData(body)) {
+        result = body
       } else {
-        if (utils.isFormData(body)) {
-          result = body
-        } else {
-          result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
-        }
+        result = utils.isString(body) ? body : (this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body))
       }
-    } catch (e) {
-      console.error(e)
     }
   }
   return result

@@ -4,12 +4,16 @@ var http = require('http')
 var https = require('https')
 var url = require('url')
 var utils = require('../core/utils')
-var interceptorExports = require('../handle/interceptor')
 var XEResponse = require('../handle/response')
 var handleExports = require('../handle')
-var errorExports = require('./error')
 
-function httpRequest (request, resolve, reject) {
+/**
+ * nodejs
+ * @param { XERequest } request
+ * @param { Function } finish
+ * @param { Function } failed
+ */
+function httpRequest (request, finish, failed) {
   var timer = null
   var body = request.getBody()
   var urlLocat = url.parse(request.getUrl())
@@ -47,22 +51,22 @@ function httpRequest (request, resolve, reject) {
 
     res.on('end', function () {
       var responseData = Buffer.concat(chunks, chunkSize)
-      interceptorExports.responseResolves(request, new XEResponse(responseData.toString('utf8'), {
+      finish(new XEResponse(responseData.toString('utf8'), {
         status: res.statusCode,
         statusText: res.statusMessage,
         headers: res.headers
-      }, request), resolve, reject)
+      }, request))
     })
 
     res.on('error', function (e) {
       if (!req.aborted) {
-        interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
+        failed()
       }
     })
   })
 
   req.on('error', function (e) {
-    interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
+    failed()
   })
 
   if (body) {
@@ -72,7 +76,7 @@ function httpRequest (request, resolve, reject) {
   if (request.timeout) {
     timer = setTimeout(function () {
       req.abort()
-      interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
+      failed('timeout')
     }, request.timeout)
   }
 
@@ -83,26 +87,26 @@ function getHttp (urlLocat) {
   return urlLocat.protocol === 'https:' ? https : http
 }
 
-function sendHttp (request, resolve, reject) {
+function sendHttp (request, finish, failed) {
   if (utils.isFunction(request.$http)) {
     var timer = null
     if (request.timeout) {
       timer = setTimeout(function () {
-        interceptorExports.responseRejects(request, errorExports.timeout(), resolve, reject)
+        failed('timeout')
       }, request.timeout)
     }
     return request.$http(request, function () {
       clearTimeout(timer)
-      return httpRequest(request, resolve, reject)
+      return httpRequest(request, finish, failed)
     }, function (resp) {
       clearTimeout(timer)
-      interceptorExports.responseResolves(request, handleExports.toResponse(resp, request), resolve, reject)
+      finish(handleExports.toResponse(resp, request))
     }, function (e) {
       clearTimeout(timer)
-      interceptorExports.responseRejects(request, errorExports.failed(), resolve, reject)
+      failed()
     })
   }
-  return httpRequest(request, resolve, reject)
+  return httpRequest(request, finish, failed)
 }
 
 var httpExports = {

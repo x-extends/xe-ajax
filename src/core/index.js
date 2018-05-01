@@ -2,8 +2,6 @@
 
 var XEAjax = require('./ajax')
 var utils = require('./utils')
-var XEAbortController = require('../handle/abortController')
-var interceptorExports = require('../handle/interceptor')
 
 function getOptions (method, def, options) {
   var opts = utils.objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
@@ -147,10 +145,6 @@ XEAjax.mixin = function (methods) {
     } : fn
   })
 }
-
-XEAjax.serialize = utils.serialize
-XEAjax.interceptors = interceptorExports.interceptors
-XEAjax.AbortController = XEAbortController
 
 XEAjax.mixin(ajaxExports)
 

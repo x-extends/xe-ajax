@@ -1,26 +1,45 @@
 'use strict'
 
 var utils = require('./utils')
+var XEAbortController = require('../handle/abortController')
 var XERequest = require('../handle/request')
 var fetchExports = require('../adapters/fetch')
 var jsonpExports = require('../adapters/jsonp')
 var setupDefaults = require('./setup')
+var handleExports = require('./index')
+var interceptorExports = require('../handle/interceptor')
+
+var errorType = {
+  aborted: 'The user aborted a request.',
+  timeout: 'Request timeout.',
+  failed: 'Network request failed.'
+}
 
 /**
-  * 支持: xhr、fetch、jsonp
+  * 支持: nodejs和浏览器 fetch
   *
   * @param { Object} options
   * @return { Promise }
   */
 function XEAjax (options) {
   var opts = utils.objectAssign({}, setupDefaults, {headers: utils.objectAssign({}, setupDefaults.headers)}, options)
+  var request = new XERequest(opts)
   var XEPromise = opts.$Promise || Promise
   return new XEPromise(function (resolve, reject) {
-    (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(new XERequest(opts), resolve, reject)
+    return interceptorExports.requests(request).then(function () {
+      (opts.jsonp ? jsonpExports.sendJSONP : fetchExports.fetchRequest)(request, function (response) {
+        interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
+      }, function (type) {
+        interceptorExports.responseRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
+      })
+    })
   }, opts.$context)
 }
 
 XEAjax.version = '3.4.1'
+XEAjax.interceptors = interceptorExports.interceptors
+XEAjax.serialize = utils.serialize
+XEAjax.AbortController = XEAbortController
 
 /**
  * installation
@@ -44,7 +63,6 @@ XEAjax.use = function (plugin) {
  * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param { Number } timeout 设置超时
  * @param { Object } headers 请求头
- * @param { Boolean } log 控制台输出日志
  * @param { Function } transformParams(params, request) 用于改变URL参数
  * @param { Function } paramsSerializer(params, request) 自定义URL序列化函数
  * @param { Function } transformBody(body, request) 用于改变提交数据
