@@ -386,7 +386,7 @@ setTimeout(() => {
 
 ## Interceptor
 ### Request interceptor
-use (finish)
+use (before)
 ``` shell
 import XEAjax from 'xe-ajax'
 
