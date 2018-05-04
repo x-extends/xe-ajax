@@ -36,7 +36,7 @@ function XEAjax (options) {
   }, request.$context)
 }
 
-XEAjax.version = '3.4.1'
+XEAjax.version = '3.4.2'
 XEAjax.interceptors = interceptorExports.interceptors
 XEAjax.serialize = utils.serialize
 XEAjax.AbortController = XEAbortController

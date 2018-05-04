@@ -14,15 +14,15 @@ xe-ajax depends on a native ES6 Promise implementation to be supported. If your 
 
 ## CDN
 [All cdnjs package](https://cdn.jsdelivr.net/npm/xe-ajax/)
-``` shell
+```HTML
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 [All unpkg package](https://unpkg.com/xe-ajax/)
-``` shell
+```HTML
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 ## AMD
-``` shell
+```JavaScript
 require.config({
   paths: {
     // ...,
@@ -31,17 +31,17 @@ require.config({
 })
 ```
 ## NPM
-``` shell
+```JavaScript
 npm install xe-ajax --save
 ```
 
 ### NodeJS
-``` shell
+```JavaScript
 const XEAjax = require('xe-ajax')
 ```
 
 ### ES6 Module import
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 ```
 
@@ -135,7 +135,7 @@ import XEAjax from 'xe-ajax'
 | formData | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a FormData object. |
 
 ## Default global settings
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
@@ -165,7 +165,7 @@ XEAjax.setup({
 
 ## Examples
 ### ajax
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 XEAjax.ajax({
@@ -180,7 +180,7 @@ XEAjax.ajax({
 
 ```
 ### fetch to Response
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 XEAjax.fetch('/api/user/list', {
@@ -230,7 +230,7 @@ formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 ```
 ### fetch to Response Schema
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // The response for a request contains the following information.
@@ -253,7 +253,7 @@ formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
 ```
 ### fetch to JSON
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // The completion or failure is based on state check.
@@ -273,7 +273,7 @@ formBody.append('file', file)
 XEAjax.postJSON('/api/user/save', formBody)
 ```
 ### jsonp
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // Case 1:
@@ -312,7 +312,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 })
 ```
 ### Multiple requests
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 const iterable1 = []
@@ -331,7 +331,7 @@ iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 ### Nested requests
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // This should be avoided in the project.
@@ -344,7 +344,7 @@ XEAjax.fetchGet('/api/user/info')
 })
 ```
 ### AMD
-``` shell
+```JavaScript
 define([
   'xe-ajax'
 ], function (XEAjax) {
@@ -366,7 +366,7 @@ define([
 ## Cancel request
 ### AbortController
 Allows control of one or more cancellation requests.
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // Create a controller.
@@ -387,7 +387,7 @@ setTimeout(() => {
 ## Interceptor
 ### Request interceptor
 use (before)
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // Trigger before the request is sent.
@@ -406,7 +406,7 @@ XEAjax.interceptors.request.use((request, next) => {
 ```
 ### Response interceptor
 use (finish, failed)
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // Intercept when the request is finish.
@@ -451,7 +451,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
 ## Functions of mixing
 ### ./customs.js
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 export function getText () {
@@ -459,7 +459,7 @@ export function getText () {
 } 
 ```
 ### ./main.js
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 import customs from './customs'
 
