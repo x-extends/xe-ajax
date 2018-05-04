@@ -48,7 +48,7 @@ import XEAjax from 'xe-ajax'
 ## API:
 * doAll ( iterable )
 * ajax ( options )
-* 
+* -
 * fetch ( url, options )
 * fetchHead ( url, options )
 * fetchDelete ( url, options )
@@ -57,7 +57,7 @@ import XEAjax from 'xe-ajax'
 * fetchPost ( url, body, options )
 * fetchPut ( url, body, options )
 * fetchPatch ( url, body, options )
-* 
+* -
 * doHead ( url, options )
 * doDelete ( url, options )
 * doJsonp ( url, params, options )
@@ -65,7 +65,7 @@ import XEAjax from 'xe-ajax'
 * doPost ( url, body, options )
 * doPut ( url, body, options )
 * doPatch ( url, body, options )
-* 
+* -
 * headJSON ( url, options )
 * deleteJSON ( url, options )
 * jsonp ( url, params, options )
