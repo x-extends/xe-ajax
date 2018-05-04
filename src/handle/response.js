@@ -46,7 +46,7 @@ responsePro.text = function () {
   return this.body._getBody(this)
 }
 
-if (utils.isSupportAdvanced) {
+if (utils._A) {
   responsePro.text = function () {
     var request = this._request
     return this.blob().then(function (blob) {
@@ -71,7 +71,7 @@ if (utils.isSupportAdvanced) {
   responsePro.formData = function () {
     return this.text().then(function (text) {
       var formData = new FormData()
-      text.trim().split('&').forEach(function (bytes) {
+      utils.arrayEach(text.trim().split('&'), function (bytes) {
         if (bytes) {
           var split = bytes.split('=')
           var name = split.shift().replace(/\+/g, ' ')

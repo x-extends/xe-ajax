@@ -15,23 +15,16 @@
   var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
   var utils = {
 
-    isNodeJS: isNodeJS,
-    isFetch: isNodeJS ? false : !!self.fetch,
-    isSupportAdvanced: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'),
+    _N: isNodeJS, // nodejs 环境
+    _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
+    _A: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'), // IE10+ 支持Blob
 
     isFormData: function (obj) {
       return typeof FormData !== 'undefined' && obj instanceof FormData
     },
 
     isCrossOrigin: function (url) {
-      if (!isNodeJS) {
-        if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
-          if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
-            return true
-          }
-        }
-      }
-      return false
+      return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host)
     },
 
     isString: function (val) {
@@ -196,7 +189,7 @@
   }
 
   function XEHeadersPolyfill (headers) {
-    this._map = {}
+    this._d = {}
     if (headers instanceof XEHeaders) {
       headers.forEach(function (value, name) {
         this.set(name, value)
@@ -211,39 +204,37 @@
   var headersPro = XEHeadersPolyfill.prototype
 
   headersPro.set = function (name, value) {
-    this._map[toHeaderKey(name)] = value
+    this._d[toHeaderKey(name)] = value
   }
   headersPro.get = function (name) {
     var _key = toHeaderKey(name)
-    return this.has(_key) ? this._map[_key] : null
+    return this.has(_key) ? this._d[_key] : null
   }
   headersPro.append = function (name, value) {
     var _key = toHeaderKey(name)
     if (this.has(_key)) {
-      this._map[_key] = this._map[_key] + ', ' + value
+      this._d[_key] = this._d[_key] + ', ' + value
     } else {
-      this._map[_key] = '' + value
+      this._d[_key] = '' + value
     }
   }
   headersPro.has = function (name) {
-    return this._map.hasOwnProperty(toHeaderKey(name))
+    return this._d.hasOwnProperty(toHeaderKey(name))
   }
   headersPro.keys = function () {
-    return new XEIterator(this._map, 0)
+    return new XEIterator(this._d, 0)
   }
   headersPro.values = function () {
-    return new XEIterator(this._map, 1)
+    return new XEIterator(this._d, 1)
   }
   headersPro.entries = function () {
-    return new XEIterator(this._map, 2)
+    return new XEIterator(this._d, 2)
   }
   headersPro['delete'] = function (name) {
-    delete this._map[toHeaderKey(name)]
+    delete this._d[toHeaderKey(name)]
   }
   headersPro.forEach = function (callback, context) {
-    utils.objectEach(this._map, function (value, name, state) {
-      callback.call(context, value, name, state)
-    })
+    utils.objectEach(this._d, callback, context)
   }
 
   var XEHeaders = typeof Headers === 'undefined' ? XEHeadersPolyfill : Headers
@@ -365,11 +356,7 @@
       thenInterceptor = thenInterceptor.then(function (response) {
         return new XEPromise(function (resolve) {
           callback(response, function (resp) {
-            if (resp && resp.body && resp.status) {
-              resolve(handleExports.toResponse(resp, request))
-            } else {
-              resolve(response)
-            }
+            resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
           }, request)
         }, request.$context)
       }).catch(function (e) {
@@ -392,10 +379,7 @@
   interceptors.request.use(function (request, next) {
     if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
       if (!utils.isFormData(request.body)) {
-        request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-        if (request.bodyType === 'json-data') {
-          request.headers.set('Content-Type', 'application/json; charset=utf-8')
-        }
+        request.headers.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
       }
     }
     if (utils.isCrossOrigin(request.getUrl())) {
@@ -418,7 +402,7 @@
   }
 
   function XERequest (options) {
-    utils.objectAssign(this, { url: '', body: null, params: null, signal: null }, options)
+    utils.objectAssign(this, { url: '', body: '', params: '', signal: '' }, options)
     this.headers = new XEHeaders(options.headers)
     this.method = this.method.toLocaleUpperCase()
     this.bodyType = this.bodyType.toLowerCase()
@@ -455,7 +439,7 @@
         return url
       }
       if (url.indexOf('//') === 0) {
-        return (utils.isNodeJS ? '' : location.protocol) + url
+        return (utils._N ? '' : location.protocol) + url
       }
       if (url.indexOf('/') === 0) {
         return utils.getLocatOrigin() + url
@@ -526,7 +510,7 @@
     return this.body._getBody(this)
   }
 
-  if (utils.isSupportAdvanced) {
+  if (utils._A) {
     responsePro.text = function () {
       var request = this._request
       return this.blob().then(function (blob) {
@@ -551,7 +535,7 @@
     responsePro.formData = function () {
       return this.text().then(function (text) {
         var formData = new FormData()
-        text.trim().split('&').forEach(function (bytes) {
+        utils.arrayEach(text.trim().split('&'), function (bytes) {
           if (bytes) {
             var split = bytes.split('=')
             var name = split.shift().replace(/\+/g, ' ')
@@ -591,7 +575,7 @@
         return resp
       }
       var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
-      if (utils.isSupportAdvanced) {
+      if (utils._A) {
         return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
       }
       return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
@@ -605,16 +589,17 @@
    * @param { Function } failed
    */
   function sendXHR (request, finish, failed) {
+    var url = request.getUrl()
     if (request.mode === 'same-origin') {
-      if (utils.isCrossOrigin(request.getUrl())) {
+      if (utils.isCrossOrigin(url)) {
         failed()
-        throw new TypeError('Fetch API cannot load ' + request.getUrl() + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getLocatOrigin() + '.')
+        throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getLocatOrigin() + '.')
       }
     }
     var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
     xhr._request = request
-    xhr.open(request.method, request.getUrl(), true)
+    xhr.open(request.method, url, true)
     if (request.timeout) {
       setTimeout(function () {
         xhr.abort()
@@ -639,7 +624,7 @@
     xhr.onabort = function () {
       failed('aborted')
     }
-    if (utils.isSupportAdvanced) {
+    if (utils._A) {
       xhr.responseType = 'blob'
     }
     if (request.credentials === 'include') {
@@ -656,12 +641,10 @@
   function parseXHRHeaders (xhr) {
     var headers = {}
     var allResponseHeaders = xhr.getAllResponseHeaders().trim()
-    if (allResponseHeaders) {
-      utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
-        var index = row.indexOf(':')
-        headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
-      })
-    }
+    utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
+      var index = row.indexOf(':')
+      headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+    })
     return headers
   }
 
@@ -672,7 +655,7 @@
    * @param { Function } failed
    */
   function sendFetch (request, finish, failed) {
-    var timer = null
+    var timer = ''
     var $fetch = request.$fetch || self.fetch
     var options = {
       _request: request,
@@ -705,7 +688,7 @@
   function getRequest (request) {
     if (request.$fetch) {
       return request.signal ? sendXHR : sendFetch
-    } else if (utils.isFetch) {
+    } else if (utils._F) {
       if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
         return sendFetch
       }
@@ -715,10 +698,10 @@
   }
 
   function createRequestFactory () {
-    if (utils.isNodeJS) {
+    if (utils._N) {
       return sendHttp
-    } else if (utils.isFetch) {
-      return function (request, finish, failed) {
+    } else if (utils._F) {
+      return function (request) {
         return getRequest(request).apply(this, arguments)
       }
     }
@@ -728,7 +711,8 @@
   var fetchRequest = createRequestFactory()
 
   var jsonpIndex = 0
-  var $global = typeof window === 'undefined' ? this : window
+  var $global = typeof window === 'undefined' ? '' : window
+  var $dom = $global ? $global.document : ''
 
   /**
    * jsonp
@@ -737,10 +721,11 @@
    * @param { Function } failed
    */
   function sendJSONP (request, finish, failed) {
-    request.script = document.createElement('script')
+    request.script = $dom.createElement('script')
+    var jsonpCallback = request.jsonpCallback
     var script = request.script
-    if (!request.jsonpCallback) {
-      request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
+    if (!jsonpCallback) {
+      jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
     }
     if (utils.isFunction(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
@@ -750,35 +735,35 @@
       })
     } else {
       var url = request.getUrl()
-      $global[request.jsonpCallback] = function (body) {
-        jsonpClear(request)
+      $global[jsonpCallback] = function (body) {
+        jsonpClear(request, jsonpCallback)
         finish({ status: 200, body: body })
       }
       script.type = 'text/javascript'
-      script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + request.jsonpCallback
-      script.onerror = function (evnt) {
-        jsonpClear(request)
+      script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + jsonpCallback
+      script.onerror = function () {
+        jsonpClear(request, jsonpCallback)
         finish()
       }
       if (request.timeout) {
         setTimeout(function () {
-          jsonpClear(request)
+          jsonpClear(request, jsonpCallback)
           finish('timeout')
         }, request.timeout)
       }
-      document.body.appendChild(script)
+      $dom.body.appendChild(script)
     }
   }
 
-  function jsonpClear (request) {
-    if (request.script.parentNode === document.body) {
-      document.body.removeChild(request.script)
+  function jsonpClear (request, jsonpCallback) {
+    if (request.script.parentNode === $dom.body) {
+      $dom.body.removeChild(request.script)
     }
     try {
-      delete $global[request.jsonpCallback]
+      delete $global[jsonpCallback]
     } catch (e) {
       // IE8
-      $global[request.jsonpCallback] = undefined
+      $global[jsonpCallback] = undefined
     }
   }
 
@@ -889,7 +874,7 @@
       var opts = method.apply(this, arguments)
       var XEPromise = opts.$Promise || Promise
       return XEAjax(opts).catch(function (e) {
-        return XEPromise.reject(getResponseSchema(isRespSchema, null, 'failed', e.message || e, {}), this)
+        return XEPromise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
       }).then(function (response) {
         return new XEPromise(function (resolve, reject) {
           var finish = response.ok ? resolve : reject

@@ -38,7 +38,7 @@ function createResponseSchema (method, isRespSchema) {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
     return XEAjax(opts).catch(function (e) {
-      return XEPromise.reject(getResponseSchema(isRespSchema, null, 'failed', e.message || e, {}), this)
+      return XEPromise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
     }).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         var finish = response.ok ? resolve : reject

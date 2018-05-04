@@ -4,23 +4,16 @@ var encode = encodeURIComponent
 var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
 var utils = {
 
-  isNodeJS: isNodeJS,
-  isFetch: isNodeJS ? false : !!self.fetch,
-  isSupportAdvanced: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'),
+  _N: isNodeJS, // nodejs 环境
+  _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
+  _A: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'), // IE10+ 支持Blob
 
   isFormData: function (obj) {
     return typeof FormData !== 'undefined' && obj instanceof FormData
   },
 
   isCrossOrigin: function (url) {
-    if (!isNodeJS) {
-      if (/(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url)) {
-        if (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host) {
-          return true
-        }
-      }
-    }
-    return false
+    return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host)
   },
 
   isString: function (val) {

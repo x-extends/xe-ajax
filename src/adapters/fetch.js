@@ -12,7 +12,7 @@ var handleExports = require('../handle')
  * @param { Function } failed
  */
 function sendFetch (request, finish, failed) {
-  var timer = null
+  var timer = ''
   var $fetch = request.$fetch || self.fetch
   var options = {
     _request: request,
@@ -45,7 +45,7 @@ function sendFetch (request, finish, failed) {
 function getRequest (request) {
   if (request.$fetch) {
     return request.signal ? sendXHR : sendFetch
-  } else if (utils.isFetch) {
+  } else if (utils._F) {
     if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
       return sendFetch
     }
@@ -55,10 +55,10 @@ function getRequest (request) {
 }
 
 function createRequestFactory () {
-  if (utils.isNodeJS) {
+  if (utils._N) {
     return sendHttp
-  } else if (utils.isFetch) {
-    return function (request, finish, failed) {
+  } else if (utils._F) {
+    return function (request) {
       return getRequest(request).apply(this, arguments)
     }
   }

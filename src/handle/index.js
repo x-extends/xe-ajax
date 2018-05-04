@@ -19,7 +19,7 @@ var handleExports = {
       return resp
     }
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
-    if (utils.isSupportAdvanced) {
+    if (utils._A) {
       return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
     }
     return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)

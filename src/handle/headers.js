@@ -31,7 +31,7 @@ function XEIterator (iterator, value) {
 }
 
 function XEHeadersPolyfill (headers) {
-  this._map = {}
+  this._d = {}
   if (headers instanceof XEHeaders) {
     headers.forEach(function (value, name) {
       this.set(name, value)
@@ -46,39 +46,37 @@ function XEHeadersPolyfill (headers) {
 var headersPro = XEHeadersPolyfill.prototype
 
 headersPro.set = function (name, value) {
-  this._map[toHeaderKey(name)] = value
+  this._d[toHeaderKey(name)] = value
 }
 headersPro.get = function (name) {
   var _key = toHeaderKey(name)
-  return this.has(_key) ? this._map[_key] : null
+  return this.has(_key) ? this._d[_key] : null
 }
 headersPro.append = function (name, value) {
   var _key = toHeaderKey(name)
   if (this.has(_key)) {
-    this._map[_key] = this._map[_key] + ', ' + value
+    this._d[_key] = this._d[_key] + ', ' + value
   } else {
-    this._map[_key] = '' + value
+    this._d[_key] = '' + value
   }
 }
 headersPro.has = function (name) {
-  return this._map.hasOwnProperty(toHeaderKey(name))
+  return this._d.hasOwnProperty(toHeaderKey(name))
 }
 headersPro.keys = function () {
-  return new XEIterator(this._map, 0)
+  return new XEIterator(this._d, 0)
 }
 headersPro.values = function () {
-  return new XEIterator(this._map, 1)
+  return new XEIterator(this._d, 1)
 }
 headersPro.entries = function () {
-  return new XEIterator(this._map, 2)
+  return new XEIterator(this._d, 2)
 }
 headersPro['delete'] = function (name) {
-  delete this._map[toHeaderKey(name)]
+  delete this._d[toHeaderKey(name)]
 }
 headersPro.forEach = function (callback, context) {
-  utils.objectEach(this._map, function (value, name, state) {
-    callback.call(context, value, name, state)
-  })
+  utils.objectEach(this._d, callback, context)
 }
 
 var XEHeaders = typeof Headers === 'undefined' ? XEHeadersPolyfill : Headers

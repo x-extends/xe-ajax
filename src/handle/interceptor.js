@@ -52,11 +52,7 @@ function responseInterceptor (calls, request, response) {
     thenInterceptor = thenInterceptor.then(function (response) {
       return new XEPromise(function (resolve) {
         callback(response, function (resp) {
-          if (resp && resp.body && resp.status) {
-            resolve(handleExports.toResponse(resp, request))
-          } else {
-            resolve(response)
-          }
+          resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
         }, request)
       }, request.$context)
     }).catch(function (e) {
@@ -79,10 +75,7 @@ var interceptors = {
 interceptors.request.use(function (request, next) {
   if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
     if (!utils.isFormData(request.body)) {
-      request.headers.set('Content-Type', 'application/x-www-form-urlencoded')
-      if (request.bodyType === 'json-data') {
-        request.headers.set('Content-Type', 'application/json; charset=utf-8')
-      }
+      request.headers.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
     }
   }
   if (utils.isCrossOrigin(request.getUrl())) {

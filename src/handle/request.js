@@ -4,7 +4,7 @@ var utils = require('../core/utils')
 var XEHeaders = require('./headers')
 
 function XERequest (options) {
-  utils.objectAssign(this, {url: '', body: null, params: null, signal: null}, options)
+  utils.objectAssign(this, {url: '', body: '', params: '', signal: ''}, options)
   this.headers = new XEHeaders(options.headers)
   this.method = this.method.toLocaleUpperCase()
   this.bodyType = this.bodyType.toLowerCase()
@@ -41,7 +41,7 @@ requestPro.getUrl = function () {
       return url
     }
     if (url.indexOf('//') === 0) {
-      return (utils.isNodeJS ? '' : location.protocol) + url
+      return (utils._N ? '' : location.protocol) + url
     }
     if (url.indexOf('/') === 0) {
       return utils.getLocatOrigin() + url

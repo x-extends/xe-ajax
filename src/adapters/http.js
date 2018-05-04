@@ -14,7 +14,7 @@ var handleExports = require('../handle')
  * @param { Function } failed
  */
 function httpRequest (request, finish, failed) {
-  var timer = null
+  var timer = ''
   var body = request.getBody()
   var urlLocat = url.parse(request.getUrl())
   var options = {
@@ -89,7 +89,7 @@ function getHttp (urlLocat) {
 
 function sendHttp (request, finish, failed) {
   if (utils.isFunction(request.$http)) {
-    var timer = null
+    var timer = ''
     if (request.timeout) {
       timer = setTimeout(function () {
         failed('timeout')
