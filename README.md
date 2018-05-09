@@ -6,6 +6,7 @@
 The asynchronous fetch function based on Promise, Support the node.js、browser environment, Simple API, lightweight encapsulation, high expansion.
 
 ## Browser Support
+
 xe-ajax depends on a native ES6 Promise implementation to be supported. If your environment doesn't support ES6 Promises, you can polyfill.
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
@@ -13,15 +14,21 @@ xe-ajax depends on a native ES6 Promise implementation to be supported. If your 
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## CDN
+
 [All cdnjs package](https://cdn.jsdelivr.net/npm/xe-ajax/)
+
 ```HTML
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
+
 [All unpkg package](https://unpkg.com/xe-ajax/)
+
 ```HTML
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
+
 ## AMD
+
 ```JavaScript
 require.config({
   paths: {
@@ -29,23 +36,31 @@ require.config({
     'xe-ajax': './dist/xe-ajax.min'
   }
 })
+define(['xe-ajax'], function (XEAjax) {
+  // XEAjax.fetch(url)
+})
 ```
+
 ## NPM
+
 ```JavaScript
 npm install xe-ajax --save
 ```
 
 ### NodeJS
+
 ```JavaScript
 const XEAjax = require('xe-ajax')
 ```
 
 ### ES6 Module import
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 ```
 
-## API:
+## API
+
 * doAll ( iterable )
 * ajax ( options )
 * ~
@@ -75,11 +90,13 @@ import XEAjax from 'xe-ajax'
 * patchJSON ( url[, body, options] )
 
 ### Arguments
+
 * **url** is the url to fetch
 * **params/body** the data to be sent.
 * **options** is an optional options object
 
 ### Options
+
 | Name | Type | Description | default value |
 |------|------|-----|----|
 | url | String | is the url to fetch |  |
@@ -103,6 +120,7 @@ import XEAjax from 'xe-ajax'
 | validateStatus | Function ( response ) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
 
 ### Headers
+
 | Name | Type | Description |
 |------|------|-----|
 | set | Function ( name, value ) | Sets a new value for an existing header inside a Headers object, or adds the header if it does not already exist. |
@@ -116,6 +134,7 @@ import XEAjax from 'xe-ajax'
 | forEach | Function ( callback, context ) | Executes a provided function once for each array element. |
 
 ### Response
+
 | Name | Type | Description |
 |------|------|-----|
 | body | ReadableStream | A simple getter used to expose a ReadableStream of the body contents. |
@@ -135,6 +154,7 @@ import XEAjax from 'xe-ajax'
 | formData | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a FormData object. |
 
 ## Default global settings
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -164,7 +184,9 @@ XEAjax.setup({
 ```
 
 ## Examples
+
 ### ajax
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -179,7 +201,9 @@ XEAjax.ajax({
 })
 
 ```
+
 ### fetch to Response
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -229,7 +253,9 @@ const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 ```
+
 ### fetch to Response Schema
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -252,7 +278,9 @@ const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
 ```
+
 ### fetch to JSON
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -272,7 +300,9 @@ const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.postJSON('/api/user/save', formBody)
 ```
+
 ### jsonp
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -303,7 +333,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 // http://xuliangzhan.com/jsonp/user/message?id=123&cb=customCallback
 // customCallback({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb', 
+  jsonp: 'cb',
   jsonpCallback: 'customCallback'
 })
 .then(response => response.json())
@@ -311,7 +341,9 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   // {message: 'success'}
 })
 ```
+
 ### Multiple requests
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -330,7 +362,9 @@ iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
+
 ### Nested requests
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -343,7 +377,9 @@ XEAjax.fetchGet('/api/user/info')
   // finish
 })
 ```
-### AMD
+
+### AMD request
+
 ```JavaScript
 define([
   'xe-ajax'
@@ -364,8 +400,11 @@ define([
 ```
 
 ## Cancel request
+
 ### AbortController
+
 Allows control of one or more cancellation requests.
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -385,8 +424,11 @@ setTimeout(() => {
 ```
 
 ## Interceptor
+
 ### Request interceptor
+
 use (before)
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -404,8 +446,11 @@ XEAjax.interceptors.request.use((request, next) => {
   next()
 })
 ```
+
 ### Response interceptor
+
 use (finish, failed)
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -415,7 +460,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
   // Example: check login failover.
   if (response.status === 403) {
-    router.replace({path: '/login'}) 
+    router.replace({path: '/login'})
     // break up
   } else {
     // Call next(), execute the next interceptor.
@@ -432,7 +477,7 @@ XEAjax.interceptors.response.use((response, next) => {
 XEAjax.interceptors.response.use((response, next) => {
   response.json().then(data => {
     const body = {
-      message: response.status === 200 ? 'success' : 'error', 
+      message: response.status === 200 ? 'success' : 'error',
       result: data
     }
     // Reset the response data and continue with the next interceptor.
@@ -441,7 +486,7 @@ XEAjax.interceptors.response.use((response, next) => {
 }, (e, next) => {
   // Turn all the exception errors to finish.
   const body = {
-    message: 'error', 
+    message: 'error',
     result: null
   }
   // Reset the response data and continue with the next interceptor.
@@ -450,15 +495,19 @@ XEAjax.interceptors.response.use((response, next) => {
 ```
 
 ## Functions of mixing
+
 ### ./customs.js
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
 export function getText () {
   return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
-} 
+}
 ```
+
 ### ./main.js
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 import customs from './customs'
@@ -469,11 +518,15 @@ XEAjax.getText('/api/user/message')
 ```
 
 ## Plugin
+
 ### Mock services
+
 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock)
 
 ## Project Demos
-[project examples.](https://github.com/xuliangzhan/examples)  
+
+[project examples.](https://github.com/xuliangzhan/examples)
 
 ## License
+
 Copyright (c) 2017-present, Xu Liangzhan
