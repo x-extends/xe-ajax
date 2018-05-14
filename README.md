@@ -501,8 +501,12 @@ XEAjax.interceptors.response.use((response, next) => {
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-export function getText () {
-  return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
+const cacheMap = {}
+export function onceGet () {
+  if (cacheMap[url]) {
+    return cacheMap[url]
+  }
+  return cacheMap[url] = XEAjax.fetchGet.apply(this, arguments)
 }
 ```
 
@@ -514,7 +518,7 @@ import customs from './customs'
 
 XEAjax.mixin(customs)
 
-XEAjax.getText('/api/user/message')
+XEAjax.onceGet('/api/user/message')
 ```
 
 ## Plugin
