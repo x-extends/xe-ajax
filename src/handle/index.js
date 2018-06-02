@@ -6,7 +6,8 @@ var XEResponse = require('./response')
 
 function isResponse (obj) {
   if (obj) {
-    return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
+    var objConstructor = obj.constructor
+    return (typeof Response !== 'undefined' && objConstructor === Response) || objConstructor === XEResponse
   }
   return false
 }
@@ -18,11 +19,12 @@ var handleExports = {
     if (isResponse(resp)) {
       return resp
     }
+    var reqBody = resp.body
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
     if (utils._A) {
-      return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
+      return new XEResponse(reqBody instanceof Blob ? reqBody : new Blob([utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody)]), options, request)
     }
-    return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
+    return new XEResponse(utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody), options, request)
   }
 }
 

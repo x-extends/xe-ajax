@@ -14,6 +14,7 @@ var handleExports = require('../handle')
 function sendFetch (request, finish, failed) {
   var timer = ''
   var $fetch = request.$fetch || self.fetch
+  var reqTimeout = request.timeout
   var options = {
     _request: request,
     method: request.method,
@@ -24,10 +25,10 @@ function sendFetch (request, finish, failed) {
     body: request.getBody(),
     headers: request.headers
   }
-  if (request.timeout) {
+  if (reqTimeout) {
     timer = setTimeout(function () {
       failed('timeout')
-    }, request.timeout)
+    }, reqTimeout)
   }
   if (request.signal && request.signal.aborted) {
     failed('aborted')

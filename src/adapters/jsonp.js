@@ -15,6 +15,7 @@ var $dom = $global ? $global.document : ''
  */
 function sendJSONP (request, finish, failed) {
   request.script = $dom.createElement('script')
+  var reqTimeout = request.timeout
   var jsonpCallback = request.jsonpCallback
   var script = request.script
   if (!jsonpCallback) {
@@ -38,11 +39,11 @@ function sendJSONP (request, finish, failed) {
       jsonpClear(request, jsonpCallback)
       finish()
     }
-    if (request.timeout) {
+    if (reqTimeout) {
       setTimeout(function () {
         jsonpClear(request, jsonpCallback)
         finish('timeout')
-      }, request.timeout)
+      }, reqTimeout)
     }
     $dom.body.appendChild(script)
   }

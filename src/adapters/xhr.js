@@ -11,6 +11,8 @@ var XEResponse = require('../handle/response')
  */
 function sendXHR (request, finish, failed) {
   var url = request.getUrl()
+  var reqTimeout = request.timeout
+  var reqCredentials = request.credentials
   if (request.mode === 'same-origin') {
     if (utils.isCrossOrigin(url)) {
       failed()
@@ -21,10 +23,10 @@ function sendXHR (request, finish, failed) {
   var xhr = request.xhr = new $XMLHttpRequest()
   xhr._request = request
   xhr.open(request.method, url, true)
-  if (request.timeout) {
+  if (reqTimeout) {
     setTimeout(function () {
       xhr.abort()
-    }, request.timeout)
+    }, reqTimeout)
   }
   request.headers.forEach(function (value, name) {
     xhr.setRequestHeader(name, value)
@@ -48,9 +50,9 @@ function sendXHR (request, finish, failed) {
   if (utils._A) {
     xhr.responseType = 'blob'
   }
-  if (request.credentials === 'include') {
+  if (reqCredentials === 'include') {
     xhr.withCredentials = true
-  } else if (request.credentials === 'omit') {
+  } else if (reqCredentials === 'omit') {
     xhr.withCredentials = false
   }
   xhr.send(request.getBody())

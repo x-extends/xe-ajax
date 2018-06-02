@@ -3,9 +3,11 @@
 var XEAjax = require('./ajax')
 var utils = require('./utils')
 
+var clearContext = utils.clearContext
+
 function getOptions (method, def, options) {
   var opts = utils.objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
-  utils.clearContext(XEAjax)
+  clearContext(XEAjax)
   return opts
 }
 
@@ -66,7 +68,7 @@ function requestToJSON (method) {
 function doAll (iterable) {
   var XEPromise = XEAjax.$Promise || Promise
   var context = XEAjax.$context
-  utils.clearContext(XEAjax)
+  clearContext(XEAjax)
   return XEPromise.all(iterable.map(function (item) {
     if (item instanceof XEPromise || item instanceof Promise) {
       return item
@@ -140,7 +142,7 @@ XEAjax.mixin = function (methods) {
   utils.objectEach(methods, function (fn, name) {
     XEAjax[name] = utils.isFunction(fn) ? function () {
       var result = fn.apply(XEAjax.$context, arguments)
-      utils.clearContext(XEAjax)
+      clearContext(XEAjax)
       return result
     } : fn
   })

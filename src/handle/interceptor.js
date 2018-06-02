@@ -73,13 +73,15 @@ var interceptors = {
 
 // default interceptor
 interceptors.request.use(function (request, next) {
-  if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
-    if (!utils.isFormData(request.body)) {
-      request.headers.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
+  var reqHeaders = request.headers
+  var reqBody = request.body
+  if (reqBody && request.method !== 'GET' && request.method !== 'HEAD') {
+    if (!utils.isFormData(reqBody)) {
+      reqHeaders.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
     }
   }
   if (utils.isCrossOrigin(request.getUrl())) {
-    request.headers.set('X-Requested-With', 'XMLHttpRequest')
+    reqHeaders.set('X-Requested-With', 'XMLHttpRequest')
   }
   next()
 })

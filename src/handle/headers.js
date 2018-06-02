@@ -31,15 +31,15 @@ function XEIterator (iterator, value) {
 }
 
 function XEHeadersPolyfill (headers) {
-  this._d = {}
+  var that = this
+  var defset = function (value, name) {
+    that.set(name, value)
+  }
+  that._d = {}
   if (headers instanceof XEHeaders) {
-    headers.forEach(function (value, name) {
-      this.set(name, value)
-    }, this)
+    headers.forEach(defset)
   } else {
-    utils.objectEach(headers, function (value, name) {
-      this.set(name, value)
-    }, this)
+    utils.objectEach(headers, defset)
   }
 }
 

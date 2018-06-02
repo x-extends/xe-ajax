@@ -15,6 +15,8 @@ var handleExports = require('../handle')
  */
 function httpRequest (request, finish, failed) {
   var timer = ''
+  var reqAgent = request.agent
+  var reqTimeout = request.timeout
   var body = request.getBody()
   var urlLocat = url.parse(request.getUrl())
   var options = {
@@ -25,8 +27,8 @@ function httpRequest (request, finish, failed) {
     headers: {}
   }
 
-  if (request.agent) {
-    options.agent = request.agent
+  if (reqAgent) {
+    options.agent = reqAgent
   }
 
   if (body) {
@@ -42,7 +44,7 @@ function httpRequest (request, finish, failed) {
     var chunkSize = 0
 
     clearTimeout(timer)
-    res.setEncoding('utf8')
+
     res.on('data', function (chunk) {
       var buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
       chunks.push(buf)
@@ -73,11 +75,11 @@ function httpRequest (request, finish, failed) {
     req.write(body)
   }
 
-  if (request.timeout) {
+  if (reqTimeout) {
     timer = setTimeout(function () {
       req.abort()
       failed('timeout')
-    }, request.timeout)
+    }, reqTimeout)
   }
 
   req.end()
@@ -90,10 +92,11 @@ function getHttp (urlLocat) {
 function sendHttp (request, finish, failed) {
   if (utils.isFunction(request.$http)) {
     var timer = ''
-    if (request.timeout) {
+    var reqTimeout = request.timeout
+    if (reqTimeout) {
       timer = setTimeout(function () {
         failed('timeout')
-      }, request.timeout)
+      }, reqTimeout)
     }
     return request.$http(request, function () {
       clearTimeout(timer)

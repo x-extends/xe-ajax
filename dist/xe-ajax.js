@@ -13,110 +13,14 @@
 
   var encode = encodeURIComponent
   var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
-  var utils = {
+  var $locat = ''
 
-    _N: isNodeJS, // nodejs 环境
-    _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
-    _A: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'), // IE10+ 支持Blob
+  if (!isNodeJS) {
+    $locat = location
+  }
 
-    isFormData: function (obj) {
-      return typeof FormData !== 'undefined' && obj instanceof FormData
-    },
-
-    isCrossOrigin: function (url) {
-      return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== location.protocol || RegExp.$2.split('/')[0] !== location.host)
-    },
-
-    isString: function (val) {
-      return typeof val === 'string'
-    },
-
-    isObject: function (obj) {
-      return obj && typeof obj === 'object'
-    },
-
-    isPlainObject: function (val) {
-      return val ? val.constructor === Object : false
-    },
-
-    isFunction: function (obj) {
-      return typeof obj === 'function'
-    },
-
-    getLocatOrigin: function () {
-      return isNodeJS ? '' : (location.origin || (location.protocol + '//' + location.host))
-    },
-
-    getBaseURL: function () {
-      if (isNodeJS) {
-        return ''
-      }
-      var pathname = location.pathname
-      var lastIndex = lastIndexOf(pathname, '/') + 1
-      return utils.getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
-    },
-
-    objectEach: function (obj, iteratee, context) {
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          iteratee.call(context, obj[key], key, obj)
-        }
-      }
-    },
-
-    // Serialize Body
-    serialize: function (body) {
-      var params = []
-      utils.objectEach(body, function (item, key) {
-        if (item !== undefined) {
-          if (utils.isPlainObject(item) || isArray(item)) {
-            params = params.concat(parseParam(item, key, isArray(item)))
-          } else {
-            params.push(encode(key) + '=' + encode(item))
-          }
-        }
-      })
-      return params.join('&').replace(/%20/g, '+')
-    },
-
-    objectAssign: Object.assign || function (target) {
-      for (var source, index = 1, len = arguments.length; index < len; index++) {
-        source = arguments[index]
-        for (var key in source) {
-          if (source.hasOwnProperty(key)) {
-            target[key] = source[key]
-          }
-        }
-      }
-      return target
-    },
-
-    arrayIndexOf: function (array, val) {
-      if (array.indexOf) {
-        return array.indexOf(val)
-      } else {
-        for (var index = 0, len = array.length; index < len; index++) {
-          if (val === array[index]) {
-            return index
-          }
-        }
-      }
-      return -1
-    },
-
-    arrayEach: function (array, callback, context) {
-      if (array.forEach) {
-        array.forEach(callback, context)
-      } else {
-        for (var index = 0, len = array.length; index < len; index++) {
-          callback.call(context, array[index], index, array)
-        }
-      }
-    },
-
-    clearContext: function (XEAjax) {
-      XEAjax.$context = XEAjax.$Promise = null
-    }
+  function isPlainObject (val) {
+    return val ? val.constructor === Object : false
   }
 
   function isArray (obj) {
@@ -132,16 +36,117 @@
     return -1
   }
 
+  function objectEach (obj, iteratee, context) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        iteratee.call(context, obj[key], key, obj)
+      }
+    }
+  }
+
   function parseParam (resultVal, resultKey, isArr) {
     var result = []
-    utils.objectEach(resultVal, function (item, key) {
-      if (utils.isPlainObject(item) || isArray(item)) {
+    objectEach(resultVal, function (item, key) {
+      if (isPlainObject(item) || isArray(item)) {
         result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
       } else {
         result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item))
       }
     })
     return result
+  }
+
+  function getLocatOrigin () {
+    return isNodeJS ? '' : ($locat.origin || ($locat.protocol + '//' + $locat.host))
+  }
+
+  var utils = {
+
+    _N: isNodeJS, // nodejs 环境
+    _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
+    _A: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'), // IE10+ 支持Blob
+
+    isFormData: function (obj) {
+      return typeof FormData !== 'undefined' && obj instanceof FormData
+    },
+
+    isCrossOrigin: function (url) {
+      return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== $locat.protocol || RegExp.$2.split('/')[0] !== $locat.host)
+    },
+
+    isString: function (val) {
+      return typeof val === 'string'
+    },
+
+    isObject: function (obj) {
+      return obj && typeof obj === 'object'
+    },
+
+    isPlainObject: isPlainObject,
+
+    isFunction: function (obj) {
+      return typeof obj === 'function'
+    },
+
+    getLocatOrigin: getLocatOrigin,
+
+    getBaseURL: function () {
+      if (isNodeJS) {
+        return ''
+      }
+      var pathname = $locat.pathname
+      var lastIndex = lastIndexOf(pathname, '/') + 1
+      return getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
+    },
+
+    objectEach: objectEach,
+
+    // Serialize Body
+    serialize: function (body) {
+      var params = []
+      objectEach(body, function (item, key) {
+        if (item !== undefined) {
+          if (isPlainObject(item) || isArray(item)) {
+            params = params.concat(parseParam(item, key, isArray(item)))
+          } else {
+            params.push(encode(key) + '=' + encode(item))
+          }
+        }
+      })
+      return params.join('&').replace(/%20/g, '+')
+    },
+
+    objectAssign: Object.assign || function (target) {
+      var args = arguments
+      for (var source, index = 1, len = args.length; index < len; index++) {
+        source = args[index]
+        for (var key in source) {
+          if (source.hasOwnProperty(key)) {
+            target[key] = source[key]
+          }
+        }
+      }
+      return target
+    },
+
+    arrayIndexOf: function (array, val) {
+      for (var index = 0, len = array.length; index < len; index++) {
+        if (val === array[index]) {
+          return index
+        }
+      }
+      return -1
+    },
+
+    arrayEach: function (array, callback, context) {
+      for (var index = 0, len = array.length; index < len; index++) {
+        callback.call(context, array[index], index, array)
+      }
+    },
+
+    clearContext: function (XEAjax) {
+      XEAjax.$context = XEAjax.$Promise = null
+    }
   }
 
   var setupDefaults = {
@@ -189,15 +194,15 @@
   }
 
   function XEHeadersPolyfill (headers) {
-    this._d = {}
+    var that = this
+    var defset = function (value, name) {
+      that.set(name, value)
+    }
+    that._d = {}
     if (headers instanceof XEHeaders) {
-      headers.forEach(function (value, name) {
-        this.set(name, value)
-      }, this)
+      headers.forEach(defset)
     } else {
-      utils.objectEach(headers, function (value, name) {
-        this.set(name, value)
-      }, this)
+      utils.objectEach(headers, defset)
     }
   }
 
@@ -278,10 +283,11 @@
   }
 
   XEAbortSignalPolyfill.prototype.install = function (request) {
-    if (request.signal) {
-      var index = getSignalIndex(request.signal)
+    var reqSignal = request.signal
+    if (reqSignal) {
+      var index = getSignalIndex(reqSignal)
       if (index === undefined) {
-        requestList.push([request.signal, [request]])
+        requestList.push([reqSignal, [request]])
       } else {
         requestList[index][1].push(request)
       }
@@ -377,13 +383,15 @@
 
   // default interceptor
   interceptors.request.use(function (request, next) {
-    if (request.body && request.method !== 'GET' && request.method !== 'HEAD') {
-      if (!utils.isFormData(request.body)) {
-        request.headers.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
+    var reqHeaders = request.headers
+    var reqBody = request.body
+    if (reqBody && request.method !== 'GET' && request.method !== 'HEAD') {
+      if (!utils.isFormData(reqBody)) {
+        reqHeaders.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
       }
     }
     if (utils.isCrossOrigin(request.getUrl())) {
-      request.headers.set('X-Requested-With', 'XMLHttpRequest')
+      reqHeaders.set('X-Requested-With', 'XMLHttpRequest')
     }
     next()
   })
@@ -471,7 +479,7 @@
   function XEResponse (body, options, request) {
     this._body = body
     this._request = request
-    this._response = {
+    var _response = this._response = {
       body: new XEReadableStream(body, request, this),
       bodyUsed: false,
       url: request.url,
@@ -481,19 +489,19 @@
       headers: new XEHeaders(options.headers || {}),
       type: 'basic'
     }
-    this._response.ok = request.validateStatus(this)
+    _response.ok = request.validateStatus(this)
   }
 
+  var decode = decodeURIComponent
+  var responsePro = XEResponse.prototype
+
   utils.arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
-    Object.defineProperty(XEResponse.prototype, name, {
+    Object.defineProperty(responsePro, name, {
       get: function () {
         return this._response[name]
       }
     })
   })
-
-  var decode = decodeURIComponent
-  var responsePro = XEResponse.prototype
 
   responsePro.clone = function () {
     if (this.bodyUsed) {
@@ -562,7 +570,8 @@
 
   function isResponse (obj) {
     if (obj) {
-      return (typeof Response !== 'undefined' && obj.constructor === Response) || obj.constructor === XEResponse
+      var objConstructor = obj.constructor
+      return (typeof Response !== 'undefined' && objConstructor === Response) || objConstructor === XEResponse
     }
     return false
   }
@@ -574,11 +583,12 @@
       if (isResponse(resp)) {
         return resp
       }
+      var reqBody = resp.body
       var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
       if (utils._A) {
-        return new XEResponse(resp.body instanceof Blob ? resp.body : new Blob([utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body)]), options, request)
+        return new XEResponse(reqBody instanceof Blob ? reqBody : new Blob([utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody)]), options, request)
       }
-      return new XEResponse(utils.isString(resp.body) ? resp.body : JSON.stringify(resp.body), options, request)
+      return new XEResponse(utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody), options, request)
     }
   }
 
@@ -590,6 +600,8 @@
    */
   function sendXHR (request, finish, failed) {
     var url = request.getUrl()
+    var reqTimeout = request.timeout
+    var reqCredentials = request.credentials
     if (request.mode === 'same-origin') {
       if (utils.isCrossOrigin(url)) {
         failed()
@@ -600,10 +612,10 @@
     var xhr = request.xhr = new $XMLHttpRequest()
     xhr._request = request
     xhr.open(request.method, url, true)
-    if (request.timeout) {
+    if (reqTimeout) {
       setTimeout(function () {
         xhr.abort()
-      }, request.timeout)
+      }, reqTimeout)
     }
     request.headers.forEach(function (value, name) {
       xhr.setRequestHeader(name, value)
@@ -627,9 +639,9 @@
     if (utils._A) {
       xhr.responseType = 'blob'
     }
-    if (request.credentials === 'include') {
+    if (reqCredentials === 'include') {
       xhr.withCredentials = true
-    } else if (request.credentials === 'omit') {
+    } else if (reqCredentials === 'omit') {
       xhr.withCredentials = false
     }
     xhr.send(request.getBody())
@@ -657,6 +669,7 @@
   function sendFetch (request, finish, failed) {
     var timer = ''
     var $fetch = request.$fetch || self.fetch
+    var reqTimeout = request.timeout
     var options = {
       _request: request,
       method: request.method,
@@ -667,10 +680,10 @@
       body: request.getBody(),
       headers: request.headers
     }
-    if (request.timeout) {
+    if (reqTimeout) {
       timer = setTimeout(function () {
         failed('timeout')
-      }, request.timeout)
+      }, reqTimeout)
     }
     if (request.signal && request.signal.aborted) {
       failed('aborted')
@@ -722,6 +735,7 @@
    */
   function sendJSONP (request, finish, failed) {
     request.script = $dom.createElement('script')
+    var reqTimeout = request.timeout
     var jsonpCallback = request.jsonpCallback
     var script = request.script
     if (!jsonpCallback) {
@@ -745,11 +759,11 @@
         jsonpClear(request, jsonpCallback)
         finish()
       }
-      if (request.timeout) {
+      if (reqTimeout) {
         setTimeout(function () {
           jsonpClear(request, jsonpCallback)
           finish('timeout')
-        }, request.timeout)
+        }, reqTimeout)
       }
       $dom.body.appendChild(script)
     }
@@ -839,9 +853,11 @@
     utils.objectAssign(setupDefaults, options)
   }
 
+  var clearContext = utils.clearContext
+
   function getOptions (method, def, options) {
     var opts = utils.objectAssign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
-    utils.clearContext(XEAjax)
+    clearContext(XEAjax)
     return opts
   }
 
@@ -902,7 +918,7 @@
   function doAll (iterable) {
     var XEPromise = XEAjax.$Promise || Promise
     var context = XEAjax.$context
-    utils.clearContext(XEAjax)
+    clearContext(XEAjax)
     return XEPromise.all(iterable.map(function (item) {
       if (item instanceof XEPromise || item instanceof Promise) {
         return item
@@ -976,7 +992,7 @@
     utils.objectEach(methods, function (fn, name) {
       XEAjax[name] = utils.isFunction(fn) ? function () {
         var result = fn.apply(XEAjax.$context, arguments)
-        utils.clearContext(XEAjax)
+        clearContext(XEAjax)
         return result
       } : fn
     })

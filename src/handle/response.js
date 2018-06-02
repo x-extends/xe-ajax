@@ -7,7 +7,7 @@ var XEHeaders = require('./headers')
 function XEResponse (body, options, request) {
   this._body = body
   this._request = request
-  this._response = {
+  var _response = this._response = {
     body: new XEReadableStream(body, request, this),
     bodyUsed: false,
     url: request.url,
@@ -17,19 +17,19 @@ function XEResponse (body, options, request) {
     headers: new XEHeaders(options.headers || {}),
     type: 'basic'
   }
-  this._response.ok = request.validateStatus(this)
+  _response.ok = request.validateStatus(this)
 }
 
+var decode = decodeURIComponent
+var responsePro = XEResponse.prototype
+
 utils.arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
-  Object.defineProperty(XEResponse.prototype, name, {
+  Object.defineProperty(responsePro, name, {
     get: function () {
       return this._response[name]
     }
   })
 })
-
-var decode = decodeURIComponent
-var responsePro = XEResponse.prototype
 
 responsePro.clone = function () {
   if (this.bodyUsed) {

@@ -13,10 +13,11 @@ function getSignalIndex (item) {
 }
 
 XEAbortSignalPolyfill.prototype.install = function (request) {
-  if (request.signal) {
-    var index = getSignalIndex(request.signal)
+  var reqSignal = request.signal
+  if (reqSignal) {
+    var index = getSignalIndex(reqSignal)
     if (index === undefined) {
-      requestList.push([request.signal, [request]])
+      requestList.push([reqSignal, [request]])
     } else {
       requestList[index][1].push(request)
     }
