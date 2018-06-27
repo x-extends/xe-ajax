@@ -39,7 +39,7 @@ function parseParam (resultVal, resultKey, isArr) {
     if (isPlainObject(item) || isArray(item)) {
       result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
     } else {
-      result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item))
+      result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item === null ? '' : item))
     }
   })
   return result
@@ -98,7 +98,7 @@ var utils = {
         if (isPlainObject(item) || isArray(item)) {
           params = params.concat(parseParam(item, key, isArray(item)))
         } else {
-          params.push(encode(key) + '=' + encode(item))
+          params.push(encode(key) + '=' + encode(item === null ? '' : item))
         }
       }
     })

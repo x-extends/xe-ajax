@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.3
+ * xe-ajax.js v3.4.4
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -50,7 +50,7 @@
       if (isPlainObject(item) || isArray(item)) {
         result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
       } else {
-        result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item))
+        result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item === null ? '' : item))
       }
     })
     return result
@@ -109,7 +109,7 @@
           if (isPlainObject(item) || isArray(item)) {
             params = params.concat(parseParam(item, key, isArray(item)))
           } else {
-            params.push(encode(key) + '=' + encode(item))
+            params.push(encode(key) + '=' + encode(item === null ? '' : item))
           }
         }
       })
@@ -808,7 +808,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.3'
+  XEAjax.version = '3.4.4'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.AbortController = XEAbortController
