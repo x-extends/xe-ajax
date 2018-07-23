@@ -121,25 +121,25 @@ import XEAjax from 'xe-ajax'
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |
 | headers | Object | optional header fields | {'Accept': 'application/json, text/plain, */*'} |
-| transformParams | Function ( params, request ) | change the URL parameter before sending the request. |  |
-| paramsSerializer | Function ( params, request ) | the custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
-| transformBody | Function ( body, request ) | change the commit body before sending the request. |  |
-| stringifyBody | Function ( body, request ) | customize the body stringify function. | JSON.stringify |
-| validateStatus | Function ( response ) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
+| transformParams | Function (params,request) | change the URL parameter before sending the request. |  |
+| paramsSerializer | Function (params,request) | the custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
+| transformBody | Function (body,request) | change the commit body before sending the request. |  |
+| stringifyBody | Function (body,request) | customize the body stringify function. | JSON.stringify |
+| validateStatus | Function (response) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
 
 ### Headers
 
 | Name | Type | Description |
 |------|------|-----|
-| set | Function ( name, value ) | Sets a new value for an existing header inside a Headers object, or adds the header if it does not already exist. |
-| append | Function ( name, value ) | Appends a new value onto an existing header inside a Headers object, or adds the header if it does not already exist. |
-| get | Function ( name ) | Returns a ByteString sequence of all the values of a header within a Headers object with a given name. |
-| has | Function ( name ) | Returns a boolean stating whether a Headers object contains a certain header. |
-| delete | Function ( name ) | Deletes a header from a Headers object. |
+| set | Function (name,value) | Sets a new value for an existing header inside a Headers object, or adds the header if it does not already exist. |
+| append | Function (name,value) | Appends a new value onto an existing header inside a Headers object, or adds the header if it does not already exist. |
+| get | Function (name) | Returns a ByteString sequence of all the values of a header within a Headers object with a given name. |
+| has | Function (name) | Returns a boolean stating whether a Headers object contains a certain header. |
+| delete | Function (name) | Deletes a header from a Headers object. |
 | keys | Function | Returns an iterator allowing you to go through all keys of the key/value pairs contained in this object. |
 | values | Function | Returns an iterator allowing you to go through all values of the key/value pairs contained in this object. |
 | entries | Function | Returns an iterator allowing to go through all key/value pairs contained in this object. |
-| forEach | Function ( callback, context ) | Executes a provided function once for each array element. |
+| forEach | Function (callback,context) | Executes a provided function once for each array element. |
 
 ### Response
 

@@ -115,24 +115,24 @@ import XEAjax from 'xe-ajax'
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 |  |
-| transformParams | Function ( params, request ) | 用于改变URL参数 |  |
-| paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
-| transformBody | Function ( body, request ) | 用于改变提交数据 |  |
-| stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
-| validateStatus | Function ( response ) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
+| transformParams | Function (params,request) | 用于改变URL参数 |  |
+| paramsSerializer | Function (params,request) | 自定义URL序列化函数 |  |
+| transformBody | Function (body,request) | 用于改变提交数据 |  |
+| stringifyBody | Function (body,request) | 自定义转换提交数据的函数 |  |
+| validateStatus | Function (response) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
 ### Headers
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| set | Function ( name, value ) | 添加 |
-| append | Function ( name, value ) | 追加 |
-| get | Function ( name ) | 根据 name 获取 |
-| has | Function ( name ) | 检查 name 是否存在 |
-| delete | Function ( name ) | 根据 name 删除 |
+| set | Function (name,value) | 添加 |
+| append | Function (name,value) | 追加 |
+| get | Function (name) | 根据 name 获取 |
+| has | Function (name) | 检查 name 是否存在 |
+| delete | Function (name) | 根据 name 删除 |
 | keys | Function | 以迭代器的形式返回所有 name |
 | values | Function | 以迭代器的形式返回所有 value |
 | entries | Function | 以迭代器的形式返回所有 [name, value] |
-| forEach | Function ( callback, context ) | 迭代器 |
+| forEach | Function (callback,context) | 迭代器 |
 
 ### Response
 | 属性 | 类型 | 描述 |
