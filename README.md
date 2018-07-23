@@ -3,6 +3,8 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
+English | [简体中文](./README.zh-CN.md)
+
 The asynchronous fetch function based on Promise, Support the node.js、browser environment, Simple API, lightweight encapsulation, high expansion.
 
 ## Browser Support
