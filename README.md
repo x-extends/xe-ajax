@@ -1,6 +1,6 @@
 # xe-ajax
 
-简体中文 | [English](./README.en-US.md)
+简体中文 | [English](https://github.com/xuliangzhan/xe-ajax/blob/master/README.en-US.md)
 
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
