@@ -26,7 +26,7 @@ function sendFetch (request, finish, failed) {
   }
   var reqSignal = request.signal
   var clearTimeoutFn = clearTimeout
-  utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,integrity'.split(','), assignOpts)
+  utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), assignOpts)
   if (reqTimeout) {
     timer = setTimeout(function () {
       failed('E_T')

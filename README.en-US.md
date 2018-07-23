@@ -99,22 +99,25 @@ import XEAjax from 'xe-ajax'
 
 ### Options
 
+*: Only the highest version of the browser is supported.
+
 | Name | Type | Description | default value |
 |------|------|-----|----|
 | url | String | is the url to fetch |  |
-| baseURL | String | base URL | defaults to context path |
-| method | String | request method | defaults to 'GET' |
+| baseURL | String | base URL | context path |
+| method | String | request method | 'GET' |
 | params | Object | request params |  |
 | body | Object | request body |  |
-| bodyType | String | submit type, You can set: json-data,form-data | defaults to 'json-data' |
-| mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | defaults to 'cors' |
-| cache | String | handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | defaults to 'default' |
-| credentials | String | set the cookie to be sent along with the request, You can set: omit,same-origin,include | defaults to 'same-origin' |
-| redirect | String | The redirect mode to use, You can set: follow,error,manual | defaults to 'follow' |
-| **referrer** | String | (It is valid in a native-supported fetch environment)Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | defaults to 'client' |
-| **referrerPolicy** | String | (It is valid in a native-supported fetch environment), You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
-| **integrity** | String | Contains the subresource integrity value of the request (e.g., sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
-| jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
+| bodyType | String | submit type, You can set: json-data,form-data | 'json-data' |
+| mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | 'cors' |
+| cache | String | handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
+| credentials | String | set the cookie to be sent along with the request, You can set: omit,same-origin,include | 'same-origin' |
+| redirect | String | The redirect mode to use, You can set: follow,error,manual | 'follow' |
+| * **referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
+| * **referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| * **keepalive** | String | The keepalive option can be used to allow the request to outlive the page |  |
+| * **integrity** | String | Contains the subresource integrity value of the request (e.g., sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
+| jsonp | String | set jsonp callback parameter name | 'callback' |
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |
 | headers | Object | optional header fields | {'Accept': 'application/json, text/plain, */*'} |
