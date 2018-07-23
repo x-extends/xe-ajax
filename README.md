@@ -16,179 +16,173 @@ xe-ajax depends on a native ES6 Promise implementation to be supported. If your 
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## CDN
-
-[All cdnjs package](https://cdn.jsdelivr.net/npm/xe-ajax/)
-
-```HTML
+使用 script 方式安装，XEAjax 会定义为全局变量  
+生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
+### cdnjs 获取最新版本
+[点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
+``` shell
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
-
-[All unpkg package](https://unpkg.com/xe-ajax/)
-
-```HTML
+### unpkg 获取最新版本
+[点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
+``` shell
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 ## AMD
-
-```JavaScript
+### require.js 安装示例
+``` shell
+// require 配置
 require.config({
   paths: {
     // ...,
     'xe-ajax': './dist/xe-ajax.min'
   }
 })
-define(['xe-ajax'], function (XEAjax) {
-  // XEAjax.fetch(url)
-})
 ```
 
 ## NPM
-
-```JavaScript
+``` shell
 npm install xe-ajax --save
 ```
 
 ### NodeJS
-
-```JavaScript
+``` shell
 const XEAjax = require('xe-ajax')
 ```
 
 ### ES6 Module import
-
-```JavaScript
+``` shell
 import XEAjax from 'xe-ajax'
 ```
 
-## API
-
+## API:
+### 提供常用便捷方法:
 * doAll ( iterable )
 * ajax ( options )
 * ~
-* fetch ( url[, options] )
-* fetchHead ( url[, options] )
-* fetchDelete ( url[, options] )
-* fetchJsonp ( url[, params, options] )
-* fetchGet ( url[, params, options] )
-* fetchPost ( url[, body, options] )
-* fetchPut ( url[, body, options] )
-* fetchPatch ( url[, body, options] )
+* fetch ( url, options )
+* fetchHead ( url, options )
+* fetchDelete ( url, options )
+* fetchJsonp ( url, params, options )
+* fetchGet ( url, params, options )
+* fetchPost ( url, body, options )
+* fetchPut ( url, body, options )
+* fetchPatch ( url, body, options )
 * ~
-* doHead ( url[, options] )
-* doDelete ( url[, options] )
-* doJsonp ( url[, params, options] )
-* doGet ( url[, params, options] )
-* doPost ( url[, body, options] )
-* doPut ( url[, body, options] )
-* doPatch ( url[, body, options] )
+* doHead ( url, options )
+* doDelete ( url, options )
+* doJsonp ( url, params, options )
+* doGet ( url, params, options )
+* doPost ( url, body, options )
+* doPut ( url, body, options )
+* doPatch ( url, body, options )
 * ~
-* headJSON ( url[, options] )
-* deleteJSON ( url[, options] )
-* jsonp ( url[, params, options] )
-* getJSON ( url[, params, options] )
-* postJSON ( url[, body, options] )
-* putJSON ( url[, body, options] )
-* patchJSON ( url[, body, options] )
+* headJSON ( url, options )
+* deleteJSON ( url, options )
+* jsonp ( url, params, options )
+* getJSON ( url, params, options )
+* postJSON ( url, body, options )
+* putJSON ( url, body, options )
+* patchJSON ( url, body, options )
 
-### Arguments
+### 入参
+* url（字符串） 请求地址，可被自定义 options 属性覆盖
+* params/body（可选，对象/数组） 要发送的数据，可被自定义 options 属性覆盖
+* options （可选，对象） 参数
 
-* **url** is the url to fetch
-* **params/body** the data to be sent.
-* **options** is an optional options object
-
-### Options
-
-| Name | Type | Description | default value |
+### options 参数
+| 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
-| url | String | is the url to fetch |  |
-| baseURL | String | base URL | defaults to context path |
-| method | String | request method | defaults to 'GET' |
-| params | Object | request params |  |
-| body | Object | request body |  |
-| bodyType | String | submit type, You can set [**'json-data'**,**'form-data'**] | defaults to 'json-data' |
-| mode | String | The mode you want to use for the request, You can set [**'cors'**,**'no-cors'**,**'same-origin'**] | defaults to 'cors' |
-| cache | String | handling cache mode, You can set [**'default'**,**'no-store'**,**'no-cache'**,**'reload'**,**'force-cache'**,**'only-if-cached'**] | defaults to 'default' |
-| credentials | String | set the cookie to be sent along with the request, You can set [**'omit'**,**'same-origin'**,**'include'**] | defaults to 'same-origin' |
-| redirect | String | The redirect mode to use, You can set [**'follow'**,**'error'**,**'manual'**] | defaults to 'follow' |
-| jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
-| jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
-| timeout | Number | set a timeout in ms |  |
-| headers | Object | optional header fields | {'Accept': 'application/json, text/plain, */*'} |
-| transformParams | Function ( params, request ) | change the URL parameter before sending the request. |  |
-| paramsSerializer | Function ( params, request ) | the custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
-| transformBody | Function ( body, request ) | change the commit body before sending the request. |  |
-| stringifyBody | Function ( body, request ) | customize the body stringify function. | JSON.stringify |
-| validateStatus | Function ( response ) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
+| url | String | 请求地址 |  |
+| baseURL | String | 基础路径 | 默认上下文路径 |
+| method | String | 请求方法 | 默认GET |
+| params | Object/Array | 请求参数 |  |
+| body | Object/Array | 提交参数 |  |
+| bodyType | String | 提交参数方式，可以设置json-data,form-data | 默认json-data |
+| mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 默认cors |
+| cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
+| credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
+| redirect | String | 重定向模式, 可以设置follow,error,manual | 默认follow |
+| jsonp | String | jsonp入参属性名 | 默认callback |
+| jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
+| timeout | Number | 设置超时 |  |
+| headers | Object | 请求头 |  |
+| transformParams | Function ( params, request ) | 用于改变URL参数 |  |
+| paramsSerializer | Function ( params, request ) | 自定义URL序列化函数 |  |
+| transformBody | Function ( body, request ) | 用于改变提交数据 |  |
+| stringifyBody | Function ( body, request ) | 自定义转换提交数据的函数 |  |
+| validateStatus | Function ( response ) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
 ### Headers
-
-| Name | Type | Description |
+| 属性 | 类型 | 描述 |
 |------|------|-----|
-| set | Function ( name, value ) | Sets a new value for an existing header inside a Headers object, or adds the header if it does not already exist. |
-| append | Function ( name, value ) | Appends a new value onto an existing header inside a Headers object, or adds the header if it does not already exist. |
-| get | Function ( name ) | Returns a ByteString sequence of all the values of a header within a Headers object with a given name. |
-| has | Function ( name ) | Returns a boolean stating whether a Headers object contains a certain header. |
-| delete | Function ( name ) | Deletes a header from a Headers object. |
-| keys | Function | Returns an iterator allowing you to go through all keys of the key/value pairs contained in this object. |
-| values | Function | Returns an iterator allowing you to go through all values of the key/value pairs contained in this object. |
-| entries | Function | Returns an iterator allowing to go through all key/value pairs contained in this object. |
-| forEach | Function ( callback, context ) | Executes a provided function once for each array element. |
+| set | Function ( name, value ) | 添加 |
+| append | Function ( name, value ) | 追加 |
+| get | Function ( name ) | 根据 name 获取 |
+| has | Function ( name ) | 检查 name 是否存在 |
+| delete | Function ( name ) | 根据 name 删除 |
+| keys | Function | 以迭代器的形式返回所有 name |
+| values | Function | 以迭代器的形式返回所有 value |
+| entries | Function | 以迭代器的形式返回所有 [name, value] |
+| forEach | Function ( callback, context ) | 迭代器 |
 
 ### Response
-
-| Name | Type | Description |
+| 属性 | 类型 | 描述 |
 |------|------|-----|
-| body | ReadableStream | A simple getter used to expose a ReadableStream of the body contents. |
-| bodyUsed | Boolean | Stores a Boolean that declares whether the body has been used in a response yet. |
-| headers | Headers | Contains the Headers object associated with the response. |
-| status | Number | HTTP status code |
-| statusText | String | Contains the status message corresponding to the status code |
-| url | String | Contains the URL of the response. |
-| ok | Boolean | Contains a boolean stating whether the response was successful (status in the range 200-299) or not. |
-| redirected | Boolean | Indicates whether or not the response is the result of a redirect; that is, its URL list has more than one entry. |
-| type | String | Contains the type of the response |
-| clone | Function | Creates a clone of a Response object. |
-| json | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with the result of parsing the body text as JSON. |
-| test | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a USVString (text). |
-| blob | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a Blob. |
-| arrayBuffer | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with an ArrayBuffer. |
-| formData | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a FormData object. |
+| body | ReadableStream | 数据流 |
+| bodyUsed | Boolean | 内容是否已被读取 |
+| headers | Headers | 响应头 |
+| status | Number | 状态码 |
+| statusText | String | 状态信息 |
+| url | String | 返回请求路径 |
+| ok | Boolean | 请求完成还是失败 |
+| redirected | Boolean | 是否重定向了 |
+| type | String | 类型 |
+| clone | Function | 返回一个新的 Response 对象 |
+| json | Function | 获取 json 数据 |
+| test | Function | 获取 text 数据 |
+| blob | Function | 获取 Blob 对象 |
+| arrayBuffer | Function | 获取 ArrayBuffer 对象 |
+| formData | Function | 获取 FormData 对象 |
 
-## Default global settings
-
-```JavaScript
+## 全局参数设置
+``` shell
 import XEAjax from 'xe-ajax'
 
+// 示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'json-data',
   credentials: 'include',
+  log: false,
   headers: {
     'Accept': 'application/json, text/plain, \*/\*;'
   },
   transformParams (params, request) {
+    // 用于在请求发送之前改变URL参数
     params.id = 123
     return params
   },
   paramsSerializer (params, request) {
+    // 自定义URL序列化函数,最终拼接在url
     return 'id=123&name=2'
   }，
   transformBody (body, request) {
+    // 用于在请求发送之前改变提交数据
     body.startTime = body.startDate.getTime()
     return body
   },
   stringifyBody (body, request) {
+    // 自定义格式化提交数据函数
     return JSON.stringify(body)
   }
 })
 ```
 
-## Examples
-
-### ajax
-
-```JavaScript
+## 示例
+### 完整调用
+``` shell
 import XEAjax from 'xe-ajax'
 
 XEAjax.ajax({
@@ -196,78 +190,87 @@ XEAjax.ajax({
   method: 'GET',
   params: {id: 1}
 }).then(response => {
-  // finish
+  // 请求完成
 }).catch(e => {
-  // error
+  // 发生错误
 })
 
 ```
-
-### fetch to Response
-
-```JavaScript
+### fetch 调用
+``` shell
 import XEAjax from 'xe-ajax'
 
 XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
-  // finish
+  // 请求完成
 }).catch(e => {
-  // error
+  // 发生错误
 })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list').then(response => response.text()).then(text => {
-  // get text
+XEAjax.fetchGet('/api/user/list').then(response => {
+  response.text().then(text => {
+    // 获取 text
+  })
 })
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list').then(response => response.json()).then(json => {
-  // get json
+XEAjax.fetchGet('/api/user/list').then(response => {
+  response.json().then(data => {
+    // 获取 data
+  })
 })
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list').then(response => response.blob()).then(blob => {
-  // get blob
+XEAjax.fetchGet('/api/user/list').then(response => {
+  response.blob().then(blob => {
+    // 获取 blob
+  })
 })
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list').then(response => response.arrayBuffer()).then(arrayBuffer => {
-  // get arrayBuffer
+XEAjax.fetchGet('/api/user/list').then(response => {
+  response.arrayBuffer().then(arrayBuffer => {
+    // 获取 arrayBuffer
+  })
 })
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list').then(response => response.formData()).then(formData => {
-  // get formData
+XEAjax.fetchGet('/api/user/list').then(response => {
+  response.formData().then(formData => {
+    // 获取 formData
+  })
 })
 
-// Submit application/json, default uses JSON.stringify(request.body)
+// 使用 application/json 方式提交，默认使用 JSON.stringify 序列化数据
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 
-// Submit application/x-www-form-urlencoded, default uses XEAjax.serialize(request.body)
+// 使用 application/x-www-form-urlencoded 方式提交，默认使用 XEAjax.serialize 序列化数据
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-// Submit FormData
+// 模拟表单 FormData 提交
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
+
+// 查询参数和数据同时提交
+XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-
-### fetch to Response Schema
-
-```JavaScript
+### 根据状态响应请求结果、包括状态信息
+``` shell
 import XEAjax from 'xe-ajax'
 
-// The response for a request contains the following information.
+// 对请求的响应包含以下信息
 // {data, status, statusText, headers}
 
-// The completion or failure is based on state check.
+// 根据 validateStatus 状态校验判断完成还是失败
 XEAjax.doGet('/api/user/list').then(response => {
-  // success
+  // 请求成功
 }).catch(response => {
-  // failed
+  // 请求失败
 })
 
 XEAjax.doPost('/api/user/save', {name: 'test'})
@@ -279,258 +282,249 @@ const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
 ```
-
-### fetch to JSON
-
-```JavaScript
+### 根据状态响应 json 调用
+``` shell
 import XEAjax from 'xe-ajax'
 
-// The completion or failure is based on state check.
+// 根据 validateStatus 状态校验判断完成还是失败
 XEAjax.getJSON('/api/user/list').then(data => {
-  // success
+  // 请求成功
 }).catch(data => {
-  // failed
+  // 请求失败
 })
 
 XEAjax.postJSON('/api/user/save', {name: 'test'})
+
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 const file = document.querySelector('#myFile').files[0]
 const formBody = new FormData()
 formBody.append('file', file)
 XEAjax.postJSON('/api/user/save', formBody)
+
+XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
-
-### jsonp
-
-```JavaScript
+### jsonp 调用
+``` shell
 import XEAjax from 'xe-ajax'
 
-// Case 1:
-// Set jsonp callback parameter name, default is 'callback'
-// http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
-// jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message')
-.then(response => response.json())
-.then(data => {
-  // {message: 'success'}
+// 例子1
+// 服务地址: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
+// 服务端返回结果: jsonp_xeajax_1521272815608_1({message: 'success'})
+XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
+  response.json().then(data => {
+    // {message: 'success'}
+  })
 })
 
-// Case 2:
-// Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
-// http://xuliangzhan.com/jsonp/user/message?id=123&cb=jsonp_xeajax_1521272815608_2
-// jsonp_xeajax_1521272815608_2({message: 'success'})
+// 例子2
+// 服务地址: http://xuliangzhan.com/jsonp/user/message?id=123&cb=jsonp_xeajax_1521272815608_2
+// 服务端返回结果: jsonp_xeajax_1521272815608_2({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   jsonp: 'cb'
-})
-.then(response => response.json())
-.then(data => {
-  // {message: 'success'}
+}).then(response => {
+  response.json().then(data => {
+    // {message: 'success'}
+  })
 })
 
-// Case 3:
-// Set jsonp callback parameter name and callback function name
-// http://xuliangzhan.com/jsonp/user/message?id=123&cb=customCallback
-// customCallback({message: 'success'})
+// 例子3
+// 服务地址: http://xuliangzhan.com/jsonp/user/message?id=123&cb=custom3
+// 服务端返回结果: custom3({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb',
-  jsonpCallback: 'customCallback'
-})
-.then(response => response.json())
-.then(data => {
-  // {message: 'success'}
+  jsonp: 'cb', 
+  jsonpCallback: 'custom3'
+}).then(response => {
+  response.json().then(data => {
+    // {message: 'success'}
+  })
 })
 ```
-
-### Multiple requests
-
-```JavaScript
+### 并发多个请求
+``` shell
 import XEAjax from 'xe-ajax'
 
 const iterable1 = []
 iterable1.push(XEAjax.fetchGet('/api/user/list'))
 iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
-  // all finish
+  // 所有异步完成之后执行
 }).catch(e => {
-  // error
+  // 请求失败时执行
 })
 
-// doAll Use object parameters, The use is consistent with that of Promise.
+// doAll 使用对象参数, 用法和 Promise.all 一致
 const iterable2 = []
 iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
-
-### Nested requests
-
-```JavaScript
+### 嵌套请求
+``` shell
 import XEAjax from 'xe-ajax'
 
-// This should be avoided in the project.
-XEAjax.fetchGet('/api/user/info')
-.then(response => response.json())
-.then(data => {
+// 相互依赖的嵌套请求(项目中应该避免这种情况)
+XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data => {
   return fetchGet('/api/user/details', {id: data.id})
 }).then(response => {
-  // finish
+  response.json().then(data => {
+    // 获取 data
+  })
 })
 ```
-
-### AMD request
-
-```JavaScript
+### AMD 使用方式
+``` shell
 define([
   'xe-ajax'
 ], function (XEAjax) {
 
   XEAjax.fetchGet('/api/user/list').then(response => {
-    // finish
+    response.json().then(data => {
+      // 获取 data
+    })
   })
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
+  XEAjax.fetchPost('/api/user/save', {name: 'test'})
+
   XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'form-data'})
 
   var file = document.querySelector('#myFile').files[0]
   var formBody = new FormData()
   formBody.append('file', file)
   XEAjax.fetchPost('/api/user/save', formBody)
+
+  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {params: {id: 1}})
 })
 ```
 
-## Cancel request
-
-### AbortController
-
-Allows control of one or more cancellation requests.
-
-```JavaScript
+## 取消请求
+### AbortController 控制器对象
+允许控制一个或多个取消指令请求
+``` shell
 import XEAjax from 'xe-ajax'
 
-// Create a controller.
+// 创建一个控制器对象
 const controller = new XEAjax.AbortController()
-// get signal
+// 获取signal
 const signal = controller.signal
-// Associate the signal and controller with the fetch request.
+// 给请求加入控制器 signal
 XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
-  // finish
+  // 请求成功
 }).catch(function (e) {
-  // error
+  // 取消请求
 })
 setTimeout(() => {
+  // 终止请求
   controller.abort()
-}, 100)
+}, 10)
 ```
 
-## Interceptor
-
-### Request interceptor
-
+## 拦截器
+### Request 拦截器
 use (before)
-
-```JavaScript
+``` shell
 import XEAjax from 'xe-ajax'
 
-// Trigger before the request is sent.
+// 请求之前拦截器
 XEAjax.interceptors.request.use((request, next) => {
-  // Can be used for unified permission intercept, set request header, Token authentication, parameters, etc.
+  // 可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
 
-  // Set params
-  // request.params.version = Date.now()
-
-  // Set Token validation to prevent XSRF/CSRF attacks.
+  // 设置参数
+  request.params.version = 1
+  // 设置 Token 验证，预防 XSRF/CSRF 攻击
   request.headers.set('X-Token', cookie('x-id'))
 
-  // Call next(), execute the next interceptor.
+  // 调用 next(),继续执行下一个拦截器
   next()
 })
 ```
-
-### Response interceptor
-
+### Response 拦截器
 use (finish, failed)
-
-```JavaScript
+``` shell
 import XEAjax from 'xe-ajax'
 
-// Intercept when the request is finish.
+// 请求完成之后拦截
 XEAjax.interceptors.response.use((response, next) => {
-  // It can be used for unified processing after a request is finish, such as checking for invalidation, message prompt, special scenario processing, etc.
+  // 请求完成之后统一处理，例如校验登录是否失效、消息提示，特殊场景处理等...
 
-  // Example: check login failover.
+  // 例子: 判断登录失效跳转
   if (response.status === 403) {
-    router.replace({path: '/login'})
-    // break up
+    router.replace({path: '/login'}) 
   } else {
-    // Call next(), execute the next interceptor.
+    // 调用 next(),继续执行下一个拦截器
     next()
   }
 }, (e, next) => {
-  // failed
-  // Call next(), execute the next interceptor.
+  // 请求发生错误
+  // 调用 next(),继续执行下一个拦截器
   next()
 })
 
-// Intercept and reset the response data after the request is complete.
-// Format: {status: 200, statusText: 'OK', body: {}, headers: {}}
+// 请求完成之后重置响应数据
 XEAjax.interceptors.response.use((response, next) => {
+  // 对所有请求返回统一的数据结构
+  // 格式: {status: 200, statusText: 'OK', body: {}, headers: {}}
+
+  // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
     const body = {
-      message: response.status === 200 ? 'success' : 'error',
+      status: response.status === 200 ? 'success' : 'error', 
       result: data
     }
-    // Reset the response data and continue with the next interceptor.
-    next({status: 200, body: body})
+    // 重置响应数据并继续执行下一个拦截器
+    next({status: response.status, body: body})
   })
 }, (e, next) => {
-  // Turn all the exception errors to finish.
+  // 对所有请求错误返回统一的数据结构
   const body = {
-    message: 'error',
+    message: 'error', 
     result: null
   }
-  // Reset the response data and continue with the next interceptor.
+  // 重置响应数据并继续执行下一个拦截器
   next({status: 200, body: body})
 })
 ```
 
-## Functions of mixing
-
+## 混合函数
 ### ./customs.js
-
-```JavaScript
+``` shell
 import XEAjax from 'xe-ajax'
 
-const cacheMap = {}
-export function onceGet () {
-  if (cacheMap[url]) {
-    return cacheMap[url]
-  }
-  return cacheMap[url] = XEAjax.fetchGet.apply(this, arguments)
-}
+export function doGet () {
+  return XEAjax.fetchGet.apply(this, arguments)
+  .then(response => response.json())
+  .then(body => {
+    return {
+      body: body, 
+      status: response.status, 
+      headers: response.headers
+    }
+  })
+} 
+export function getText () {
+  return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
+} 
 ```
-
 ### ./main.js
-
-```JavaScript
+``` shell
 import XEAjax from 'xe-ajax'
 import customs from './customs'
 
 XEAjax.mixin(customs)
 
-XEAjax.onceGet('/api/user/message')
+// 调用自定义扩展函数
+XEAjax.doGet('/api/user/list')
+XEAjax.getText('/api/user/message')
 ```
 
-## Plugin
+## 插件
+### Mock 虚拟服务
+支持 MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock) 等。
 
-### Mock services
-
-MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock)
-
-## Project Demos
-
-[project examples.](https://github.com/xuliangzhan/examples)
+## 示例
+[项目示例](https://github.com/xuliangzhan/examples)  
 
 ## License
 
