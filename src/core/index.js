@@ -6,7 +6,7 @@ var utils = require('./utils')
 var clearContext = utils.clearContext
 
 function getOptions (method, def, options) {
-  var opts = utils.objectAssign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
+  var opts = utils.assign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
   clearContext(XEAjax)
   return opts
 }
@@ -73,7 +73,7 @@ function doAll (iterable) {
     if (item instanceof XEPromise || item instanceof Promise) {
       return item
     }
-    return utils.isObject(item) ? XEAjax(utils.objectAssign({$context: context, $Promise: XEPromise}, item)) : item
+    return utils.isObj(item) ? XEAjax(utils.assign({$context: context, $Promise: XEPromise}, item)) : item
   }), context)
 }
 
@@ -85,7 +85,7 @@ function createFetch (method) {
 
 function createParamsFetch (method, defs) {
   return function (url, params, opts) {
-    return getOptions(method, utils.objectAssign({url: url, params: params}, defs), opts)
+    return getOptions(method, utils.assign({url: url, params: params}, defs), opts)
   }
 }
 
@@ -140,7 +140,7 @@ var ajaxExports = {
  */
 XEAjax.mixin = function (methods) {
   utils.objectEach(methods, function (fn, name) {
-    XEAjax[name] = utils.isFunction(fn) ? function () {
+    XEAjax[name] = utils.isFn(fn) ? function () {
       var result = fn.apply(XEAjax.$context, arguments)
       clearContext(XEAjax)
       return result

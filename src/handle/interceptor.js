@@ -10,7 +10,7 @@ var reqQueue = {resolves: [], rejects: []}
 var respQueue = {resolves: [], rejects: []}
 
 function addCheckQueue (calls, callback) {
-  if (utils.arrayIndexOf(calls, callback) === -1) {
+  if (!utils.includes(calls, callback)) {
     calls.push(callback)
   }
 }
@@ -75,8 +75,9 @@ var interceptors = {
 interceptors.request.use(function (request, next) {
   var reqHeaders = request.headers
   var reqBody = request.body
-  if (reqBody && request.method !== 'GET' && request.method !== 'HEAD') {
-    if (!utils.isFormData(reqBody)) {
+  var reqMethod = request.method
+  if (reqBody && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
+    if (!utils.isFData(reqBody)) {
       reqHeaders.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
     }
   }
@@ -86,17 +87,21 @@ interceptors.request.use(function (request, next) {
   next()
 })
 
+function responseToResolves (request, response, resolve, reject) {
+  responseInterceptor(respQueue.resolves, request, response).then(resolve)
+}
+
+function responseToRejects (request, response, resolve, reject) {
+  responseInterceptor(respQueue.rejects, request, response).then(function (e) {
+    (handleExports.isResponse(e) ? resolve : reject)(e)
+  })
+}
+
 var interceptorExports = {
   interceptors: interceptors,
   requests: requests,
-  responseResolves: function (request, response, resolve, reject) {
-    responseInterceptor(respQueue.resolves, request, response).then(resolve)
-  },
-  responseRejects: function (request, response, resolve, reject) {
-    responseInterceptor(respQueue.rejects, request, response).then(function (e) {
-      (handleExports.isResponse(e) ? resolve : reject)(e)
-    })
-  }
+  toResolves: responseToResolves,
+  toRejects: responseToRejects
 }
 
 module.exports = interceptorExports

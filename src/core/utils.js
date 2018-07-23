@@ -1,7 +1,9 @@
 'use strict'
 
+/* eslint-disable valid-typeof */
+var STRING_UNDEFINED = 'undefined'
 var encode = encodeURIComponent
-var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
+var isNodeJS = typeof window === STRING_UNDEFINED && typeof process !== STRING_UNDEFINED
 var $locat = ''
 
 if (!isNodeJS) {
@@ -53,31 +55,31 @@ var utils = {
 
   _N: isNodeJS, // nodejs 环境
   _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
-  _A: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'), // IE10+ 支持Blob
+  _A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
 
-  isFormData: function (obj) {
-    return typeof FormData !== 'undefined' && obj instanceof FormData
+  isFData: function (obj) {
+    return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
   },
 
   isCrossOrigin: function (url) {
     return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== $locat.protocol || RegExp.$2.split('/')[0] !== $locat.host)
   },
 
-  isString: function (val) {
+  isStr: function (val) {
     return typeof val === 'string'
   },
 
-  isObject: function (obj) {
+  isObj: function (obj) {
     return obj && typeof obj === 'object'
   },
 
   isPlainObject: isPlainObject,
 
-  isFunction: function (obj) {
+  isFn: function (obj) {
     return typeof obj === 'function'
   },
 
-  getLocatOrigin: getLocatOrigin,
+  getOrigin: getLocatOrigin,
 
   getBaseURL: function () {
     if (isNodeJS) {
@@ -105,7 +107,7 @@ var utils = {
     return params.join('&').replace(/%20/g, '+')
   },
 
-  objectAssign: Object.assign || function (target) {
+  assign: Object.assign || function (target) {
     var args = arguments
     for (var source, index = 1, len = args.length; index < len; index++) {
       source = args[index]
@@ -118,13 +120,8 @@ var utils = {
     return target
   },
 
-  arrayIndexOf: function (array, val) {
-    for (var index = 0, len = array.length; index < len; index++) {
-      if (val === array[index]) {
-        return index
-      }
-    }
-    return -1
+  includes: function (array, val) {
+    return lastIndexOf(array, val) > -1
   },
 
   arrayEach: function (array, callback, context) {

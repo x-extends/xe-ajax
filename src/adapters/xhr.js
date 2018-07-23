@@ -16,7 +16,7 @@ function sendXHR (request, finish, failed) {
   if (request.mode === 'same-origin') {
     if (utils.isCrossOrigin(url)) {
       failed()
-      throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getLocatOrigin() + '.')
+      throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
     }
   }
   var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest

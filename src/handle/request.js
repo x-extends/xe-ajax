@@ -4,33 +4,36 @@ var utils = require('../core/utils')
 var XEHeaders = require('./headers')
 
 function XERequest (options) {
-  utils.objectAssign(this, {url: '', body: '', params: '', signal: ''}, options)
+  utils.assign(this, {url: '', body: '', params: '', signal: ''}, options)
   this.headers = new XEHeaders(options.headers)
   this.method = this.method.toLocaleUpperCase()
   this.bodyType = this.bodyType.toLowerCase()
-  if (this.signal && utils.isFunction(this.signal.install)) {
-    this.signal.install(this)
+  var reqSignal = this.signal
+  if (reqSignal && reqSignal.install) {
+    reqSignal.install(this)
   }
 }
 
 var requestPro = XERequest.prototype
 
 requestPro.abort = function () {
-  if (this.xhr) {
-    this.xhr.abort()
+  var xhr = this.xhr
+  if (xhr) {
+    xhr.abort()
   }
   this.$abort = true
 }
 requestPro.getUrl = function () {
   var url = this.url
-  var params = ''
+  var params = this.params
   if (url) {
-    var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) === -1 ? {} : {_t: Date.now()}
-    if (utils.isFunction(this.transformParams)) {
-      this.params = this.transformParams(this.params || {}, this)
+    var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? {_t: Date.now()} : {}
+    var transformParams = this.transformParams
+    if (transformParams) {
+      params = this.params = transformParams(params || {}, this)
     }
-    if (this.params && !utils.isFormData(this.params)) {
-      params = utils.isString(this.params) ? this.params : (this.paramsSerializer || utils.serialize)(utils.objectAssign(_param, this.params), this)
+    if (params && !utils.isFData(params)) {
+      params = utils.isStr(params) ? params : (this.paramsSerializer || utils.serialize)(utils.assign(_param, params), this)
     } else {
       params = utils.serialize(_param)
     }
@@ -44,7 +47,7 @@ requestPro.getUrl = function () {
       return (utils._N ? '' : location.protocol) + url
     }
     if (url.indexOf('/') === 0) {
-      return utils.getLocatOrigin() + url
+      return utils.getOrigin() + url
     }
     return this.baseURL.replace(/\/$/, '') + '/' + url
   }
@@ -53,14 +56,17 @@ requestPro.getUrl = function () {
 requestPro.getBody = function () {
   var result = null
   var body = this.body
-  if (body && this.method !== 'GET' && this.method !== 'HEAD') {
-    if (this.transformBody) {
-      body = this.body = this.transformBody(body, this) || body
+  var reqMethod = this.method
+  if (body && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
+    var transformBody = this.transformBody
+    var stringifyBody = this.stringifyBody
+    if (transformBody) {
+      body = this.body = transformBody(body, this) || body
     }
-    if (this.stringifyBody) {
-      result = this.stringifyBody(body, this)
+    if (stringifyBody) {
+      result = stringifyBody(body, this)
     } else {
-      if (utils.isFormData(body) || utils.isString(body)) {
+      if (utils.isFData(body) || utils.isStr(body)) {
         result = body
       } else {
         result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)

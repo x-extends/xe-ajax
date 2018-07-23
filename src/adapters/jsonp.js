@@ -14,14 +14,13 @@ var $dom = $global ? $global.document : ''
  * @param { Function } failed
  */
 function sendJSONP (request, finish, failed) {
-  request.script = $dom.createElement('script')
   var reqTimeout = request.timeout
   var jsonpCallback = request.jsonpCallback
-  var script = request.script
+  var script = request.script = $dom.createElement('script')
   if (!jsonpCallback) {
     jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
   }
-  if (utils.isFunction(request.$jsonp)) {
+  if (utils.isFn(request.$jsonp)) {
     return request.$jsonp(script, request).then(function (resp) {
       finish(handleExports.toResponse({status: 200, body: resp}, request))
     }).catch(function () {
@@ -50,8 +49,10 @@ function sendJSONP (request, finish, failed) {
 }
 
 function jsonpClear (request, jsonpCallback) {
-  if (request.script.parentNode === $dom.body) {
-    $dom.body.removeChild(request.script)
+  var script = request.script
+  var $body = $dom.body
+  if (script.parentNode === $body) {
+    $body.removeChild(script)
   }
   try {
     delete $global[jsonpCallback]

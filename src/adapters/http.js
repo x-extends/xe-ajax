@@ -19,12 +19,13 @@ function httpRequest (request, finish, failed) {
   var reqTimeout = request.timeout
   var body = request.getBody()
   var urlLocat = url.parse(request.getUrl())
+  var headers = {}
   var options = {
     hostname: urlLocat.hostname,
     port: urlLocat.port,
     path: urlLocat.path,
     method: request.method,
-    headers: {}
+    headers: headers
   }
 
   if (reqAgent) {
@@ -32,11 +33,11 @@ function httpRequest (request, finish, failed) {
   }
 
   if (body) {
-    options.headers['Content-Length'] = Buffer.byteLength(body)
+    headers['Content-Length'] = Buffer.byteLength(body)
   }
 
   request.headers.forEach(function (value, name) {
-    options.headers[name] = value
+    headers[name] = value
   })
 
   var req = getHttp(urlLocat).request(options, function (res) {
@@ -90,7 +91,8 @@ function getHttp (urlLocat) {
 }
 
 function sendHttp (request, finish, failed) {
-  if (utils.isFunction(request.$http)) {
+  var clearTimeoutFn = clearTimeout
+  if (utils.isFn(request.$http)) {
     var timer = ''
     var reqTimeout = request.timeout
     if (reqTimeout) {
@@ -99,13 +101,13 @@ function sendHttp (request, finish, failed) {
       }, reqTimeout)
     }
     return request.$http(request, function () {
-      clearTimeout(timer)
+      clearTimeoutFn(timer)
       return httpRequest(request, finish, failed)
     }, function (resp) {
-      clearTimeout(timer)
+      clearTimeoutFn(timer)
       finish(handleExports.toResponse(resp, request))
     }, function (e) {
-      clearTimeout(timer)
+      clearTimeoutFn(timer)
       failed()
     })
   }

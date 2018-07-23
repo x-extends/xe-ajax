@@ -25,32 +25,35 @@ function sendFetch (request, finish, failed) {
     body: request.getBody(),
     headers: request.headers
   }
+  var reqSignal = request.signal
+  var clearTimeoutFn = clearTimeout
   if (reqTimeout) {
     timer = setTimeout(function () {
       failed('timeout')
     }, reqTimeout)
   }
-  if (request.signal && request.signal.aborted) {
+  if (reqSignal && reqSignal.aborted) {
     failed('aborted')
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
-      clearTimeout(timer)
+      clearTimeoutFn(timer)
       finish(handleExports.toResponse(resp, request))
     }).catch(function (e) {
-      clearTimeout(timer)
+      clearTimeoutFn(timer)
       failed()
     })
   }
 }
 
 function getRequest (request) {
+  var reqSignal = request.signal
   if (request.$fetch) {
-    return request.signal ? sendXHR : sendFetch
+    return reqSignal ? sendXHR : sendFetch
   } else if (utils._F) {
     if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
       return sendFetch
     }
-    return request.signal ? sendXHR : sendFetch
+    return reqSignal ? sendXHR : sendFetch
   }
   return sendXHR
 }

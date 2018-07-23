@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.4
+ * xe-ajax.js v3.4.5
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -11,8 +11,10 @@
 }(this, function () {
   'use strict'
 
+  /* eslint-disable valid-typeof */
+  var STRING_UNDEFINED = 'undefined'
   var encode = encodeURIComponent
-  var isNodeJS = typeof window === 'undefined' && typeof process !== 'undefined'
+  var isNodeJS = typeof window === STRING_UNDEFINED && typeof process !== STRING_UNDEFINED
   var $locat = ''
 
   if (!isNodeJS) {
@@ -64,31 +66,31 @@
 
     _N: isNodeJS, // nodejs 环境
     _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
-    _A: !(typeof Blob === 'undefined' || typeof FormData === 'undefined' || typeof FileReader === 'undefined'), // IE10+ 支持Blob
+    _A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
 
-    isFormData: function (obj) {
-      return typeof FormData !== 'undefined' && obj instanceof FormData
+    isFData: function (obj) {
+      return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
     },
 
     isCrossOrigin: function (url) {
       return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== $locat.protocol || RegExp.$2.split('/')[0] !== $locat.host)
     },
 
-    isString: function (val) {
+    isStr: function (val) {
       return typeof val === 'string'
     },
 
-    isObject: function (obj) {
+    isObj: function (obj) {
       return obj && typeof obj === 'object'
     },
 
     isPlainObject: isPlainObject,
 
-    isFunction: function (obj) {
+    isFn: function (obj) {
       return typeof obj === 'function'
     },
 
-    getLocatOrigin: getLocatOrigin,
+    getOrigin: getLocatOrigin,
 
     getBaseURL: function () {
       if (isNodeJS) {
@@ -116,7 +118,7 @@
       return params.join('&').replace(/%20/g, '+')
     },
 
-    objectAssign: Object.assign || function (target) {
+    assign: Object.assign || function (target) {
       var args = arguments
       for (var source, index = 1, len = args.length; index < len; index++) {
         source = args[index]
@@ -129,13 +131,8 @@
       return target
     },
 
-    arrayIndexOf: function (array, val) {
-      for (var index = 0, len = array.length; index < len; index++) {
-        if (val === array[index]) {
-          return index
-        }
-      }
-      return -1
+    includes: function (array, val) {
+      return lastIndexOf(array, val) > -1
     },
 
     arrayEach: function (array, callback, context) {
@@ -302,9 +299,10 @@
   XEAbortControllerPolyfill.prototype.abort = function () {
     var index = getSignalIndex(this.signal)
     if (index !== undefined) {
-      utils.arrayEach(requestList[index][1], function (request) {
+      var requestItem = requestList[index]
+      utils.arrayEach(requestItem[1], function (request) {
         request.abort()
-        requestList[index][0]._abortSignal.aborted = true
+        requestItem[0]._abortSignal.aborted = true
       })
       requestList.splice(index, 1)
     }
@@ -320,7 +318,7 @@
   var respQueue = { resolves: [], rejects: [] }
 
   function addCheckQueue (calls, callback) {
-    if (utils.arrayIndexOf(calls, callback) === -1) {
+    if (!utils.includes(calls, callback)) {
       calls.push(callback)
     }
   }
@@ -385,8 +383,9 @@
   interceptors.request.use(function (request, next) {
     var reqHeaders = request.headers
     var reqBody = request.body
-    if (reqBody && request.method !== 'GET' && request.method !== 'HEAD') {
-      if (!utils.isFormData(reqBody)) {
+    var reqMethod = request.method
+    if (reqBody && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
+      if (!utils.isFData(reqBody)) {
         reqHeaders.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
       }
     }
@@ -396,47 +395,54 @@
     next()
   })
 
+  function responseToResolves (request, response, resolve, reject) {
+    responseInterceptor(respQueue.resolves, request, response).then(resolve)
+  }
+
+  function responseToRejects (request, response, resolve, reject) {
+    responseInterceptor(respQueue.rejects, request, response).then(function (e) {
+      (handleExports.isResponse(e) ? resolve : reject)(e)
+    })
+  }
+
   var interceptorExports = {
     interceptors: interceptors,
     requests: requests,
-    responseResolves: function (request, response, resolve, reject) {
-      responseInterceptor(respQueue.resolves, request, response).then(resolve)
-    },
-    responseRejects: function (request, response, resolve, reject) {
-      responseInterceptor(respQueue.rejects, request, response).then(function (e) {
-        (handleExports.isResponse(e) ? resolve : reject)(e)
-      })
-    }
+    toResolves: responseToResolves,
+    toRejects: responseToRejects
   }
 
   function XERequest (options) {
-    utils.objectAssign(this, { url: '', body: '', params: '', signal: '' }, options)
+    utils.assign(this, { url: '', body: '', params: '', signal: '' }, options)
     this.headers = new XEHeaders(options.headers)
     this.method = this.method.toLocaleUpperCase()
     this.bodyType = this.bodyType.toLowerCase()
-    if (this.signal && utils.isFunction(this.signal.install)) {
-      this.signal.install(this)
+    var reqSignal = this.signal
+    if (reqSignal && reqSignal.install) {
+      reqSignal.install(this)
     }
   }
 
   var requestPro = XERequest.prototype
 
   requestPro.abort = function () {
-    if (this.xhr) {
-      this.xhr.abort()
+    var xhr = this.xhr
+    if (xhr) {
+      xhr.abort()
     }
     this.$abort = true
   }
   requestPro.getUrl = function () {
     var url = this.url
-    var params = ''
+    var params = this.params
     if (url) {
-      var _param = utils.arrayIndexOf(['no-store', 'no-cache', 'reload'], this.cache) === -1 ? {} : { _t: Date.now() }
-      if (utils.isFunction(this.transformParams)) {
-        this.params = this.transformParams(this.params || {}, this)
+      var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
+      var transformParams = this.transformParams
+      if (transformParams) {
+        params = this.params = transformParams(params || {}, this)
       }
-      if (this.params && !utils.isFormData(this.params)) {
-        params = utils.isString(this.params) ? this.params : (this.paramsSerializer || utils.serialize)(utils.objectAssign(_param, this.params), this)
+      if (params && !utils.isFData(params)) {
+        params = utils.isStr(params) ? params : (this.paramsSerializer || utils.serialize)(utils.assign(_param, params), this)
       } else {
         params = utils.serialize(_param)
       }
@@ -450,7 +456,7 @@
         return (utils._N ? '' : location.protocol) + url
       }
       if (url.indexOf('/') === 0) {
-        return utils.getLocatOrigin() + url
+        return utils.getOrigin() + url
       }
       return this.baseURL.replace(/\/$/, '') + '/' + url
     }
@@ -459,14 +465,17 @@
   requestPro.getBody = function () {
     var result = null
     var body = this.body
-    if (body && this.method !== 'GET' && this.method !== 'HEAD') {
-      if (this.transformBody) {
-        body = this.body = this.transformBody(body, this) || body
+    var reqMethod = this.method
+    if (body && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
+      var transformBody = this.transformBody
+      var stringifyBody = this.stringifyBody
+      if (transformBody) {
+        body = this.body = transformBody(body, this) || body
       }
-      if (this.stringifyBody) {
-        result = this.stringifyBody(body, this)
+      if (stringifyBody) {
+        result = stringifyBody(body, this)
       } else {
-        if (utils.isFormData(body) || utils.isString(body)) {
+        if (utils.isFData(body) || utils.isStr(body)) {
           result = body
         } else {
           result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
@@ -479,13 +488,14 @@
   function XEResponse (body, options, request) {
     this._body = body
     this._request = request
+    var status = options.status
     var _response = this._response = {
       body: new XEReadableStream(body, request, this),
       bodyUsed: false,
       url: request.url,
-      status: options.status,
+      status: status,
       statusText: options.statusText,
-      redirected: options.status === 302,
+      redirected: status === 302,
       headers: new XEHeaders(options.headers || {}),
       type: 'basic'
     }
@@ -495,7 +505,7 @@
   var decode = decodeURIComponent
   var responsePro = XEResponse.prototype
 
-  utils.arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+  utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
     Object.defineProperty(responsePro, name, {
       get: function () {
         return this._response[name]
@@ -576,6 +586,10 @@
     return false
   }
 
+  function getStringifyBody (reqBody) {
+    return utils.isStr(reqBody) ? reqBody : JSON.stringify(reqBody)
+  }
+
   var handleExports = {
     isResponse: isResponse,
     // result to Response
@@ -586,9 +600,11 @@
       var reqBody = resp.body
       var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
       if (utils._A) {
-        return new XEResponse(reqBody instanceof Blob ? reqBody : new Blob([utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody)]), options, request)
+        reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
+      } else {
+        reqBody = getStringifyBody(reqBody)
       }
-      return new XEResponse(utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody), options, request)
+      return new XEResponse(reqBody, options, request)
     }
   }
 
@@ -605,7 +621,7 @@
     if (request.mode === 'same-origin') {
       if (utils.isCrossOrigin(url)) {
         failed()
-        throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getLocatOrigin() + '.')
+        throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
       }
     }
     var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
@@ -680,32 +696,35 @@
       body: request.getBody(),
       headers: request.headers
     }
+    var reqSignal = request.signal
+    var clearTimeoutFn = clearTimeout
     if (reqTimeout) {
       timer = setTimeout(function () {
         failed('timeout')
       }, reqTimeout)
     }
-    if (request.signal && request.signal.aborted) {
+    if (reqSignal && reqSignal.aborted) {
       failed('aborted')
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
-        clearTimeout(timer)
+        clearTimeoutFn(timer)
         finish(handleExports.toResponse(resp, request))
       }).catch(function (e) {
-        clearTimeout(timer)
+        clearTimeoutFn(timer)
         failed()
       })
     }
   }
 
   function getRequest (request) {
+    var reqSignal = request.signal
     if (request.$fetch) {
-      return request.signal ? sendXHR : sendFetch
+      return reqSignal ? sendXHR : sendFetch
     } else if (utils._F) {
       if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
         return sendFetch
       }
-      return request.signal ? sendXHR : sendFetch
+      return reqSignal ? sendXHR : sendFetch
     }
     return sendXHR
   }
@@ -734,14 +753,13 @@
    * @param { Function } failed
    */
   function sendJSONP (request, finish, failed) {
-    request.script = $dom.createElement('script')
     var reqTimeout = request.timeout
     var jsonpCallback = request.jsonpCallback
-    var script = request.script
+    var script = request.script = $dom.createElement('script')
     if (!jsonpCallback) {
       jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
     }
-    if (utils.isFunction(request.$jsonp)) {
+    if (utils.isFn(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
         finish(handleExports.toResponse({ status: 200, body: resp }, request))
       }).catch(function () {
@@ -770,8 +788,10 @@
   }
 
   function jsonpClear (request, jsonpCallback) {
-    if (request.script.parentNode === $dom.body) {
-      $dom.body.removeChild(request.script)
+    var script = request.script
+    var $body = $dom.body
+    if (script.parentNode === $body) {
+      $body.removeChild(script)
     }
     try {
       delete $global[jsonpCallback]
@@ -794,21 +814,21 @@
     * @return { Promise }
     */
   function XEAjax (options) {
-    var opts = utils.objectAssign({}, setupDefaults, { headers: utils.objectAssign({}, setupDefaults.headers) }, options)
+    var opts = utils.assign({}, setupDefaults, { headers: utils.assign({}, setupDefaults.headers) }, options)
     var request = new XERequest(opts)
     var XEPromise = request.$Promise || Promise
     return new XEPromise(function (resolve, reject) {
       return interceptorExports.requests(request).then(function () {
         (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
-          interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
+          interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
         }, function (type) {
-          interceptorExports.responseRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
+          interceptorExports.toRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
         })
       })
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.4'
+  XEAjax.version = '3.4.5'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.AbortController = XEAbortController
@@ -850,13 +870,13 @@
    * @param { Function } $options 自定义参数
    */
   XEAjax.setup = function (options) {
-    utils.objectAssign(setupDefaults, options)
+    utils.assign(setupDefaults, options)
   }
 
   var clearContext = utils.clearContext
 
   function getOptions (method, def, options) {
-    var opts = utils.objectAssign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
+    var opts = utils.assign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
     clearContext(XEAjax)
     return opts
   }
@@ -923,7 +943,7 @@
       if (item instanceof XEPromise || item instanceof Promise) {
         return item
       }
-      return utils.isObject(item) ? XEAjax(utils.objectAssign({ $context: context, $Promise: XEPromise }, item)) : item
+      return utils.isObj(item) ? XEAjax(utils.assign({ $context: context, $Promise: XEPromise }, item)) : item
     }), context)
   }
 
@@ -935,7 +955,7 @@
 
   function createParamsFetch (method, defs) {
     return function (url, params, opts) {
-      return getOptions(method, utils.objectAssign({ url: url, params: params }, defs), opts)
+      return getOptions(method, utils.assign({ url: url, params: params }, defs), opts)
     }
   }
 
@@ -990,7 +1010,7 @@
    */
   XEAjax.mixin = function (methods) {
     utils.objectEach(methods, function (fn, name) {
-      XEAjax[name] = utils.isFunction(fn) ? function () {
+      XEAjax[name] = utils.isFn(fn) ? function () {
         var result = fn.apply(XEAjax.$context, arguments)
         clearContext(XEAjax)
         return result

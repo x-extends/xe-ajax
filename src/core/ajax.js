@@ -22,15 +22,15 @@ var errorType = {
   * @return { Promise }
   */
 function XEAjax (options) {
-  var opts = utils.objectAssign({}, setupDefaults, {headers: utils.objectAssign({}, setupDefaults.headers)}, options)
+  var opts = utils.assign({}, setupDefaults, {headers: utils.assign({}, setupDefaults.headers)}, options)
   var request = new XERequest(opts)
   var XEPromise = request.$Promise || Promise
   return new XEPromise(function (resolve, reject) {
     return interceptorExports.requests(request).then(function () {
       (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
-        interceptorExports.responseResolves(request, handleExports.toResponse(response, request), resolve, reject)
+        interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
       }, function (type) {
-        interceptorExports.responseRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
+        interceptorExports.toRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
       })
     })
   }, request.$context)
@@ -78,7 +78,7 @@ XEAjax.use = function (plugin) {
  * @param { Function } $options 自定义参数
  */
 XEAjax.setup = function (options) {
-  utils.objectAssign(setupDefaults, options)
+  utils.assign(setupDefaults, options)
 }
 
 module.exports = XEAjax

@@ -32,9 +32,10 @@ function XEAbortControllerPolyfill () {
 XEAbortControllerPolyfill.prototype.abort = function () {
   var index = getSignalIndex(this.signal)
   if (index !== undefined) {
-    utils.arrayEach(requestList[index][1], function (request) {
+    var requestItem = requestList[index]
+    utils.arrayEach(requestItem[1], function (request) {
       request.abort()
-      requestList[index][0]._abortSignal.aborted = true
+      requestItem[0]._abortSignal.aborted = true
     })
     requestList.splice(index, 1)
   }

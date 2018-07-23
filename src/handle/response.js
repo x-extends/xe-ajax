@@ -7,13 +7,14 @@ var XEHeaders = require('./headers')
 function XEResponse (body, options, request) {
   this._body = body
   this._request = request
+  var status = options.status
   var _response = this._response = {
     body: new XEReadableStream(body, request, this),
     bodyUsed: false,
     url: request.url,
-    status: options.status,
+    status: status,
     statusText: options.statusText,
-    redirected: options.status === 302,
+    redirected: status === 302,
     headers: new XEHeaders(options.headers || {}),
     type: 'basic'
   }
@@ -23,7 +24,7 @@ function XEResponse (body, options, request) {
 var decode = decodeURIComponent
 var responsePro = XEResponse.prototype
 
-utils.arrayEach(['body', 'bodyUsed', 'url', 'headers', 'status', 'statusText', 'ok', 'redirected', 'type'], function (name) {
+utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
   Object.defineProperty(responsePro, name, {
     get: function () {
       return this._response[name]

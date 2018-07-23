@@ -12,6 +12,10 @@ function isResponse (obj) {
   return false
 }
 
+function getStringifyBody (reqBody) {
+  return utils.isStr(reqBody) ? reqBody : JSON.stringify(reqBody)
+}
+
 var handleExports = {
   isResponse: isResponse,
   // result to Response
@@ -22,9 +26,11 @@ var handleExports = {
     var reqBody = resp.body
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
     if (utils._A) {
-      return new XEResponse(reqBody instanceof Blob ? reqBody : new Blob([utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody)]), options, request)
+      reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
+    } else {
+      reqBody = getStringifyBody(reqBody)
     }
-    return new XEResponse(utils.isString(reqBody) ? reqBody : JSON.stringify(reqBody), options, request)
+    return new XEResponse(reqBody, options, request)
   }
 }
 
