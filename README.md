@@ -99,19 +99,19 @@ import XEAjax from 'xe-ajax'
 |------|------|-----|----|
 | url | String | 请求地址 |  |
 | baseURL | String | 基础路径 | 默认上下文路径 |
-| method | String | 请求方法 | 默认GET |
+| method | String | 请求方法 | 'GET' |
 | params | Object/Array | 请求参数 |  |
 | body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式，可以设置json-data,form-data | 默认json-data |
+| bodyType | String | 提交参数方式，可以设置json-data,form-data | 'json-data' |
 | mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 默认cors |
-| cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
-| credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
-| redirect | String | 重定向模式, 可以设置follow,error,manual | 默认follow |
-| * **referrer** | String | 可以设置no-referrer,client或URL | 默认client |
+| cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
+| credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 'same-origin' |
+| redirect | String | 重定向模式, 可以设置follow,error,manual | 'follow' |
+| * **referrer** | String | 可以设置no-referrer,client或URL | 'client' |
 | * **referrerPolicy** | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
 | * **keepalive** | String | 选项可用于允许请求超过页面的生存时间 |  |
 | * **integrity** | String | 包括请求的subresource integrity值 (例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
-| jsonp | String | jsonp入参属性名 | 默认callback |
+| jsonp | String | jsonp入参属性名 | 'callback' |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置超时 |  |
 | headers | Object | 请求头 |  |
