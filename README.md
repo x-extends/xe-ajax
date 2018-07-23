@@ -104,10 +104,10 @@ import XEAjax from 'xe-ajax'
 | mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 默认cors |
 | cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 默认default |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 默认same-origin |
-| *redirect* | String | 重定向模式, 可以设置follow,error,manual | 默认follow |
-| *referrer* | String | 可以设置no-referrer,client或URL | 在原生支持fetch环境下才有效 |
-| *referrerPolicy* | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url | 在原生支持fetch环境下才有效 |
-| integrity | String | 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) | 在原生支持fetch环境下才有效 |
+| redirect | String | 重定向模式, 可以设置follow,error,manual | 默认follow |
+| **referrer** | String | (在原生支持fetch环境下才有效)可以设置no-referrer,client或URL | 默认client |
+| **referrerPolicy** | String | (在原生支持fetch环境下才有效)可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| **integrity** | String | (在原生支持fetch环境下才有效)包括请求的subresource integrity值 (例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
 | jsonp | String | jsonp入参属性名 | 默认callback |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置超时 |  |

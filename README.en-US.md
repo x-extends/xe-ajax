@@ -106,11 +106,14 @@ import XEAjax from 'xe-ajax'
 | method | String | request method | defaults to 'GET' |
 | params | Object | request params |  |
 | body | Object | request body |  |
-| bodyType | String | submit type, You can set [**'json-data'**,**'form-data'**] | defaults to 'json-data' |
-| mode | String | The mode you want to use for the request, You can set [**'cors'**,**'no-cors'**,**'same-origin'**] | defaults to 'cors' |
-| cache | String | handling cache mode, You can set [**'default'**,**'no-store'**,**'no-cache'**,**'reload'**,**'force-cache'**,**'only-if-cached'**] | defaults to 'default' |
-| credentials | String | set the cookie to be sent along with the request, You can set [**'omit'**,**'same-origin'**,**'include'**] | defaults to 'same-origin' |
-| redirect | String | The redirect mode to use, You can set [**'follow'**,**'error'**,**'manual'**] | defaults to 'follow' |
+| bodyType | String | submit type, You can set: json-data,form-data | defaults to 'json-data' |
+| mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | defaults to 'cors' |
+| cache | String | handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | defaults to 'default' |
+| credentials | String | set the cookie to be sent along with the request, You can set: omit,same-origin,include | defaults to 'same-origin' |
+| redirect | String | The redirect mode to use, You can set: follow,error,manual | defaults to 'follow' |
+| **referrer** | String | (It is valid in a native-supported fetch environment)Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | defaults to 'client' |
+| **referrerPolicy** | String | (It is valid in a native-supported fetch environment), You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| **integrity** | String | Contains the subresource integrity value of the request (e.g., sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
 | jsonp | String | set jsonp callback parameter name | defaults to 'callback' |
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |
