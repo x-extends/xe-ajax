@@ -79,7 +79,7 @@ function httpRequest (request, finish, failed) {
   if (reqTimeout) {
     timer = setTimeout(function () {
       req.abort()
-      failed('timeout')
+      failed('E_T')
     }, reqTimeout)
   }
 
@@ -97,7 +97,7 @@ function sendHttp (request, finish, failed) {
     var reqTimeout = request.timeout
     if (reqTimeout) {
       timer = setTimeout(function () {
-        failed('timeout')
+        failed('E_T')
       }, reqTimeout)
     }
     return request.$http(request, function () {

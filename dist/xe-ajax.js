@@ -168,12 +168,9 @@
 
   function getObjectIterators (obj, getIndex) {
     var result = []
-    for (var name in obj) {
-      if (obj.hasOwnProperty(name)) {
-        var value = obj[name]
-        result.push([name, value, [name, value]][getIndex])
-      }
-    }
+    utils.objectEach(obj, function (value, name) {
+      result.push([name, value, [name, value]][getIndex])
+    })
     return result
   }
 
@@ -647,10 +644,10 @@
       failed()
     }
     xhr.ontimeout = function () {
-      failed('timeout')
+      failed('E_T')
     }
     xhr.onabort = function () {
-      failed('aborted')
+      failed('E_A')
     }
     if (utils._A) {
       xhr.responseType = 'blob'
@@ -688,23 +685,23 @@
     var reqTimeout = request.timeout
     var options = {
       _request: request,
-      method: request.method,
-      mode: request.mode,
-      cache: request.cache,
-      credentials: request.credentials,
-      redirect: request.redirect,
-      body: request.getBody(),
-      headers: request.headers
+      body: request.getBody()
+    }
+    var assignOpts = function (pro) {
+      if (request[pro]) {
+        options[pro] = request[pro]
+      }
     }
     var reqSignal = request.signal
     var clearTimeoutFn = clearTimeout
+    utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,integrity'.split(','), assignOpts)
     if (reqTimeout) {
       timer = setTimeout(function () {
-        failed('timeout')
+        failed('E_T')
       }, reqTimeout)
     }
     if (reqSignal && reqSignal.aborted) {
-      failed('aborted')
+      failed('E_A')
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
         clearTimeoutFn(timer)
@@ -780,7 +777,7 @@
       if (reqTimeout) {
         setTimeout(function () {
           jsonpClear(request, jsonpCallback)
-          finish('timeout')
+          finish('E_T')
         }, reqTimeout)
       }
       $dom.body.appendChild(script)
@@ -802,9 +799,9 @@
   }
 
   var errorType = {
-    aborted: 'The user aborted a request.',
-    timeout: 'Request timeout.',
-    failed: 'Network request failed.'
+    E_A: 'The user aborted a request.',
+    E_T: 'Request timeout.',
+    E_F: 'Network request failed.'
   }
 
   /**
@@ -822,7 +819,7 @@
         (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
           interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
         }, function (type) {
-          interceptorExports.toRejects(request, new TypeError(errorType[type || 'failed']), resolve, reject)
+          interceptorExports.toRejects(request, new TypeError(errorType[type || 'E_F']), resolve, reject)
         })
       })
     }, request.$context)
@@ -860,6 +857,10 @@
    * @param { Function } transformBody(body, request) 用于改变提交数据
    * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
    * @param { Function } validateStatus(response) 自定义校验请求是否成功
+   * 只有在原生支持 fetch 的环境下才有效
+   * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
+   * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
+   * @param { String } integrity 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=)
    * 高级参数
    * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
    * @param { Function } $http 自定义 http 请求函数

@@ -8,12 +8,9 @@ function toHeaderKey (name) {
 
 function getObjectIterators (obj, getIndex) {
   var result = []
-  for (var name in obj) {
-    if (obj.hasOwnProperty(name)) {
-      var value = obj[name]
-      result.push([name, value, [name, value]][getIndex])
-    }
-  }
+  utils.objectEach(obj, function (value, name) {
+    result.push([name, value, [name, value]][getIndex])
+  })
   return result
 }
 

@@ -17,23 +17,23 @@ function sendFetch (request, finish, failed) {
   var reqTimeout = request.timeout
   var options = {
     _request: request,
-    method: request.method,
-    mode: request.mode,
-    cache: request.cache,
-    credentials: request.credentials,
-    redirect: request.redirect,
-    body: request.getBody(),
-    headers: request.headers
+    body: request.getBody()
+  }
+  var assignOpts = function (pro) {
+    if (request[pro]) {
+      options[pro] = request[pro]
+    }
   }
   var reqSignal = request.signal
   var clearTimeoutFn = clearTimeout
+  utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,integrity'.split(','), assignOpts)
   if (reqTimeout) {
     timer = setTimeout(function () {
-      failed('timeout')
+      failed('E_T')
     }, reqTimeout)
   }
   if (reqSignal && reqSignal.aborted) {
-    failed('aborted')
+    failed('E_A')
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeoutFn(timer)

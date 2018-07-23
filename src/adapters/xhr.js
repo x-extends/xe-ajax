@@ -42,10 +42,10 @@ function sendXHR (request, finish, failed) {
     failed()
   }
   xhr.ontimeout = function () {
-    failed('timeout')
+    failed('E_T')
   }
   xhr.onabort = function () {
-    failed('aborted')
+    failed('E_A')
   }
   if (utils._A) {
     xhr.responseType = 'blob'
