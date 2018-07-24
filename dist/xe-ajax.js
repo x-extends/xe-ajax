@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.5
+ * xe-ajax.js v3.4.6
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -15,6 +15,7 @@
   var STRING_UNDEFINED = 'undefined'
   var encode = encodeURIComponent
   var isNodeJS = typeof window === STRING_UNDEFINED && typeof process !== STRING_UNDEFINED
+  var isFetchAbortController = typeof AbortController !== STRING_UNDEFINED && typeof AbortSignal !== STRING_UNDEFINED
   var $locat = ''
 
   if (!isNodeJS) {
@@ -67,6 +68,7 @@
     _N: isNodeJS, // nodejs 环境
     _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
     _A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
+    _FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
 
     isFData: function (obj) {
       return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
@@ -306,7 +308,7 @@
   }
 
   /* eslint-disable no-undef */
-  var XEAbortController = typeof AbortController === 'undefined' ? XEAbortControllerPolyfill : AbortController
+  var XEAbortController = utils._FAC ? AbortController : XEAbortControllerPolyfill
 
   /**
    * interceptor queue
@@ -687,14 +689,13 @@
       _request: request,
       body: request.getBody()
     }
-    var assignOpts = function (pro) {
+    var reqSignal = request.signal
+    var clearTimeoutFn = clearTimeout
+    utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), function (pro) {
       if (request[pro]) {
         options[pro] = request[pro]
       }
-    }
-    var reqSignal = request.signal
-    var clearTimeoutFn = clearTimeout
-    utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), assignOpts)
+    })
     if (reqTimeout) {
       timer = setTimeout(function () {
         failed('E_T')
@@ -718,7 +719,7 @@
     if (request.$fetch) {
       return reqSignal ? sendXHR : sendFetch
     } else if (utils._F) {
-      if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
+      if (utils._FAC) {
         return sendFetch
       }
       return reqSignal ? sendXHR : sendFetch
@@ -825,7 +826,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.5'
+  XEAjax.version = '3.4.6'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.AbortController = XEAbortController
@@ -849,7 +850,6 @@
    * @param { String } bodyType 提交参数方式可以设置json-data,form-data(json-data)
    * @param { String } jsonp 调用jsonp服务,回调属性默认callback
    * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
-   * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param { Number } timeout 设置超时
    * @param { Object } headers 请求头
    * @param { Function } transformParams(params, request) 用于改变URL参数
@@ -858,6 +858,7 @@
    * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
    * @param { Function } validateStatus(response) 自定义校验请求是否成功
    * 只有在原生支持 fetch 的环境下才有效
+   * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
    * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
    * @param { String } integrity 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=)

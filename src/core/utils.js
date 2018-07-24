@@ -4,6 +4,7 @@
 var STRING_UNDEFINED = 'undefined'
 var encode = encodeURIComponent
 var isNodeJS = typeof window === STRING_UNDEFINED && typeof process !== STRING_UNDEFINED
+var isFetchAbortController = typeof AbortController !== STRING_UNDEFINED && typeof AbortSignal !== STRING_UNDEFINED
 var $locat = ''
 
 if (!isNodeJS) {
@@ -56,6 +57,7 @@ var utils = {
   _N: isNodeJS, // nodejs 环境
   _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
   _A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
+  _FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
 
   isFData: function (obj) {
     return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData

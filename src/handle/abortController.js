@@ -42,6 +42,6 @@ XEAbortControllerPolyfill.prototype.abort = function () {
 }
 
 /* eslint-disable no-undef */
-var XEAbortController = typeof AbortController === 'undefined' ? XEAbortControllerPolyfill : AbortController
+var XEAbortController = utils._FAC ? AbortController : XEAbortControllerPolyfill
 
 module.exports = XEAbortController

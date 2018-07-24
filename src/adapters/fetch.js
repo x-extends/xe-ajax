@@ -19,14 +19,13 @@ function sendFetch (request, finish, failed) {
     _request: request,
     body: request.getBody()
   }
-  var assignOpts = function (pro) {
+  var reqSignal = request.signal
+  var clearTimeoutFn = clearTimeout
+  utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), function (pro) {
     if (request[pro]) {
       options[pro] = request[pro]
     }
-  }
-  var reqSignal = request.signal
-  var clearTimeoutFn = clearTimeout
-  utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), assignOpts)
+  })
   if (reqTimeout) {
     timer = setTimeout(function () {
       failed('E_T')
@@ -50,7 +49,7 @@ function getRequest (request) {
   if (request.$fetch) {
     return reqSignal ? sendXHR : sendFetch
   } else if (utils._F) {
-    if (typeof AbortController !== 'undefined' && typeof AbortSignal !== 'undefined') {
+    if (utils._FAC) {
       return sendFetch
     }
     return reqSignal ? sendXHR : sendFetch

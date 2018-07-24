@@ -36,7 +36,7 @@ function XEAjax (options) {
   }, request.$context)
 }
 
-XEAjax.version = '3.4.5'
+XEAjax.version = '3.4.6'
 XEAjax.interceptors = interceptorExports.interceptors
 XEAjax.serialize = utils.serialize
 XEAjax.AbortController = XEAbortController
@@ -60,7 +60,6 @@ XEAjax.use = function (plugin) {
  * @param { String } bodyType 提交参数方式可以设置json-data,form-data(json-data)
  * @param { String } jsonp 调用jsonp服务,回调属性默认callback
  * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
- * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param { Number } timeout 设置超时
  * @param { Object } headers 请求头
  * @param { Function } transformParams(params, request) 用于改变URL参数
@@ -69,6 +68,7 @@ XEAjax.use = function (plugin) {
  * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
  * @param { Function } validateStatus(response) 自定义校验请求是否成功
  * 只有在原生支持 fetch 的环境下才有效
+ * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
  * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
  * @param { String } integrity 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=)
