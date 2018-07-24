@@ -62,7 +62,7 @@ import XEAjax from 'xe-ajax'
 ```
 
 ## API
-
+### Provides three commonly used convenience functions: 
 * doAll ( iterable )
 * ajax ( options )
 * ~
@@ -202,7 +202,11 @@ XEAjax.ajax({
   method: 'GET',
   params: {id: 1}
 }).then(response => {
-  // finish
+  if (response.ok) {
+    // success
+  } else {
+    // error
+  }
 }).catch(e => {
   // error
 })
@@ -218,7 +222,11 @@ XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
-  // finish
+  if (response.ok) {
+    // success
+  } else {
+    // error
+  }
 }).catch(e => {
   // error
 })
@@ -377,11 +385,17 @@ import XEAjax from 'xe-ajax'
 
 // This should be avoided in the project.
 XEAjax.fetchGet('/api/user/info')
-.then(response => response.json())
-.then(data => {
-  return fetchGet('/api/user/details', {id: data.id})
-}).then(response => {
-  // finish
+  .then(response => response.json())
+  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id})).then(response => {
+    response.json().then(data => {
+      // data
+    })
+  })
+XEAjax.doGet('/api/user/info').then(({ data }) => XEAjax.doGet('/api/user/details', {id: data.id})).then(({ data }) => {
+  // data
+})
+XEAjax.getJSON('/api/user/info').then(data => XEAjax.getJSON('/api/user/details', {id: data.id})).then(data => {
+  // data
 })
 ```
 
@@ -392,8 +406,20 @@ define([
   'xe-ajax'
 ], function (XEAjax) {
 
-  XEAjax.fetchGet('/api/user/list').then(response => {
-    // finish
+  XEAjax.fetchGet('/api/user/list').then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        // data
+      })
+    }
+  })
+
+  XEAjax.doGet('/api/user/list').then(function (response) {
+    // response.data
+  })
+
+  XEAjax.getJSON('/api/user/list').then(function (data) {
+    // data
   })
 
   XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
@@ -403,6 +429,8 @@ define([
   var formBody = new FormData()
   formBody.append('file', file)
   XEAjax.fetchPost('/api/user/save', formBody)
+
+  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {params: {id: 1}})
 })
 ```
 

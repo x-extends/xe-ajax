@@ -7,7 +7,7 @@
 
 基于 Promise 的异步请求函数，使用 fetch API，支持 node.js、browser 环境。
 
-## Browser Support
+## 兼容性
 
 xe-ajax 依赖原生的 ES6 Promise 实现。如果您的环境不支持 ES6 Promise，您可以使用 polyfill。
 
@@ -15,7 +15,7 @@ xe-ajax 依赖原生的 ES6 Promise 实现。如果您的环境不支持 ES6 Pro
 --- | --- | --- | --- | --- | --- |
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
-## CDN
+## CDN 安装
 使用 script 方式安装，XEAjax 会定义为全局变量  
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
 ### cdnjs 获取最新版本
@@ -29,7 +29,7 @@ xe-ajax 依赖原生的 ES6 Promise 实现。如果您的环境不支持 ES6 Pro
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-## AMD
+## AMD 安装
 ### require.js 安装示例
 ``` shell
 // require 配置
@@ -39,9 +39,12 @@ require.config({
     'xe-ajax': './dist/xe-ajax.min'
   }
 })
+define(['xe-ajax'], function (XEAjax) {
+  // XEAjax.fetch(url)
+})
 ```
 
-## NPM
+## NPM 安装
 ``` shell
 npm install xe-ajax --save
 ```
@@ -57,7 +60,7 @@ import XEAjax from 'xe-ajax'
 ```
 
 ## API:
-### 提供常用便捷方法:
+### 提供三种常用的便捷函数: 
 * doAll ( iterable )
 * ajax ( options )
 * ~
@@ -197,7 +200,11 @@ XEAjax.ajax({
   method: 'GET',
   params: {id: 1}
 }).then(response => {
-  // 请求完成
+  if (response.ok) {
+    // 请求失败
+  } else {
+    // 请求成功
+  }
 }).catch(e => {
   // 发生错误
 })
@@ -211,7 +218,11 @@ XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {name: 'test'}
 }).then(response => {
-  // 请求完成
+  if (response.ok) {
+    // 请求失败
+  } else {
+    // 请求成功
+  }
 }).catch(e => {
   // 发生错误
 })
@@ -373,12 +384,18 @@ XEAjax.doAll(iterable2)
 import XEAjax from 'xe-ajax'
 
 // 相互依赖的嵌套请求(项目中应该避免这种情况)
-XEAjax.fetchGet('/api/user/info').then(response => response.json()).then(data => {
-  return fetchGet('/api/user/details', {id: data.id})
-}).then(response => {
-  response.json().then(data => {
-    // 获取 data
+XEAjax.fetchGet('/api/user/info')
+  .then(response => response.json())
+  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id})).then(response => {
+    response.json().then(data => {
+      // 获取 data
+    })
   })
+XEAjax.doGet('/api/user/info').then(({ data }) => XEAjax.doGet('/api/user/details', {id: data.id})).then(({ data }) => {
+  // 获取 data
+})
+XEAjax.getJSON('/api/user/info').then(data => XEAjax.getJSON('/api/user/details', {id: data.id})).then(data => {
+  // 获取 data
 })
 ```
 ### AMD 使用方式
@@ -387,14 +404,23 @@ define([
   'xe-ajax'
 ], function (XEAjax) {
 
-  XEAjax.fetchGet('/api/user/list').then(response => {
-    response.json().then(data => {
-      // 获取 data
-    })
+  XEAjax.fetchGet('/api/user/list').then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        // 获取 data
+      })
+    }
   })
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'})
+  XEAjax.doGet('/api/user/list').then(function (response) {
+    // 获取 response.data
+  })
 
+  XEAjax.getJSON('/api/user/list').then(function (data) {
+    // 获取 data
+  })
+
+  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
   XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'form-data'})
 
   var file = document.querySelector('#myFile').files[0]
