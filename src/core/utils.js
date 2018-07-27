@@ -5,6 +5,7 @@ var STRING_UNDEFINED = 'undefined'
 var encode = encodeURIComponent
 var isNodeJS = typeof window === STRING_UNDEFINED && typeof process !== STRING_UNDEFINED
 var isFetchAbortController = typeof AbortController !== STRING_UNDEFINED && typeof AbortSignal !== STRING_UNDEFINED
+var $console = typeof console === STRING_UNDEFINED ? '' : console
 var $locat = ''
 
 if (!isNodeJS) {
@@ -79,6 +80,13 @@ var utils = {
 
   isFn: function (obj) {
     return typeof obj === 'function'
+  },
+
+  err: function (e) {
+    var outError = $console.error ? $console.error : ''
+    if (outError) {
+      outError(e)
+    }
   },
 
   getOrigin: getLocatOrigin,

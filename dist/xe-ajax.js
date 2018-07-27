@@ -16,6 +16,7 @@
   var encode = encodeURIComponent
   var isNodeJS = typeof window === STRING_UNDEFINED && typeof process !== STRING_UNDEFINED
   var isFetchAbortController = typeof AbortController !== STRING_UNDEFINED && typeof AbortSignal !== STRING_UNDEFINED
+  var $console = typeof console === STRING_UNDEFINED ? '' : console
   var $locat = ''
 
   if (!isNodeJS) {
@@ -90,6 +91,13 @@
 
     isFn: function (obj) {
       return typeof obj === 'function'
+    },
+
+    err: function (e) {
+      var outError = $console.error ? $console.error : ''
+      if (outError) {
+        outError(e)
+      }
     },
 
     getOrigin: getLocatOrigin,
@@ -342,9 +350,7 @@
             resolve(req)
           })
         }, request.$context)
-      }).catch(function (e) {
-        console.error(e)
-      })
+      }).catch(utils.err)
     })
     return thenInterceptor
   }
@@ -362,9 +368,7 @@
             resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
           }, request)
         }, request.$context)
-      }).catch(function (e) {
-        console.error(e)
-      })
+      }).catch(utils.err)
     })
     return thenInterceptor
   }
