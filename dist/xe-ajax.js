@@ -221,10 +221,11 @@
   }
   headersPro.append = function (name, value) {
     var _key = toHeaderKey(name)
+    var store = this._d
     if (this.has(_key)) {
-      this._d[_key] = this._d[_key] + ', ' + value
+      store[_key] = store[_key] + ', ' + value
     } else {
-      this._d[_key] = '' + value
+      store[_key] = '' + value
     }
   }
   headersPro.has = function (name) {
@@ -251,14 +252,14 @@
   function XEReadableStream (body, request, response) {
     this.locked = false
     this._getBody = function () {
-      var that = this
+      var stream = this
       var XEPromise = request.$Promise || Promise
       response._response.bodyUsed = true
       return new XEPromise(function (resolve, reject) {
-        if (that.locked) {
+        if (stream.locked) {
           reject(new TypeError('body stream already read'))
         } else {
-          that.locked = true
+          stream.locked = true
           resolve(body)
         }
       }, request.$context)
@@ -284,16 +285,17 @@
         return index
       }
     }
+    return -1
   }
 
   XEAbortSignalPolyfill.prototype.install = function (request) {
     var reqSignal = request.signal
     if (reqSignal) {
       var index = getSignalIndex(reqSignal)
-      if (index === undefined) {
-        requestList.push([reqSignal, [request]])
-      } else {
+      if (index > -1) {
         requestList[index][1].push(request)
+      } else {
+        requestList.push([reqSignal, [request]])
       }
     }
   }
@@ -305,7 +307,7 @@
   // Abort Request
   XEAbortControllerPolyfill.prototype.abort = function () {
     var index = getSignalIndex(this.signal)
-    if (index !== undefined) {
+    if (index > -1) {
       var requestItem = requestList[index]
       utils.arrayEach(requestItem[1], function (request) {
         request.abort()

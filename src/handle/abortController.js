@@ -10,16 +10,17 @@ function getSignalIndex (item) {
       return index
     }
   }
+  return -1
 }
 
 XEAbortSignalPolyfill.prototype.install = function (request) {
   var reqSignal = request.signal
   if (reqSignal) {
     var index = getSignalIndex(reqSignal)
-    if (index === undefined) {
-      requestList.push([reqSignal, [request]])
-    } else {
+    if (index > -1) {
       requestList[index][1].push(request)
+    } else {
+      requestList.push([reqSignal, [request]])
     }
   }
 }
@@ -31,7 +32,7 @@ function XEAbortControllerPolyfill () {
 // Abort Request
 XEAbortControllerPolyfill.prototype.abort = function () {
   var index = getSignalIndex(this.signal)
-  if (index !== undefined) {
+  if (index > -1) {
     var requestItem = requestList[index]
     utils.arrayEach(requestItem[1], function (request) {
       request.abort()

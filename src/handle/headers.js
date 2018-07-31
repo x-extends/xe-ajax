@@ -51,10 +51,11 @@ headersPro.get = function (name) {
 }
 headersPro.append = function (name, value) {
   var _key = toHeaderKey(name)
+  var store = this._d
   if (this.has(_key)) {
-    this._d[_key] = this._d[_key] + ', ' + value
+    store[_key] = store[_key] + ', ' + value
   } else {
-    this._d[_key] = '' + value
+    store[_key] = '' + value
   }
 }
 headersPro.has = function (name) {
