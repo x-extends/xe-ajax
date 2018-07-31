@@ -868,7 +868,7 @@
    * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
    * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
    * @param { String } integrity 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=)
-   * 高级参数
+   * 高级参数(不建议使用))
    * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
    * @param { Function } $http 自定义 http 请求函数
    * @param { Function } $fetch 自定义 fetch 请求函数
