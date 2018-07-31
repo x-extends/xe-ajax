@@ -20,18 +20,18 @@ xe-ajax 依赖原生的 ES6 Promise 实现。如果您的环境不支持 ES6 Pro
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
 ### cdnjs 获取最新版本
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
-``` shell
+```JavaScript
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 ### unpkg 获取最新版本
 [点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
-``` shell
+```JavaScript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 ## AMD 安装
 ### require.js 安装示例
-``` shell
+```JavaScript
 // require 配置
 require.config({
   paths: {
@@ -45,17 +45,17 @@ define(['xe-ajax'], function (XEAjax) {
 ```
 
 ## NPM 安装
-``` shell
+```JavaScript
 npm install xe-ajax --save
 ```
 
 ### NodeJS
-``` shell
+```JavaScript
 const XEAjax = require('xe-ajax')
 ```
 
 ### ES6 Module import
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 ```
 
@@ -157,7 +157,7 @@ import XEAjax from 'xe-ajax'
 | formData | Function | 获取 FormData 对象 |
 
 ## 全局参数设置
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 示例
@@ -192,7 +192,7 @@ XEAjax.setup({
 
 ## 示例
 ### 完整调用
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 XEAjax.ajax({
@@ -211,7 +211,7 @@ XEAjax.ajax({
 
 ```
 ### fetch 调用
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 XEAjax.fetch('/api/user/list', {
@@ -269,8 +269,8 @@ XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 // 模拟表单 FormData 提交
-const file = document.querySelector('#myFile').files[0]
-const formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 
@@ -278,7 +278,7 @@ XEAjax.fetchPost('/api/user/save', formBody)
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### 根据状态响应请求结果、包括状态信息
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 对请求的响应包含以下信息
@@ -295,13 +295,13 @@ XEAjax.doPost('/api/user/save', {name: 'test'})
 XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-const file = document.querySelector('#myFile').files[0]
-const formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
 ```
 ### 根据状态响应 json 调用
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败
@@ -317,15 +317,15 @@ XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType:
 
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-const file = document.querySelector('#myFile').files[0]
-const formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.postJSON('/api/user/save', formBody)
 
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 ### jsonp 调用
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 例子1
@@ -361,10 +361,10 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 })
 ```
 ### 并发多个请求
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
-const iterable1 = []
+let iterable1 = []
 iterable1.push(XEAjax.fetchGet('/api/user/list'))
 iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
@@ -374,13 +374,13 @@ Promise.all(iterable1).then(datas => {
 })
 
 // doAll 使用对象参数, 用法和 Promise.all 一致
-const iterable2 = []
+let iterable2 = []
 iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 ### 嵌套请求
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 相互依赖的嵌套请求(项目中应该避免这种情况)
@@ -399,7 +399,7 @@ XEAjax.getJSON('/api/user/info').then(data => XEAjax.getJSON('/api/user/details'
 })
 ```
 ### AMD 使用方式
-``` shell
+```JavaScript
 define([
   'xe-ajax'
 ], function (XEAjax) {
@@ -435,13 +435,14 @@ define([
 ## 取消请求
 ### AbortController 控制器对象
 允许控制一个或多个取消指令请求
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 创建一个控制器对象
-const controller = new XEAjax.AbortController()
+// 如果当前环境支持 AbortController，则使用原生的 AbortController
+let controller = new XEAjax.AbortController() // 或者使用原生 let controller = new AbortController()
 // 获取signal
-const signal = controller.signal
+let signal = controller.signal
 // 给请求加入控制器 signal
 XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
   // 请求成功
@@ -451,13 +452,15 @@ XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
 setTimeout(() => {
   // 终止请求
   controller.abort()
-}, 10)
+}, 50)
 ```
 
 ## 拦截器
 ### Request 拦截器
-use (before)
-``` shell
+
+XEAjax.interceptors.request.use(Function([request, next]))
+
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 请求之前拦截器
@@ -474,8 +477,10 @@ XEAjax.interceptors.request.use((request, next) => {
 })
 ```
 ### Response 拦截器
-use (finish, failed)
-``` shell
+
+XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
+
+```JavaScript
 import XEAjax from 'xe-ajax'
 
 // 请求完成之后拦截
@@ -502,7 +507,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
   // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
-    const body = {
+    let body = {
       status: response.status === 200 ? 'success' : 'error', 
       result: data
     }
@@ -511,7 +516,7 @@ XEAjax.interceptors.response.use((response, next) => {
   })
 }, (e, next) => {
   // 对所有请求错误返回统一的数据结构
-  const body = {
+  let body = {
     message: 'error', 
     result: null
   }
@@ -522,34 +527,27 @@ XEAjax.interceptors.response.use((response, next) => {
 
 ## 混合函数
 ### ./customs.js
-``` shell
+```JavaScript
 import XEAjax from 'xe-ajax'
 
-export function doGet () {
-  return XEAjax.fetchGet.apply(this, arguments)
-  .then(response => response.json())
-  .then(body => {
-    return {
-      body: body, 
-      status: response.status, 
-      headers: response.headers
-    }
-  })
-} 
-export function getText () {
-  return XEAjax.fetchGet.apply(this, arguments).then(response => response.text())
-} 
+const cacheMap = {}
+export function onceGet () {
+  if (cacheMap[url]) {
+    return cacheMap[url]
+  }
+  return cacheMap[url] = XEAjax.fetchGet.apply(this, arguments)
+}
 ```
+
 ### ./main.js
-``` shell
+
+```JavaScript
 import XEAjax from 'xe-ajax'
 import customs from './customs'
 
 XEAjax.mixin(customs)
 
-// 调用自定义扩展函数
-XEAjax.doGet('/api/user/list')
-XEAjax.getText('/api/user/message')
+XEAjax.onceGet('/api/user/message')
 ```
 
 ## 示例

@@ -263,8 +263,8 @@ XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 // Submit FormData
-const file = document.querySelector('#myFile').files[0]
-const formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 ```
@@ -288,8 +288,8 @@ XEAjax.doPost('/api/user/save', {name: 'test'})
 XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-const file = document.querySelector('#myFile').files[0]
-const formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
 ```
@@ -310,8 +310,8 @@ XEAjax.postJSON('/api/user/save', {name: 'test'})
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
-const file = document.querySelector('#myFile').files[0]
-const formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.postJSON('/api/user/save', formBody)
 ```
@@ -362,7 +362,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-const iterable1 = []
+let iterable1 = []
 iterable1.push(XEAjax.fetchGet('/api/user/list'))
 iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
 Promise.all(iterable1).then(datas => {
@@ -372,7 +372,7 @@ Promise.all(iterable1).then(datas => {
 })
 
 // doAll Use object parameters, The use is consistent with that of Promise.
-const iterable2 = []
+let iterable2 = []
 iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
@@ -444,9 +444,10 @@ Allows control of one or more cancellation requests.
 import XEAjax from 'xe-ajax'
 
 // Create a controller.
-const controller = new XEAjax.AbortController()
+// If the current environment supports AbortController, native AbortController is used
+let controller = new XEAjax.AbortController() // let controller = new AbortController()
 // get signal
-const signal = controller.signal
+let signal = controller.signal
 // Associate the signal and controller with the fetch request.
 XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
   // finish
@@ -455,14 +456,14 @@ XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
 })
 setTimeout(() => {
   controller.abort()
-}, 100)
+}, 50)
 ```
 
 ## Interceptor
 
 ### Request interceptor
 
-use (before)
+XEAjax.interceptors.request.use(Function([request, next]))
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -484,7 +485,7 @@ XEAjax.interceptors.request.use((request, next) => {
 
 ### Response interceptor
 
-use (finish, failed)
+XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -511,7 +512,7 @@ XEAjax.interceptors.response.use((response, next) => {
 // Format: {status: 200, statusText: 'OK', body: {}, headers: {}}
 XEAjax.interceptors.response.use((response, next) => {
   response.json().then(data => {
-    const body = {
+    let body = {
       message: response.status === 200 ? 'success' : 'error',
       result: data
     }
@@ -520,7 +521,7 @@ XEAjax.interceptors.response.use((response, next) => {
   })
 }, (e, next) => {
   // Turn all the exception errors to finish.
-  const body = {
+  let body = {
     message: 'error',
     result: null
   }
