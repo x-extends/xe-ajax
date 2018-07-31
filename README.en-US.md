@@ -178,7 +178,7 @@ XEAjax.setup({
     return params
   },
   paramsSerializer (params, request) {
-    return 'id=123&name=2'
+    return XEUtils.serialize(params)
   }，
   transformBody (body, request) {
     body.startTime = body.startDate.getTime()
@@ -292,6 +292,8 @@ let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
+
+XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
 
 ### fetch to JSON
@@ -304,6 +306,10 @@ XEAjax.getJSON('/api/user/list').then(data => {
   // success
 }).catch(data => {
   // failed
+})
+
+XEAjax.getJSON('/api/user/list/15/1').then(({page, result}) => {
+  // success
 })
 
 XEAjax.postJSON('/api/user/save', {name: 'test'})

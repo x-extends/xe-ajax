@@ -176,7 +176,7 @@ XEAjax.setup({
   },
   paramsSerializer (params, request) {
     // 自定义URL序列化函数,最终拼接在url
-    return 'id=123&name=2'
+    return XEUtils.serialize(params)
   }，
   transformBody (body, request) {
     // 用于在请求发送之前改变提交数据
@@ -311,10 +311,12 @@ XEAjax.getJSON('/api/user/list').then(data => {
   // 请求失败
 })
 
+XEAjax.getJSON('/api/user/list/15/1').then(({page, result}) => {
+  // 请求成功
+})
+
 XEAjax.postJSON('/api/user/save', {name: 'test'})
-
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 let file = document.querySelector('#myFile').files[0]
