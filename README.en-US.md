@@ -556,12 +556,6 @@ XEAjax.mixin(customs)
 XEAjax.onceGet('/api/user/message')
 ```
 
-## Plugin
-
-### Mock services
-
-MockJS、[XEAjaxMock](https://github.com/xuliangzhan/xe-ajax-mock)
-
 ## Project Demos
 
 [project examples.](https://github.com/xuliangzhan/examples)
