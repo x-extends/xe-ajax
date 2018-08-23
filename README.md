@@ -104,6 +104,7 @@ import XEAjax from 'xe-ajax'
 * patchJSON ( url, body, options )
 
 ### 入参
+
 * url（字符串） 请求地址，可被自定义 options 属性覆盖
 * params/body（可选，对象/数组） 要发送的数据，可被自定义 options 属性覆盖
 * options （可选，对象） 参数
@@ -139,6 +140,7 @@ import XEAjax from 'xe-ajax'
 | validateStatus | Function (response) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
 
 ### Headers
+
 | 属性 | 类型 | 描述 |
 |------|------|-----|
 | set | Function (name,value) | 添加 |
@@ -152,6 +154,7 @@ import XEAjax from 'xe-ajax'
 | forEach | Function (callback,context) | 迭代器 |
 
 ### Response
+
 | 属性 | 类型 | 描述 |
 |------|------|-----|
 | body | ReadableStream | 数据流 |
@@ -171,6 +174,7 @@ import XEAjax from 'xe-ajax'
 | formData | Function | 获取 FormData 对象 |
 
 ## 全局参数设置
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -205,7 +209,9 @@ XEAjax.setup({
 ```
 
 ## 示例
+
 ### 完整调用
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -224,7 +230,9 @@ XEAjax.ajax({
 })
 
 ```
+
 ### fetch 调用
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -291,7 +299,9 @@ XEAjax.fetchPost('/api/user/save', formBody)
 // 查询参数和数据同时提交
 XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
+
 ### 根据状态响应请求结果、包括状态信息
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -314,7 +324,9 @@ let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.doPost('/api/user/save', formBody)
 ```
+
 ### 根据状态响应 json 调用
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -340,7 +352,9 @@ XEAjax.postJSON('/api/user/save', formBody)
 
 XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
 ```
+
 ### jsonp 调用
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -368,7 +382,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
 // 服务地址: http://xuliangzhan.com/jsonp/user/message?id=123&cb=custom3
 // 服务端返回结果: custom3({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb', 
+  jsonp: 'cb',
   jsonpCallback: 'custom3'
 }).then(response => {
   response.json().then(data => {
@@ -376,7 +390,9 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
   })
 })
 ```
+
 ### 并发多个请求
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -395,7 +411,9 @@ iterable2.push({url: '/api/user/list'})
 iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
+
 ### 嵌套请求
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -414,7 +432,9 @@ XEAjax.getJSON('/api/user/info').then(data => XEAjax.getJSON('/api/user/details'
   // 获取 data
 })
 ```
+
 ### AMD 使用方式
+
 ```JavaScript
 define([
   'xe-ajax'
@@ -449,8 +469,11 @@ define([
 ```
 
 ## 取消请求
+
 ### AbortController 控制器对象
+
 允许控制一个或多个取消指令请求
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
@@ -472,6 +495,7 @@ setTimeout(() => {
 ```
 
 ## 拦截器
+
 ### Request 拦截器
 
 XEAjax.interceptors.request.use(Function([request, next]))
@@ -492,6 +516,7 @@ XEAjax.interceptors.request.use((request, next) => {
   next()
 })
 ```
+
 ### Response 拦截器
 
 XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
@@ -505,7 +530,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
   // 例子: 判断登录失效跳转
   if (response.status === 403) {
-    router.replace({path: '/login'}) 
+    router.replace({path: '/login'})
   } else {
     // 调用 next(),继续执行下一个拦截器
     next()
@@ -524,7 +549,7 @@ XEAjax.interceptors.response.use((response, next) => {
   // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
     let body = {
-      status: response.status === 200 ? 'success' : 'error', 
+      status: response.status === 200 ? 'success' : 'error',
       result: data
     }
     // 重置响应数据并继续执行下一个拦截器
@@ -533,7 +558,7 @@ XEAjax.interceptors.response.use((response, next) => {
 }, (e, next) => {
   // 对所有请求错误返回统一的数据结构
   let body = {
-    message: 'error', 
+    message: 'error',
     result: null
   }
   // 重置响应数据并继续执行下一个拦截器
@@ -568,7 +593,8 @@ XEAjax.mixin(customs)
 XEAjax.onceGet('/api/user/message')
 ```
 
-## 示例
+## 项目
+
 [项目示例](https://github.com/xuliangzhan/examples)  
 
 ## License
