@@ -33,11 +33,7 @@ function XEHeadersPolyfill (headers) {
     that.set(name, value)
   }
   that._d = {}
-  if (headers instanceof XEHeaders) {
-    headers.forEach(defset)
-  } else {
-    utils.objectEach(headers, defset)
-  }
+  utils[headers instanceof XEHeaders ? 'headersEach' : 'objectEach'](headers, defset)
 }
 
 var headersPro = XEHeadersPolyfill.prototype

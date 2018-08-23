@@ -13,7 +13,7 @@ function getOptions (method, def, options) {
 
 function responseHeaders (response) {
   var result = {}
-  response.headers.forEach(function (value, key) {
+  utils.headersEach(response.headers, function (value, key) {
     result[key] = value
   })
   return result

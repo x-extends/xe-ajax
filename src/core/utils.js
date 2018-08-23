@@ -140,6 +140,12 @@ var utils = {
     }
   },
 
+  headersEach: function (headers, callabck) {
+    if (headers && headers.forEach) {
+      headers.forEach(callabck)
+    }
+  },
+
   clearContext: function (XEAjax) {
     XEAjax.$context = XEAjax.$Promise = null
   }

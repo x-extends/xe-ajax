@@ -28,7 +28,7 @@ function sendXHR (request, finish, failed) {
       xhr.abort()
     }, reqTimeout)
   }
-  request.headers.forEach(function (value, name) {
+  utils.headersEach(request.headers, function (value, name) {
     xhr.setRequestHeader(name, value)
   })
   xhr.onload = function () {

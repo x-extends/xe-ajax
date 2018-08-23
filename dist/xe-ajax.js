@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.6
+ * xe-ajax.js v3.4.7
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -151,6 +151,12 @@
       }
     },
 
+    headersEach: function (headers, callabck) {
+      if (headers && headers.forEach) {
+        headers.forEach(callabck)
+      }
+    },
+
     clearContext: function (XEAjax) {
       XEAjax.$context = XEAjax.$Promise = null
     }
@@ -203,11 +209,7 @@
       that.set(name, value)
     }
     that._d = {}
-    if (headers instanceof XEHeaders) {
-      headers.forEach(defset)
-    } else {
-      utils.objectEach(headers, defset)
-    }
+    utils[headers instanceof XEHeaders ? 'headersEach' : 'objectEach'](headers, defset)
   }
 
   var headersPro = XEHeadersPolyfill.prototype
@@ -638,7 +640,7 @@
         xhr.abort()
       }, reqTimeout)
     }
-    request.headers.forEach(function (value, name) {
+    utils.headersEach(request.headers, function (value, name) {
       xhr.setRequestHeader(name, value)
     })
     xhr.onload = function () {
@@ -832,7 +834,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.6'
+  XEAjax.version = '3.4.7'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.AbortController = XEAbortController
@@ -891,7 +893,7 @@
 
   function responseHeaders (response) {
     var result = {}
-    response.headers.forEach(function (value, key) {
+    utils.headersEach(response.headers, function (value, key) {
       result[key] = value
     })
     return result

@@ -36,7 +36,7 @@ function httpRequest (request, finish, failed) {
     headers['Content-Length'] = Buffer.byteLength(body)
   }
 
-  request.headers.forEach(function (value, name) {
+  utils.headersEach(request.headers, function (value, name) {
     headers[name] = value
   })
 
