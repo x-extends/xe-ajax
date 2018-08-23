@@ -62,7 +62,9 @@ import XEAjax from 'xe-ajax'
 ```
 
 ## API
-### Provides three commonly used convenience functions: 
+
+### Provides three commonly used convenience functions
+
 * doAll ( iterable )
 * ajax ( options )
 * ~

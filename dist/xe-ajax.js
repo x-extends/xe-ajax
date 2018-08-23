@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.7
+ * xe-ajax.js v3.4.8
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -834,7 +834,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.7'
+  XEAjax.version = '3.4.8'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.AbortController = XEAbortController
@@ -924,8 +924,15 @@
       }).then(function (response) {
         return new XEPromise(function (resolve, reject) {
           var finish = response.ok ? resolve : reject
-          response.clone().json().catch(function (e) {
-            return response.clone().text()
+          // response.text() 解决兼容 Safari 10.1 及 Webkit 部分版本
+          response.text().then(function (data) {
+            try {
+              return JSON.parse(data)
+            } catch (e) {
+              return data
+            }
+          }).catch(function (e) {
+            return ''
           }).then(function (data) {
             finish(getResponseSchema(isRespSchema, data, response.status, response.statusText, responseHeaders(response)))
           })

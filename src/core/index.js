@@ -44,8 +44,15 @@ function createResponseSchema (method, isRespSchema) {
     }).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         var finish = response.ok ? resolve : reject
-        response.clone().json().catch(function (e) {
-          return response.clone().text()
+        // response.text() 解决兼容 Safari 10.1 及 Webkit 部分版本
+        response.text().then(function (data) {
+          try {
+            return JSON.parse(data)
+          } catch (e) {
+            return data
+          }
+        }).catch(function (e) {
+          return ''
         }).then(function (data) {
           finish(getResponseSchema(isRespSchema, data, response.status, response.statusText, responseHeaders(response)))
         })

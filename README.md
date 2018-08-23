@@ -16,21 +16,30 @@ xe-ajax 依赖原生的 ES6 Promise 实现。如果您的环境不支持 ES6 Pro
 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## CDN 安装
+
 使用 script 方式安装，XEAjax 会定义为全局变量  
 生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
+
 ### cdnjs 获取最新版本
+
 [点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
+
 ```JavaScript
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
+
 ### unpkg 获取最新版本
+
 [点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
+
 ```JavaScript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 ## AMD 安装
+
 ### require.js 安装示例
+
 ```JavaScript
 // require 配置
 require.config({
@@ -45,22 +54,27 @@ define(['xe-ajax'], function (XEAjax) {
 ```
 
 ## NPM 安装
+
 ```JavaScript
 npm install xe-ajax --save
 ```
 
 ### NodeJS
+
 ```JavaScript
 const XEAjax = require('xe-ajax')
 ```
 
 ### ES6 Module import
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 ```
 
-## API:
-### 提供三种常用的便捷函数: 
+## API
+
+### 提供三种常用的便捷函数
+
 * doAll ( iterable )
 * ajax ( options )
 * ~
@@ -528,7 +542,9 @@ XEAjax.interceptors.response.use((response, next) => {
 ```
 
 ## 混合函数
+
 ### ./customs.js
+
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
