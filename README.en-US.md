@@ -382,7 +382,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
 // Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
 // http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
 // jsonp_xeajax_1521272815608_2({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
+XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
   .then(response => {
     // response.data
   })
