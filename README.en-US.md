@@ -211,10 +211,11 @@ XEAjax.ajax(options)
     if (response.ok) {
       // success
     } else {
-      // error
+      // failed
     }
   }).catch(e => {
     // error
+    console.log(e.message)
   })
 ```
 
@@ -234,10 +235,11 @@ XEAjax.fetch('/api/user/list', options)
     if (response.ok) {
       // success
     } else {
-      // error
+      // failed
     }
   }).catch(e => {
     // error
+    console.log(e.message)
   })
 
 // Response Text

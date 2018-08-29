@@ -9,7 +9,7 @@
 
 ## 兼容性
 
-xe-ajax 依赖 Promise。如果您的环境不支持 Promise，您可以使用 babel-polyfill 或者 bluebird.js
+xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-polyfill 或者 bluebird.js
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- | --- |
@@ -232,6 +232,7 @@ XEAjax.ajax(options)
   })
   .catch(e => {
     // 发生错误
+    console.log(e.message)
   })
 ```
 
@@ -255,13 +256,14 @@ XEAjax.fetch('/api/user/list', options)
     }
   }).catch(e => {
     // 发生错误
+    console.log(e.message)
   })
 
 // Response Text
 XEAjax.fetchGet('/api/user/list')
   .then(response => {
     response.text().then(text => {
-      // 获取 text
+      // text
     })
   })
 
@@ -269,7 +271,7 @@ XEAjax.fetchGet('/api/user/list')
 XEAjax.fetchGet('/api/user/list')
   .then(response => {
     response.json().then(data => {
-      // 获取 data
+      // data
     })
   })
 
@@ -277,7 +279,7 @@ XEAjax.fetchGet('/api/user/list')
 XEAjax.fetchGet('/api/user/list')
   .then(response => {
     response.blob().then(blob => {
-      // 获取 blob
+      // blob
     })
   })
 
@@ -285,7 +287,7 @@ XEAjax.fetchGet('/api/user/list')
 XEAjax.fetchGet('/api/user/list')
   .then(response => {
     response.arrayBuffer().then(arrayBuffer => {
-      // 获取 arrayBuffer
+      // arrayBuffer
     })
   })
 
@@ -293,7 +295,7 @@ XEAjax.fetchGet('/api/user/list')
 XEAjax.fetchGet('/api/user/list')
   .then(response => {
     response.formData().then(formData => {
-      // 获取 formData
+      // formData
     })
   })
 
