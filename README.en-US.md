@@ -311,7 +311,7 @@ let query = {
 XEAjax.fetchPost('/api/user/save', body3, {params: query})
 ```
 
-### fetch to Response Schema
+### fetch to Response Schema (v3.4.0+)
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -445,7 +445,7 @@ XEAjax.getJSON('/api/user/info')
   })
 ```
 
-## Upload/Download
+## Upload/Download (v3.4.9+)
 
 ### Progress
 
@@ -487,7 +487,7 @@ progress.onload = evnt => {
 XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
 ```
 
-## Cancel request
+## Cancel request (v3.2.0+)
 
 ### AbortController
 
@@ -513,7 +513,7 @@ setTimeout(() => {
 }, 50)
 ```
 
-## Interceptor
+## Interceptor (v3.0+)
 
 ### Request interceptor
 

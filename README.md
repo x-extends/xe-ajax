@@ -328,7 +328,7 @@ let query = {
 XEAjax.fetchPost('/api/user/save', body3, {params: query})
 ```
 
-### 根据状态响应请求结果、包括状态信息
+### 根据状态响应请求结果、包括状态信息 (v3.4.0+)
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -451,7 +451,7 @@ XEAjax.getJSON('/api/user/info')
   })
 ```
 
-## 上传/下载
+## 上传/下载 (v3.4.9+)
 
 ### Progress 进度监听对象
 
@@ -494,7 +494,7 @@ progress.onload = evnt => {
 XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
 ```
 
-## 取消请求
+## 取消请求 (v3.2.0+)
 
 ### AbortController 控制器对象
 
@@ -521,7 +521,7 @@ setTimeout(() => {
 }, 50)
 ```
 
-## 拦截器
+## 拦截器 (v3.0+)
 
 ### Request 拦截器
 
