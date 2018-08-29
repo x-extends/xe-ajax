@@ -25,7 +25,7 @@ var handleExports = {
     }
     var reqBody = resp.body
     var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
-    if (utils._A) {
+    if (utils.IS_A) {
       reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
     } else {
       reqBody = getStringifyBody(reqBody)

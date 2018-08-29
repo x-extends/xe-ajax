@@ -44,7 +44,7 @@ requestPro.getUrl = function () {
       return url
     }
     if (url.indexOf('//') === 0) {
-      return (utils._N ? '' : location.protocol) + url
+      return (utils.IS_N ? '' : location.protocol) + url
     }
     if (url.indexOf('/') === 0) {
       return utils.getOrigin() + url

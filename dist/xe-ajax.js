@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.8
+ * xe-ajax.js v3.4.9-beta.0
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -66,10 +66,11 @@
 
   var utils = {
 
-    _N: isNodeJS, // nodejs 环境
-    _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
-    _A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
-    _FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
+    IS_N: isNodeJS, // nodejs 环境
+    IS_F: isNodeJS ? false : !!self.fetch, // 支持 fetch
+    IS_A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
+    IS_FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
+    IS_DEF: Object.defineProperty && ({}).__defineGetter__,
 
     isFData: function (obj) {
       return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
@@ -139,6 +140,10 @@
         }
       }
       return target
+    },
+
+    trim: function (str) {
+      return ('' + str).replace(/(^\s*)|(\s*$)/g, '')
     },
 
     includes: function (array, val) {
@@ -256,7 +261,11 @@
     this._getBody = function () {
       var stream = this
       var XEPromise = request.$Promise || Promise
-      response._response.bodyUsed = true
+      if (utils.IS_DEF) {
+        response._response.bodyUsed = true
+      } else {
+        response.bodyUsed = true
+      }
       return new XEPromise(function (resolve, reject) {
         if (stream.locked) {
           reject(new TypeError('body stream already read'))
@@ -268,16 +277,31 @@
     }
   }
 
-  function XEAbortSignalPolyfill () {
-    this.onaborted = null
-    this._abortSignal = { aborted: false }
+  function XEProgress () {
+    this.time = 0
+    this.speed = 0
+    this.loaded = 0
+    this.value = 0
+    this.total = 0
+    this.onupload = this.onload = null
   }
 
-  Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
-    get: function () {
-      return this._abortSignal.aborted
+  function XEAbortSignalPolyfill () {
+    this.onaborted = null
+    if (utils.IS_DEF) {
+      this.D_AS = { aborted: false }
+    } else {
+      this.aborted = false
     }
-  })
+  }
+
+  if (utils.IS_DEF) {
+    Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
+      get: function () {
+        return this.D_AS.aborted
+      }
+    })
+  }
 
   var requestList = []
 
@@ -312,15 +336,20 @@
     if (index > -1) {
       var requestItem = requestList[index]
       utils.arrayEach(requestItem[1], function (request) {
+        var item = requestItem[0]
         request.abort()
-        requestItem[0]._abortSignal.aborted = true
+        if (utils.IS_DEF) {
+          item.D_AS.aborted = true
+        } else {
+          item.aborted = true
+        }
       })
       requestList.splice(index, 1)
     }
   }
 
   /* eslint-disable no-undef */
-  var XEAbortController = utils._FAC ? AbortController : XEAbortControllerPolyfill
+  var XEAbortController = utils.IS_FAC ? AbortController : XEAbortControllerPolyfill
 
   /**
    * interceptor queue
@@ -354,7 +383,7 @@
             resolve(req)
           })
         }, request.$context)
-      }).catch(utils.err)
+      })['catch'](utils.err)
     })
     return thenInterceptor
   }
@@ -372,7 +401,7 @@
             resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
           }, request)
         }, request.$context)
-      }).catch(utils.err)
+      })['catch'](utils.err)
     })
     return thenInterceptor
   }
@@ -460,7 +489,7 @@
         return url
       }
       if (url.indexOf('//') === 0) {
-        return (utils._N ? '' : location.protocol) + url
+        return (utils.IS_N ? '' : location.protocol) + url
       }
       if (url.indexOf('/') === 0) {
         return utils.getOrigin() + url
@@ -506,19 +535,26 @@
       headers: new XEHeaders(options.headers || {}),
       type: 'basic'
     }
-    _response.ok = request.validateStatus(this)
+    if (utils.IS_DEF) {
+      _response.ok = request.validateStatus(this)
+    } else {
+      utils.assign(this, _response)
+      this.ok = request.validateStatus(this)
+    }
   }
 
   var decode = decodeURIComponent
   var responsePro = XEResponse.prototype
 
-  utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
-    Object.defineProperty(responsePro, name, {
-      get: function () {
-        return this._response[name]
-      }
+  if (utils.IS_DEF) {
+    utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
+      Object.defineProperty(responsePro, name, {
+        get: function () {
+          return this._response[name]
+        }
+      })
     })
-  })
+  }
 
   responsePro.clone = function () {
     if (this.bodyUsed) {
@@ -535,7 +571,7 @@
     return this.body._getBody(this)
   }
 
-  if (utils._A) {
+  if (utils.IS_A) {
     responsePro.text = function () {
       var request = this._request
       return this.blob().then(function (blob) {
@@ -560,7 +596,7 @@
     responsePro.formData = function () {
       return this.text().then(function (text) {
         var formData = new FormData()
-        utils.arrayEach(text.trim().split('&'), function (bytes) {
+        utils.arrayEach(utils.trim(text).split('&'), function (bytes) {
           if (bytes) {
             var split = bytes.split('=')
             var name = split.shift().replace(/\+/g, ' ')
@@ -606,7 +642,7 @@
       }
       var reqBody = resp.body
       var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
-      if (utils._A) {
+      if (utils.IS_A) {
         reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
       } else {
         reqBody = getStringifyBody(reqBody)
@@ -633,22 +669,23 @@
     }
     var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
-    xhr._request = request
-    xhr.open(request.method, url, true)
-    if (reqTimeout) {
-      setTimeout(function () {
-        xhr.abort()
-      }, reqTimeout)
-    }
-    utils.headersEach(request.headers, function (value, name) {
-      xhr.setRequestHeader(name, value)
-    })
-    xhr.onload = function () {
-      finish(new XEResponse(xhr.response, {
+    var progress = request.progress
+    var loadFinish = function () {
+      finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
         status: xhr.status,
         statusText: xhr.statusText,
         headers: parseXHRHeaders(xhr)
       }, request))
+    }
+    xhr._request = request
+    if (xhr.onload === undefined) {
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          loadFinish()
+        }
+      }
+    } else {
+      xhr.onload = loadFinish
     }
     xhr.onerror = function () {
       failed()
@@ -659,7 +696,22 @@
     xhr.onabort = function () {
       failed('E_A')
     }
-    if (utils._A) {
+    if (progress) {
+      var onupload = progress.onupload
+      var onload = progress.onload
+      var upload = xhr.upload
+      if (onupload && upload) {
+        loadListener(upload, onupload, progress)
+      }
+      if (onload) {
+        loadListener(xhr, onload, progress)
+      }
+    }
+    xhr.open(request.method, url, true)
+    utils.headersEach(request.headers, function (value, name) {
+      xhr.setRequestHeader(name, value)
+    })
+    if (utils.IS_A) {
       xhr.responseType = 'blob'
     }
     if (reqCredentials === 'include') {
@@ -667,18 +719,48 @@
     } else if (reqCredentials === 'omit') {
       xhr.withCredentials = false
     }
+    if (reqTimeout) {
+      setTimeout(function () {
+        xhr.abort()
+      }, reqTimeout)
+    }
     xhr.send(request.getBody())
     if (request.$abort) {
       xhr.abort()
     }
   }
 
+  // 进度监听处理
+  function loadListener (target, callback, progress) {
+    var prepareFn = function () {
+      progress.time = new Date().getTime()
+    }
+    target.onloadstart = prepareFn
+    target.onprogress = function (evnt) {
+      var prevDateTime = progress.time
+      var currDateTime = new Date().getTime()
+      var prevLoaded = progress.loaded
+      var total = evnt.total
+      var loaded = evnt.loaded
+      if (evnt.lengthComputable) {
+        progress.value = Math.round(loaded / total * 100)
+      }
+      progress.total = total
+      progress.loaded = loaded
+      progress.time = currDateTime
+      progress.speed = (loaded - prevLoaded) / (currDateTime - prevDateTime) * 1000
+      callback(evnt)
+    }
+    target.onloadend = prepareFn
+  }
+
+  // 处理响应头
   function parseXHRHeaders (xhr) {
     var headers = {}
-    var allResponseHeaders = xhr.getAllResponseHeaders().trim()
+    var allResponseHeaders = utils.trim(xhr.getAllResponseHeaders())
     utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
       var index = row.indexOf(':')
-      headers[row.slice(0, index).trim()] = row.slice(index + 1).trim()
+      headers[utils.trim(row.slice(0, index))] = utils.trim(row.slice(index + 1))
     })
     return headers
   }
@@ -715,7 +797,7 @@
       $fetch(request.getUrl(), options).then(function (resp) {
         clearTimeoutFn(timer)
         finish(handleExports.toResponse(resp, request))
-      }).catch(function (e) {
+      })['catch'](function (e) {
         clearTimeoutFn(timer)
         failed()
       })
@@ -724,21 +806,23 @@
 
   function getRequest (request) {
     var reqSignal = request.signal
-    if (request.$fetch) {
-      return reqSignal ? sendXHR : sendFetch
-    } else if (utils._F) {
-      if (utils._FAC) {
-        return sendFetch
+    if (!request.progress) {
+      if (request.$fetch) {
+        return reqSignal ? sendXHR : sendFetch
+      } else if (utils.IS_F) {
+        if (utils.IS_FAC) {
+          return sendFetch
+        }
+        return reqSignal ? sendXHR : sendFetch
       }
-      return reqSignal ? sendXHR : sendFetch
     }
     return sendXHR
   }
 
   function createRequestFactory () {
-    if (utils._N) {
+    if (utils.IS_N) {
       return sendHttp
-    } else if (utils._F) {
+    } else if (utils.IS_F) {
       return function (request) {
         return getRequest(request).apply(this, arguments)
       }
@@ -768,7 +852,7 @@
     if (utils.isFn(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
         finish(handleExports.toResponse({ status: 200, body: resp }, request))
-      }).catch(function () {
+      })['catch'](function () {
         failed()
       })
     } else {
@@ -834,9 +918,10 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.8'
+  XEAjax.version = '3.4.9-beta.0'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
+  XEAjax.Progress = XEProgress
   XEAjax.AbortController = XEAbortController
 
   /**
@@ -919,7 +1004,7 @@
     return function () {
       var opts = method.apply(this, arguments)
       var XEPromise = opts.$Promise || Promise
-      return XEAjax(opts).catch(function (e) {
+      return XEAjax(opts)['catch'](function (e) {
         return XEPromise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
       }).then(function (response) {
         return new XEPromise(function (resolve, reject) {
@@ -931,7 +1016,7 @@
             } catch (e) {
               return data
             }
-          }).catch(function (e) {
+          })['catch'](function (e) {
             return ''
           }).then(function (data) {
             finish(getResponseSchema(isRespSchema, data, response.status, response.statusText, responseHeaders(response)))

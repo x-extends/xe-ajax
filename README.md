@@ -5,15 +5,15 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-基于 Promise 的异步请求函数，使用 fetch API，支持 node.js、browser 环境。
+基于 [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) 的异步请求函数，支持 nodejs、browser 环境。
 
 ## 兼容性
 
-xe-ajax 依赖原生的 ES6 Promise 实现。如果您的环境不支持 ES6 Promise，您可以使用 polyfill。
+xe-ajax 依赖 Promise。如果您的环境不支持 Promise，您可以使用 babel-polyfill 或者 bluebird.js
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- | --- |
-8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
+7+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## CDN 安装
 
@@ -215,20 +215,24 @@ XEAjax.setup({
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-XEAjax.ajax({
+let options = {
   url: '/api/user/list',
   method: 'GET',
-  params: {id: 1}
-}).then(response => {
-  if (response.ok) {
-    // 请求失败
-  } else {
-    // 请求成功
+  params: {
+    id: 1
   }
-}).catch(e => {
-  // 发生错误
-})
-
+}
+XEAjax.ajax(options)
+  .then(response => {
+    if (response.ok) {
+      // 请求成功
+    } else {
+      // 请求失败
+    }
+  })
+  .catch(e => {
+    // 发生错误
+  })
 ```
 
 ### fetch 调用
@@ -236,68 +240,92 @@ XEAjax.ajax({
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-XEAjax.fetch('/api/user/list', {
+let options = {
   method: 'POST',
-  body: {name: 'test'}
-}).then(response => {
-  if (response.ok) {
-    // 请求失败
-  } else {
-    // 请求成功
+  body: {
+    name: 'test'
   }
-}).catch(e => {
-  // 发生错误
-})
+}
+XEAjax.fetch('/api/user/list', options)
+  .then(response => {
+    if (response.ok) {
+      // 请求成功
+    } else {
+      // 请求失败
+    }
+  }).catch(e => {
+    // 发生错误
+  })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.text().then(text => {
-    // 获取 text
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.text().then(text => {
+      // 获取 text
+    })
   })
-})
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.json().then(data => {
-    // 获取 data
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.json().then(data => {
+      // 获取 data
+    })
   })
-})
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.blob().then(blob => {
-    // 获取 blob
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.blob().then(blob => {
+      // 获取 blob
+    })
   })
-})
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.arrayBuffer().then(arrayBuffer => {
-    // 获取 arrayBuffer
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.arrayBuffer().then(arrayBuffer => {
+      // 获取 arrayBuffer
+    })
   })
-})
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list').then(response => {
-  response.formData().then(formData => {
-    // 获取 formData
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.formData().then(formData => {
+      // 获取 formData
+    })
   })
-})
 
 // 使用 application/json 方式提交，默认使用 JSON.stringify 序列化数据
-XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+let body1 = {
+  name: 'u111',
+  password: '123456'
+}
+XEAjax.fetchPost('/api/user/save', body1, {bodyType: 'json-data'})
 
 // 使用 application/x-www-form-urlencoded 方式提交，默认使用 XEAjax.serialize 序列化数据
-XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+let body2 = {
+  name: 'u222',
+  password: '123456'
+}
+XEAjax.fetchPost('/api/user/save', body2, {bodyType: 'form-data'})
 
-// 模拟表单 FormData 提交
+// 模拟表单 multipart/form-data 提交
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 
 // 查询参数和数据同时提交
-XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+let body3 = {
+  name: 'u333',
+  password: '123456'
+}
+let query = {
+  id: 111
+}
+XEAjax.fetchPost('/api/user/save', body3, {params: query})
 ```
 
 ### 根据状态响应请求结果、包括状态信息
@@ -306,23 +334,19 @@ XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {params: 
 import XEAjax from 'xe-ajax'
 
 // 对请求的响应包含以下信息
-// {data, status, statusText, headers}
+// result => {data, status, statusText, headers}
 
 // 根据 validateStatus 状态校验判断完成还是失败
-XEAjax.doGet('/api/user/list').then(response => {
-  // 请求成功
-}).catch(response => {
+XEAjax.doGet('/api/user/list').then(result => {
+  // 请求成功 result.data
+}).catch(result => {
   // 请求失败
 })
 
-XEAjax.doPost('/api/user/save', {name: 'test'})
-XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
-
-let file = document.querySelector('#myFile').files[0]
-let formBody = new FormData()
-formBody.append('file', file)
-XEAjax.doPost('/api/user/save', formBody)
+XEAjax.doGet('/api/user/list/15/1')
+XEAjax.doPost('/api/user/save', {name: 'u111'})
+XEAjax.doPut('/api/user/update', {name: 'u222'})
+XEAjax.doDelete('/api/user/delete/111')
 ```
 
 ### 根据状态响应 json 调用
@@ -330,27 +354,17 @@ XEAjax.doPost('/api/user/save', formBody)
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-// 根据 validateStatus 状态校验判断完成还是失败
+// 根据 validateStatus 状态校验判断完成还是失败,直接可以获取响应结果
 XEAjax.getJSON('/api/user/list').then(data => {
-  // 请求成功
+  // 请求成功 data
 }).catch(data => {
   // 请求失败
 })
 
-XEAjax.getJSON('/api/user/list/15/1').then(({page, result}) => {
-  // 请求成功
-})
-
-XEAjax.postJSON('/api/user/save', {name: 'test'})
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
-
-let file = document.querySelector('#myFile').files[0]
-let formBody = new FormData()
-formBody.append('file', file)
-XEAjax.postJSON('/api/user/save', formBody)
-
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+XEAjax.getJSON('/api/user/list/15/1')
+XEAjax.postJSON('/api/user/save', {name: 'u111'})
+XEAjax.putJSON('/api/user/update', {name: 'u222'})
+XEAjax.deleteJSON('/api/user/delete/111')
 ```
 
 ### jsonp 调用
@@ -359,36 +373,32 @@ XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {
 import XEAjax from 'xe-ajax'
 
 // 例子1
-// 服务地址: http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
+// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
 // 服务端返回结果: jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message').then(response => {
-  response.json().then(data => {
-    // {message: 'success'}
+XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
+  .then(response => {
+    if (response.ok) {
+      response.json().then(data => {
+        // data
+      })
+    }
   })
-})
 
 // 例子2
-// 服务地址: http://xuliangzhan.com/jsonp/user/message?id=123&cb=jsonp_xeajax_1521272815608_2
+// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
 // 服务端返回结果: jsonp_xeajax_1521272815608_2({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb'
-}).then(response => {
-  response.json().then(data => {
-    // {message: 'success'}
+XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
+  .then(response => {
+    // response.data
   })
-})
 
 // 例子3
-// 服务地址: http://xuliangzhan.com/jsonp/user/message?id=123&cb=custom3
-// 服务端返回结果: custom3({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb',
-  jsonpCallback: 'custom3'
-}).then(response => {
-  response.json().then(data => {
-    // {message: 'success'}
+// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func3
+// 服务端返回结果: func3({message: 'success'})
+XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func3'})
+  .then(data => {
+    // data
   })
-})
 ```
 
 ### 并发多个请求
@@ -398,7 +408,8 @@ import XEAjax from 'xe-ajax'
 
 let iterable1 = []
 iterable1.push(XEAjax.fetchGet('/api/user/list'))
-iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
+iterable1.push(XEAjax.doGet('/api/user/list'))
+iterable1.push(XEAjax.postJSON('/api/user/save'), {name: 'n1'})
 Promise.all(iterable1).then(datas => {
   // 所有异步完成之后执行
 }).catch(e => {
@@ -408,7 +419,7 @@ Promise.all(iterable1).then(datas => {
 // doAll 使用对象参数, 用法和 Promise.all 一致
 let iterable2 = []
 iterable2.push({url: '/api/user/list'})
-iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
+iterable2.push({url: '/api/user/save', body: {name: 'n1'}}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 
@@ -420,52 +431,67 @@ import XEAjax from 'xe-ajax'
 // 相互依赖的嵌套请求(项目中应该避免这种情况)
 XEAjax.fetchGet('/api/user/info')
   .then(response => response.json())
-  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id})).then(response => {
-    response.json().then(data => {
-      // 获取 data
-    })
-  })
-XEAjax.doGet('/api/user/info').then(({ data }) => XEAjax.doGet('/api/user/details', {id: data.id})).then(({ data }) => {
-  // 获取 data
-})
-XEAjax.getJSON('/api/user/info').then(data => XEAjax.getJSON('/api/user/details', {id: data.id})).then(data => {
-  // 获取 data
-})
-```
-
-### AMD 使用方式
-
-```JavaScript
-define([
-  'xe-ajax'
-], function (XEAjax) {
-
-  XEAjax.fetchGet('/api/user/list').then(function (response) {
+  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id}))
+  .then(response => {
     if (response.ok) {
-      response.json().then(function (data) {
-        // 获取 data
+      response.json().then(data => {
+        // data
       })
     }
   })
-
-  XEAjax.doGet('/api/user/list').then(function (response) {
-    // 获取 response.data
+XEAjax.doGet('/api/user/info')
+  .then(result => XEAjax.doGet('/api/user/details', {id: result.data.id}))
+  .then(result => {
+    // result.data
   })
-
-  XEAjax.getJSON('/api/user/list').then(function (data) {
-    // 获取 data
+XEAjax.getJSON('/api/user/info')
+  .then(data => XEAjax.getJSON('/api/user/details', {id: data.id}))
+  .then(data => {
+    // data
   })
+```
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'form-data'})
+## 上传/下载
 
-  var file = document.querySelector('#myFile').files[0]
-  var formBody = new FormData()
-  formBody.append('file', file)
-  XEAjax.fetchPost('/api/user/save', formBody)
+### Progress 进度监听对象
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {params: {id: 1}})
-})
+用于监听请求进度
+
+```JavaScript
+import XEAjax from 'xe-ajax'
+
+// 上传、下载
+var file = document.querySelector('#myFile').files[0]
+var formBody = new FormData()
+formBody.append('file', file)
+XEAjax.doPost('/api/upload', formBody)
+
+// 上传进度
+// 创建一个进度监听对象
+let progress = new XEAjax.Progress()
+// 监听上传进度
+progress.onupload = evnt => {
+  console.log(`进度：${progress.value}%; 速度：${Math.round(progress.speed / 1024)} KB/秒; 已上传：${Math.round(progress.loaded / 1024)} KB; 剩余时间：${Math.ceil((progress.total - progress.loaded) / progress.speed)}秒`)
+}
+var file = document.querySelector('#myFile').files[0]
+var formBody = new FormData()
+formBody.append('file', file)
+XEAjax.fetchPost('/api/upload', formBody, {progress})
+// 进度：5%; 速度：36769 KB/秒; 已上传：3824 KB; 剩余时间：2秒
+// 进度：19%; 速度：23360 KB/秒; 已上传：13568 KB; 剩余时间：3秒
+// 进度：45%; 速度：35071 KB/秒; 已上传：31648 KB; 剩余时间：2秒
+// 进度：69%; 速度：22268 KB/秒; 已上传：48352 KB; 剩余时间：1秒
+// 进度：86%; 速度：29737 KB/秒; 已上传：60064 KB; 剩余时间：1秒
+// 进度：100%; 速度：4153 KB/秒; 已上传：69904 KB; 剩余时间：0秒
+
+// 下载进度
+// 创建一个进度监听对象
+let progress = new XEAjax.Progress()
+// 监听下载进度
+progress.onload = evnt => {
+  console.log(`进度：${progress.value}%; 速度：${Math.round(progress.speed / 1024)} KB/秒; 已下载：${Math.round(progress.loaded / 1024)} KB; 剩余时间：${Math.ceil((progress.total - progress.loaded) / progress.speed)}秒`)
+}
+XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
 ```
 
 ## 取消请求
@@ -483,11 +509,12 @@ let controller = new XEAjax.AbortController() // 或者使用原生 let controll
 // 获取signal
 let signal = controller.signal
 // 给请求加入控制器 signal
-XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
-  // 请求成功
-}).catch(function (e) {
-  // 取消请求
-})
+XEAjax.fetchGet('/api/user/list', {id: 1}, {signal})
+  .then(response => {
+    // 请求成功
+  }).catch(e => {
+    // 请求被取消
+  })
 setTimeout(() => {
   // 终止请求
   controller.abort()
@@ -505,7 +532,7 @@ import XEAjax from 'xe-ajax'
 
 // 请求之前拦截器
 XEAjax.interceptors.request.use((request, next) => {
-  // 可以用于统一的权限拦截、设置请求头、Token 验证、参数等处理...
+  // 用于请求的权限拦截、设置请求头、Token 验证、参数等处理...
 
   // 设置参数
   request.params.version = 1
@@ -574,7 +601,7 @@ XEAjax.interceptors.response.use((response, next) => {
 import XEAjax from 'xe-ajax'
 
 const cacheMap = {}
-export function onceGet () {
+export function getOnce () {
   if (cacheMap[url]) {
     return cacheMap[url]
   }
@@ -590,7 +617,7 @@ import customs from './customs'
 
 XEAjax.mixin(customs)
 
-XEAjax.onceGet('/api/user/message')
+XEAjax.getOnce('/api/static/data')
 ```
 
 ## 项目

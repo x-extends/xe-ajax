@@ -1,6 +1,7 @@
 'use strict'
 
 var utils = require('./utils')
+var XEProgress = require('../handle/progress')
 var XEAbortController = require('../handle/abortController')
 var XERequest = require('../handle/request')
 var fetchRequest = require('../adapters/fetch')
@@ -36,9 +37,10 @@ function XEAjax (options) {
   }, request.$context)
 }
 
-XEAjax.version = '3.4.8'
+XEAjax.version = '3.4.9-beta.0'
 XEAjax.interceptors = interceptorExports.interceptors
 XEAjax.serialize = utils.serialize
+XEAjax.Progress = XEProgress
 XEAjax.AbortController = XEAbortController
 
 /**

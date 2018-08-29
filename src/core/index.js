@@ -39,7 +39,7 @@ function createResponseSchema (method, isRespSchema) {
   return function () {
     var opts = method.apply(this, arguments)
     var XEPromise = opts.$Promise || Promise
-    return XEAjax(opts).catch(function (e) {
+    return XEAjax(opts)['catch'](function (e) {
       return XEPromise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
     }).then(function (response) {
       return new XEPromise(function (resolve, reject) {
@@ -51,7 +51,7 @@ function createResponseSchema (method, isRespSchema) {
           } catch (e) {
             return data
           }
-        }).catch(function (e) {
+        })['catch'](function (e) {
           return ''
         }).then(function (data) {
           finish(getResponseSchema(isRespSchema, data, response.status, response.statusText, responseHeaders(response)))

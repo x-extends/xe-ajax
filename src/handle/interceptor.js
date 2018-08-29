@@ -35,7 +35,7 @@ function requests (request) {
           resolve(req)
         })
       }, request.$context)
-    }).catch(utils.err)
+    })['catch'](utils.err)
   })
   return thenInterceptor
 }
@@ -53,7 +53,7 @@ function responseInterceptor (calls, request, response) {
           resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
         }, request)
       }, request.$context)
-    }).catch(utils.err)
+    })['catch'](utils.err)
   })
   return thenInterceptor
 }

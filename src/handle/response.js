@@ -18,19 +18,26 @@ function XEResponse (body, options, request) {
     headers: new XEHeaders(options.headers || {}),
     type: 'basic'
   }
-  _response.ok = request.validateStatus(this)
+  if (utils.IS_DEF) {
+    _response.ok = request.validateStatus(this)
+  } else {
+    utils.assign(this, _response)
+    this.ok = request.validateStatus(this)
+  }
 }
 
 var decode = decodeURIComponent
 var responsePro = XEResponse.prototype
 
-utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
-  Object.defineProperty(responsePro, name, {
-    get: function () {
-      return this._response[name]
-    }
+if (utils.IS_DEF) {
+  utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
+    Object.defineProperty(responsePro, name, {
+      get: function () {
+        return this._response[name]
+      }
+    })
   })
-})
+}
 
 responsePro.clone = function () {
   if (this.bodyUsed) {
@@ -47,7 +54,7 @@ responsePro.text = function () {
   return this.body._getBody(this)
 }
 
-if (utils._A) {
+if (utils.IS_A) {
   responsePro.text = function () {
     var request = this._request
     return this.blob().then(function (blob) {
@@ -72,7 +79,7 @@ if (utils._A) {
   responsePro.formData = function () {
     return this.text().then(function (text) {
       var formData = new FormData()
-      utils.arrayEach(text.trim().split('&'), function (bytes) {
+      utils.arrayEach(utils.trim(text).split('&'), function (bytes) {
         if (bytes) {
           var split = bytes.split('=')
           var name = split.shift().replace(/\+/g, ' ')

@@ -5,15 +5,15 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 
-The asynchronous fetch function based on Promise, Support the node.js、browser environment, Simple API, lightweight encapsulation, high expansion.
+The asynchronous fetch function based on [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), Support the nodejs、browser environment.
 
 ## Browser Support
 
-xe-ajax depends on a native ES6 Promise implementation to be supported. If your environment doesn't support ES6 Promises, you can polyfill.
+xe-ajax depends on a native Promise implementation to be supported. If your environment doesn't support Promises, you can babel-polyfill or bluebird.js.
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- | --- |
-8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
+7+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
 ## CDN
 
@@ -199,20 +199,23 @@ XEAjax.setup({
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-XEAjax.ajax({
+let options = {
   url: '/api/user/list',
   method: 'GET',
-  params: {id: 1}
-}).then(response => {
-  if (response.ok) {
-    // success
-  } else {
-    // error
+  params: {
+    id: 1
   }
-}).catch(e => {
-  // error
-})
-
+}
+XEAjax.ajax(options)
+  .then(response => {
+    if (response.ok) {
+      // success
+    } else {
+      // error
+    }
+  }).catch(e => {
+    // error
+  })
 ```
 
 ### fetch to Response
@@ -220,55 +223,92 @@ XEAjax.ajax({
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-XEAjax.fetch('/api/user/list', {
+let options = {
   method: 'POST',
-  body: {name: 'test'}
-}).then(response => {
-  if (response.ok) {
-    // success
-  } else {
-    // error
+  body: {
+    name: 'test'
   }
-}).catch(e => {
-  // error
-})
+}
+XEAjax.fetch('/api/user/list', options)
+  .then(response => {
+    if (response.ok) {
+      // success
+    } else {
+      // error
+    }
+  }).catch(e => {
+    // error
+  })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list').then(response => response.text()).then(text => {
-  // get text
-})
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.text().then(text => {
+      // text
+    })
+  })
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list').then(response => response.json()).then(json => {
-  // get json
-})
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.json().then(data => {
+      // data
+    })
+  })
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list').then(response => response.blob()).then(blob => {
-  // get blob
-})
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.blob().then(blob => {
+      // blob
+    })
+  })
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list').then(response => response.arrayBuffer()).then(arrayBuffer => {
-  // get arrayBuffer
-})
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.arrayBuffer().then(arrayBuffer => {
+      // arrayBuffer
+    })
+  })
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list').then(response => response.formData()).then(formData => {
-  // get formData
-})
+XEAjax.fetchGet('/api/user/list')
+  .then(response => {
+    response.formData().then(formData => {
+      // formData
+    })
+  })
 
 // Submit application/json, default uses JSON.stringify(request.body)
-XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+let body1 = {
+  name: 'u111',
+  password: '123456'
+}
+XEAjax.fetchPost('/api/user/save', body1, {bodyType: 'json-data'})
 
 // Submit application/x-www-form-urlencoded, default uses XEAjax.serialize(request.body)
-XEAjax.fetchPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+let body2 = {
+  name: 'u222',
+  password: '123456'
+}
+XEAjax.fetchPost('/api/user/save', body2, {bodyType: 'form-data'})
 
-// Submit FormData
+// Submit multipart/form-data
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
+
+// Submit body and query params
+let body3 = {
+  name: 'u333',
+  password: '123456'
+}
+let query = {
+  id: 111
+}
+XEAjax.fetchPost('/api/user/save', body3, {params: query})
 ```
 
 ### fetch to Response Schema
@@ -277,25 +317,19 @@ XEAjax.fetchPost('/api/user/save', formBody)
 import XEAjax from 'xe-ajax'
 
 // The response for a request contains the following information.
-// {data, status, statusText, headers}
+// result => {data, status, statusText, headers}
 
 // The completion or failure is based on state check.
-XEAjax.doGet('/api/user/list').then(response => {
-  // success
-}).catch(response => {
+XEAjax.doGet('/api/user/list').then(result => {
+  // success result.data
+}).catch(result => {
   // failed
 })
 
-XEAjax.doPost('/api/user/save', {name: 'test'})
-XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-XEAjax.doPost('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
-
-let file = document.querySelector('#myFile').files[0]
-let formBody = new FormData()
-formBody.append('file', file)
-XEAjax.doPost('/api/user/save', formBody)
-
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {params: {id: 1}})
+XEAjax.doGet('/api/user/list/15/1')
+XEAjax.doPost('/api/user/save', {name: 'u111'})
+XEAjax.doPut('/api/user/update', {name: 'u222'})
+XEAjax.doDelete('/api/user/delete/111')
 ```
 
 ### fetch to JSON
@@ -331,38 +365,34 @@ import XEAjax from 'xe-ajax'
 
 // Case 1:
 // Set jsonp callback parameter name, default is 'callback'
-// http://xuliangzhan.com/jsonp/user/message?callback=jsonp_xeajax_1521272815608_1
+// http://xuliangzhan.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message')
-.then(response => response.json())
-.then(data => {
-  // {message: 'success'}
-})
+XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
+  .then(response => {
+    if (response.ok) {
+      response.json().then(data => {
+        // data
+      })
+    }
+  })
 
 // Case 2:
 // Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
-// http://xuliangzhan.com/jsonp/user/message?id=123&cb=jsonp_xeajax_1521272815608_2
+// http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
 // jsonp_xeajax_1521272815608_2({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb'
-})
-.then(response => response.json())
-.then(data => {
-  // {message: 'success'}
-})
+XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
+  .then(response => {
+    // response.data
+  })
 
 // Case 3:
 // Set jsonp callback parameter name and callback function name
-// http://xuliangzhan.com/jsonp/user/message?id=123&cb=customCallback
-// customCallback({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/jsonp/user/message', {id: 123}, {
-  jsonp: 'cb',
-  jsonpCallback: 'customCallback'
-})
-.then(response => response.json())
-.then(data => {
-  // {message: 'success'}
-})
+// http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func3
+// func3({message: 'success'})
+XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func3'})
+  .then(data => {
+    // data
+  })
 ```
 
 ### Multiple requests
@@ -372,7 +402,8 @@ import XEAjax from 'xe-ajax'
 
 let iterable1 = []
 iterable1.push(XEAjax.fetchGet('/api/user/list'))
-iterable1.push(XEAjax.fetchGet('/api/user/message'), {id: 1})
+iterable1.push(XEAjax.doGet('/api/user/list'))
+iterable1.push(XEAjax.postJSON('/api/user/save'), {name: 'n1'})
 Promise.all(iterable1).then(datas => {
   // all finish
 }).catch(e => {
@@ -382,7 +413,7 @@ Promise.all(iterable1).then(datas => {
 // doAll Use object parameters, The use is consistent with that of Promise.
 let iterable2 = []
 iterable2.push({url: '/api/user/list'})
-iterable2.push({url: '/api/user/message', body: {id: 1}, method: 'POST'})
+iterable2.push({url: '/api/user/save', body: {name: 'n1'}}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 
@@ -394,52 +425,66 @@ import XEAjax from 'xe-ajax'
 // This should be avoided in the project.
 XEAjax.fetchGet('/api/user/info')
   .then(response => response.json())
-  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id})).then(response => {
-    response.json().then(data => {
-      // data
-    })
-  })
-XEAjax.doGet('/api/user/info').then(({ data }) => XEAjax.doGet('/api/user/details', {id: data.id})).then(({ data }) => {
-  // data
-})
-XEAjax.getJSON('/api/user/info').then(data => XEAjax.getJSON('/api/user/details', {id: data.id})).then(data => {
-  // data
-})
-```
-
-### AMD request
-
-```JavaScript
-define([
-  'xe-ajax'
-], function (XEAjax) {
-
-  XEAjax.fetchGet('/api/user/list').then(function (response) {
+  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id}))
+  .then(response => {
     if (response.ok) {
-      response.json().then(function (data) {
+      response.json().then(data => {
         // data
       })
     }
   })
-
-  XEAjax.doGet('/api/user/list').then(function (response) {
-    // response.data
+XEAjax.doGet('/api/user/info')
+  .then(result => XEAjax.doGet('/api/user/details', {id: result.data.id}))
+  .then(result => {
+    // result.data
   })
-
-  XEAjax.getJSON('/api/user/list').then(function (data) {
+XEAjax.getJSON('/api/user/info')
+  .then(data => XEAjax.getJSON('/api/user/details', {id: data.id}))
+  .then(data => {
     // data
   })
+```
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'json-data'})
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {bodyType: 'form-data'})
+## Upload/Download
 
-  var file = document.querySelector('#myFile').files[0]
-  var formBody = new FormData()
-  formBody.append('file', file)
-  XEAjax.fetchPost('/api/user/save', formBody)
+### Progress
 
-  XEAjax.fetchPost('/api/user/save', {name: 'test'}, {params: {id: 1}})
-})
+Listener request progress.
+
+```JavaScript
+import XEAjax from 'xe-ajax'
+
+var file = document.querySelector('#myFile').files[0]
+var formBody = new FormData()
+formBody.append('file', file)
+XEAjax.doPost('/api/upload', formBody)
+
+// Upload
+// create a Progress.
+let progress = new XEAjax.Progress()
+// listener upload
+progress.onupload = evnt => {
+  console.log(`Progress:${progress.value}%; Speed:${Math.round(progress.speed / 1024)} KB/s; Loaded:${Math.round(progress.loaded / 1024)} KB; Time Remaining:${Math.ceil((progress.total - progress.loaded) / progress.speed)}s`)
+}
+var file = document.querySelector('#myFile').files[0]
+var formBody = new FormData()
+formBody.append('file', file)
+XEAjax.fetchPost('/api/upload', formBody, {progress})
+// Progress:5%; Speed:36769 KB/s; Loaded:3824 KB; ime Remaining:2s
+// Progress:19%; Speed:23360 KB/s; Loaded:13568 KB; ime Remaining:3s
+// Progress:45%; Speed:35071 KB/s; Loaded:31648 KB; ime Remaining:2s
+// Progress:69%; Speed:22268 KB/s; Loaded:48352 KB; ime Remaining:1s
+// Progress:86%; Speed:29737 KB/s; Loaded:60064 KB; ime Remaining:1s
+// Progress:100%; Speed:4153 KB/s; Loaded:69904 KB; ime Remaining:0s
+
+// Download
+// create Progress object.
+let progress = new XEAjax.Progress()
+// listener load
+progress.onload = evnt => {
+  console.log(`Progress:${progress.value}%; Speed:${Math.round(progress.speed / 1024)} KB/s; Loaded:${Math.round(progress.loaded / 1024)} KB; ime Remaining:${Math.ceil((progress.total - progress.loaded) / progress.speed)}s`)
+}
+XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
 ```
 
 ## Cancel request
@@ -457,11 +502,12 @@ let controller = new XEAjax.AbortController() // let controller = new AbortContr
 // get signal
 let signal = controller.signal
 // Associate the signal and controller with the fetch request.
-XEAjax.fetchGet('/api/user/list', {id: 1}, {signal}).then(response => {
-  // finish
-}).catch(function (e) {
-  // error
-})
+XEAjax.fetchGet('/api/user/list', {id: 1}, {signal})
+  .then(response => {
+    // finish
+  }).catch(function (e) {
+    // error
+  })
 setTimeout(() => {
   controller.abort()
 }, 50)
@@ -546,7 +592,7 @@ XEAjax.interceptors.response.use((response, next) => {
 import XEAjax from 'xe-ajax'
 
 const cacheMap = {}
-export function onceGet () {
+export function getOnce () {
   if (cacheMap[url]) {
     return cacheMap[url]
   }
@@ -562,7 +608,7 @@ import customs from './customs'
 
 XEAjax.mixin(customs)
 
-XEAjax.onceGet('/api/user/message')
+XEAjax.getOnce('/api/user/message')
 ```
 
 ## Project Demos

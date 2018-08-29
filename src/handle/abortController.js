@@ -35,14 +35,19 @@ XEAbortControllerPolyfill.prototype.abort = function () {
   if (index > -1) {
     var requestItem = requestList[index]
     utils.arrayEach(requestItem[1], function (request) {
+      var item = requestItem[0]
       request.abort()
-      requestItem[0]._abortSignal.aborted = true
+      if (utils.IS_DEF) {
+        item.D_AS.aborted = true
+      } else {
+        item.aborted = true
+      }
     })
     requestList.splice(index, 1)
   }
 }
 
 /* eslint-disable no-undef */
-var XEAbortController = utils._FAC ? AbortController : XEAbortControllerPolyfill
+var XEAbortController = utils.IS_FAC ? AbortController : XEAbortControllerPolyfill
 
 module.exports = XEAbortController

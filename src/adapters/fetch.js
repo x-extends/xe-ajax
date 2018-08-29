@@ -37,7 +37,7 @@ function sendFetch (request, finish, failed) {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeoutFn(timer)
       finish(handleExports.toResponse(resp, request))
-    }).catch(function (e) {
+    })['catch'](function (e) {
       clearTimeoutFn(timer)
       failed()
     })
@@ -46,21 +46,23 @@ function sendFetch (request, finish, failed) {
 
 function getRequest (request) {
   var reqSignal = request.signal
-  if (request.$fetch) {
-    return reqSignal ? sendXHR : sendFetch
-  } else if (utils._F) {
-    if (utils._FAC) {
-      return sendFetch
+  if (!request.progress) {
+    if (request.$fetch) {
+      return reqSignal ? sendXHR : sendFetch
+    } else if (utils.IS_F) {
+      if (utils.IS_FAC) {
+        return sendFetch
+      }
+      return reqSignal ? sendXHR : sendFetch
     }
-    return reqSignal ? sendXHR : sendFetch
   }
   return sendXHR
 }
 
 function createRequestFactory () {
-  if (utils._N) {
+  if (utils.IS_N) {
     return sendHttp
-  } else if (utils._F) {
+  } else if (utils.IS_F) {
     return function (request) {
       return getRequest(request).apply(this, arguments)
     }

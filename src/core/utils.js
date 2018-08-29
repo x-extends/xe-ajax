@@ -55,10 +55,11 @@ function getLocatOrigin () {
 
 var utils = {
 
-  _N: isNodeJS, // nodejs 环境
-  _F: isNodeJS ? false : !!self.fetch, // 支持 fetch
-  _A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
-  _FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
+  IS_N: isNodeJS, // nodejs 环境
+  IS_F: isNodeJS ? false : !!self.fetch, // 支持 fetch
+  IS_A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
+  IS_FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
+  IS_DEF: Object.defineProperty && ({}).__defineGetter__,
 
   isFData: function (obj) {
     return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
@@ -128,6 +129,10 @@ var utils = {
       }
     }
     return target
+  },
+
+  trim: function (str) {
+    return ('' + str).replace(/(^\s*)|(\s*$)/g, '')
   },
 
   includes: function (array, val) {
