@@ -77,7 +77,13 @@
     },
 
     isCrossOrigin: function (url) {
-      return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== $locat.protocol || RegExp.$2.split('/')[0] !== $locat.host)
+      if (!isNodeJS) {
+        var matchs = ('' + url).match(/(\w+:)\/{2}((.*?)\/|(.*)$)/)
+        if (matchs && matchs.length > 2) {
+          return matchs[1] !== $locat.protocol || matchs[2].split('/')[0] !== $locat.host
+        }
+      }
+      return false
     },
 
     isStr: function (val) {
@@ -782,7 +788,7 @@
             _progress.speed = formatUnit(speed, progress)
             _progress.remaining = Math.ceil((lastItem.total - lastItem.loaded) / speed)
             prossQueue = []
-            callback(lastItem)
+            callback(lastItem.evnt)
           }
         } else {
           clearInterval(prossInterval)
@@ -1008,7 +1014,7 @@
    * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
    * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
    * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
-   * @param { String } integrity 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=)
+   * @param { String } integrity 包括请求的subresource integrity值
    * 高级参数(不建议使用))
    * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
    * @param { Function } $http 自定义 http 请求函数

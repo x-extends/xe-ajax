@@ -66,7 +66,13 @@ var utils = {
   },
 
   isCrossOrigin: function (url) {
-    return !isNodeJS && /(\w+:)\/{2}((.*?)\/|(.*)$)/.test(url) && (RegExp.$1 !== $locat.protocol || RegExp.$2.split('/')[0] !== $locat.host)
+    if (!isNodeJS) {
+      var matchs = ('' + url).match(/(\w+:)\/{2}((.*?)\/|(.*)$)/)
+      if (matchs && matchs.length > 2) {
+        return matchs[1] !== $locat.protocol || matchs[2].split('/')[0] !== $locat.host
+      }
+    }
+    return false
   },
 
   isStr: function (val) {

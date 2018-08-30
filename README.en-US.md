@@ -496,7 +496,6 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 // ...
 // Progress:99% 14.08MB/14.26MB; Speed:119.6KB/s; Remaining:2s
 // Progress:100% 14.26MB/14.26MB; Speed:114.4KB/s; Remaining:0s
-// Upload time:23s
 
 // Download
 // create Progress object.
@@ -505,7 +504,7 @@ let progress = new XEAjax.Progress()
 progress.onDownloadProgress = evnt => {
   console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
 }
-XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
+XEAjax.fetchGet('/api/download/file/1', {progress, method: 'GET'})
 ```
 
 ## Cancel request (v3.2.0+)
