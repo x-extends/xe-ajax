@@ -178,7 +178,6 @@ import XEAjax from 'xe-ajax'
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-// 示例
 XEAjax.setup({
   baseURL: 'http://xuliangzhan.com',
   bodyType: 'json-data',
@@ -189,7 +188,9 @@ XEAjax.setup({
   },
   transformParams (params, request) {
     // 用于在请求发送之前改变URL参数
-    params.id = 123
+    if (request.method === 'GET') {
+      params.queryDate = params.queryDate.getTime()
+    }
     return params
   },
   paramsSerializer (params, request) {
@@ -482,7 +483,10 @@ import XEAjax from 'xe-ajax'
 var file = document.querySelector('#myFile').files[0]
 var formBody = new FormData()
 formBody.append('file', file)
+XEAjax.fetchPost('/api/upload', formBody)
 XEAjax.doPost('/api/upload', formBody)
+XEAjax.postJSON('/api/upload', formBody)
+
 
 // 上传进度
 // 创建一个进度监听对象
@@ -501,6 +505,7 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 // ...
 // 进度：99% 14.08MB/14.26MB; 速度：119.6KB/秒; 剩余：2秒
 // 进度：100% 14.26MB/14.26MB; 速度：114.4KB/秒; 剩余：0秒
+
 
 // 下载进度
 // 创建一个进度监听对象

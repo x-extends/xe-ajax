@@ -176,7 +176,9 @@ XEAjax.setup({
     'Accept': 'application/json, text/plain, \*/\*;'
   },
   transformParams (params, request) {
-    params.id = 123
+    if (request.method === 'GET') {
+      params.queryDate = params.queryDate.getTime()
+    }
     return params
   },
   paramsSerializer (params, request) {
@@ -453,8 +455,8 @@ XEAjax.getJSON('/api/user/info')
 
 | Name | Type | Description |
 |------|------|-----|
-| onUploadProgress | Function (event) | 上传进度监听 |
-| onDownloadProgress | Function (event) | 下载进度监听 |
+| onUploadProgress | Function (event) | Upload progress |
+| onDownloadProgress | Function (event) | Download progress |
 | meanSpeed | Number | Default 0 off,Set the rate to equalization mode and calculate the average rate every millisecond |
 | fixed | Number | default 2 |
 
@@ -477,7 +479,10 @@ import XEAjax from 'xe-ajax'
 var file = document.querySelector('#myFile').files[0]
 var formBody = new FormData()
 formBody.append('file', file)
+XEAjax.fetchPost('/api/upload', formBody)
 XEAjax.doPost('/api/upload', formBody)
+XEAjax.postJSON('/api/upload', formBody)
+
 
 // Upload
 // create a Progress.
@@ -496,6 +501,7 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 // ...
 // Progress:99% 14.08MB/14.26MB; Speed:119.6KB/s; Remaining:2s
 // Progress:100% 14.26MB/14.26MB; Speed:114.4KB/s; Remaining:0s
+
 
 // Download
 // create Progress object.
