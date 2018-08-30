@@ -5,6 +5,7 @@ var utils = require('../core/utils')
 function XEProgress (options) {
   Object.assign(this, {
     fixed: 2,
+    meanSpeed: 0,
     onDownloadProgress: null,
     onUploadProgress: null
   }, options, {_progress: {}})

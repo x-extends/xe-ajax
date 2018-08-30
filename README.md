@@ -461,6 +461,7 @@ XEAjax.getJSON('/api/user/info')
 |------|------|-----|
 | onUploadProgress | Function (event) | 上传进度监听 |
 | onDownloadProgress | Function (event) | 下载进度监听 |
+| meanSpeed | Number | 默认0关闭，设置速率为均衡模式，每隔多少毫秒内计算平均速率 |
 | fixed | Number | 默认2位数 |
 
 ### Progress 对象

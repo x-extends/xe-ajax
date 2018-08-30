@@ -455,6 +455,7 @@ XEAjax.getJSON('/api/user/info')
 |------|------|-----|
 | onUploadProgress | Function (event) | 上传进度监听 |
 | onDownloadProgress | Function (event) | 下载进度监听 |
+| meanSpeed | Number | Default 0 off,Set the rate to equalization mode and calculate the average rate every millisecond |
 | fixed | Number | default 2 |
 
 ### Progress

@@ -70,7 +70,7 @@
     IS_F: isNodeJS ? false : !!self.fetch, // 支持 fetch
     IS_A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
     IS_FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
-    IS_DEF: Object.defineProperty && ({}).__defineGetter__,
+    IS_DEF: Object.defineProperty && ({}).__defineGetter__, // ie7-8 false
 
     isFData: function (obj) {
       return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
@@ -277,13 +277,23 @@
     }
   }
 
-  function XEProgress () {
-    this.time = 0
-    this.speed = 0
-    this.loaded = 0
-    this.value = 0
-    this.total = 0
-    this.onupload = this.onload = null
+  function XEProgress (options) {
+    Object.assign(this, {
+      fixed: 2,
+      meanSpeed: 0,
+      onDownloadProgress: null,
+      onUploadProgress: null
+    }, options, { _progress: {} })
+  }
+
+  if (utils.IS_DEF) {
+    utils.arrayEach('time,speed,loaded,value,total,remaining'.split(','), function (name) {
+      Object.defineProperty(XEProgress.prototype, name, {
+        get: function () {
+          return this._progress[name]
+        }
+      })
+    })
   }
 
   function XEAbortSignalPolyfill () {
@@ -697,14 +707,14 @@
       failed('E_A')
     }
     if (progress) {
-      var onupload = progress.onupload
-      var onload = progress.onload
+      var uploadProgress = progress.onUploadProgress
+      var downloadProgress = progress.onDownloadProgress
       var upload = xhr.upload
-      if (onupload && upload) {
-        loadListener(upload, onupload, progress)
+      if (uploadProgress && upload) {
+        loadListener(upload, uploadProgress, progress)
       }
-      if (onload) {
-        loadListener(xhr, onload, progress)
+      if (downloadProgress) {
+        loadListener(xhr, downloadProgress, progress)
       }
     }
     xhr.open(request.method, url, true)
@@ -732,26 +742,70 @@
 
   // 进度监听处理
   function loadListener (target, callback, progress) {
-    var prepareFn = function () {
-      progress.time = new Date().getTime()
-    }
-    target.onloadstart = prepareFn
+    var handleTime = new Date().getTime()
+    var prossQueue = []
+    var _progress = utils.IS_DEF ? progress._progress : progress
+    var meanSpeed = progress.meanSpeed
+    _progress.time = handleTime
     target.onprogress = function (evnt) {
-      var prevDateTime = progress.time
       var currDateTime = new Date().getTime()
-      var prevLoaded = progress.loaded
+      var prevDateTime = _progress.time
+      var prevLoaded = _progress.loaded ? _progress.loaded.value : 0
       var total = evnt.total
       var loaded = evnt.loaded
+      var speed = (loaded - prevLoaded) / (currDateTime - prevDateTime) * 1000
       if (evnt.lengthComputable) {
-        progress.value = Math.round(loaded / total * 100)
+        _progress.value = Math.round(loaded / total * 100)
       }
-      progress.total = total
-      progress.loaded = loaded
-      progress.time = currDateTime
-      progress.speed = (loaded - prevLoaded) / (currDateTime - prevDateTime) * 1000
-      callback(evnt)
+      _progress.total = formatUnit(total, progress)
+      _progress.loaded = formatUnit(loaded, progress)
+      _progress.speed = formatUnit(speed, progress)
+      _progress.time = currDateTime
+      _progress.remaining = Math.ceil((total - loaded) / speed)
+      prossQueue.push({ total: total, loaded: loaded, speed: speed, evnt: evnt })
+      if (!meanSpeed) {
+        callback(evnt)
+      }
     }
-    target.onloadend = prepareFn
+    if (meanSpeed) {
+      var prossInterval = setInterval(function () {
+        if (_progress.value < 100) {
+          var len = prossQueue.length
+          if (len) {
+            var countSpeed = 0
+            var lastItem = null
+            for (var index = 0; index < len; index++) {
+              lastItem = prossQueue[0]
+              countSpeed += lastItem.speed
+            }
+            var speed = countSpeed / len
+            _progress.speed = formatUnit(speed, progress)
+            _progress.remaining = Math.ceil((lastItem.total - lastItem.loaded) / speed)
+            prossQueue = []
+            callback(lastItem)
+          }
+        } else {
+          clearInterval(prossInterval)
+        }
+      }, meanSpeed)
+    }
+  }
+
+  var sUnits = ['B', 'KB', 'MB', 'GB', 'TB']
+  var sUnitRatio = 1024
+  var sUnitLen = sUnits.length
+  function formatUnit (bSize, progress) {
+    var unit = ''
+    var size = bSize
+    for (var index = 0; index < sUnitLen; index++) {
+      unit = sUnits[index]
+      if (size >= sUnitRatio) {
+        size = size / sUnitRatio
+      } else {
+        break
+      }
+    }
+    return { value: bSize, size: parseFloat(size.toFixed(progress.fixed)), unit: unit }
   }
 
   // 处理响应头

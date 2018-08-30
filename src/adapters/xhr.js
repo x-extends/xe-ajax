@@ -84,15 +84,14 @@ function sendXHR (request, finish, failed) {
 
 // 进度监听处理
 function loadListener (target, callback, progress) {
-  var handleTime = new Date()
+  var handleTime = new Date().getTime()
+  var prossQueue = []
   var _progress = utils.IS_DEF ? progress._progress : progress
-  var prepareFn = function () {
-    _progress.time = new Date().getTime()
-  }
-  target.onloadstart = prepareFn
+  var meanSpeed = progress.meanSpeed
+  _progress.time = handleTime
   target.onprogress = function (evnt) {
-    var prevDateTime = _progress.time || handleTime
     var currDateTime = new Date().getTime()
+    var prevDateTime = _progress.time
     var prevLoaded = _progress.loaded ? _progress.loaded.value : 0
     var total = evnt.total
     var loaded = evnt.loaded
@@ -105,9 +104,33 @@ function loadListener (target, callback, progress) {
     _progress.speed = formatUnit(speed, progress)
     _progress.time = currDateTime
     _progress.remaining = Math.ceil((total - loaded) / speed)
-    callback(evnt)
+    prossQueue.push({total: total, loaded: loaded, speed: speed, evnt: evnt})
+    if (!meanSpeed) {
+      callback(evnt)
+    }
   }
-  target.onloadend = prepareFn
+  if (meanSpeed) {
+    var prossInterval = setInterval(function () {
+      if (_progress.value < 100) {
+        var len = prossQueue.length
+        if (len) {
+          var countSpeed = 0
+          var lastItem = null
+          for (var index = 0; index < len; index++) {
+            lastItem = prossQueue[0]
+            countSpeed += lastItem.speed
+          }
+          var speed = countSpeed / len
+          _progress.speed = formatUnit(speed, progress)
+          _progress.remaining = Math.ceil((lastItem.total - lastItem.loaded) / speed)
+          prossQueue = []
+          callback(lastItem)
+        }
+      } else {
+        clearInterval(prossInterval)
+      }
+    }, meanSpeed)
+  }
 }
 
 var sUnits = ['B', 'KB', 'MB', 'GB', 'TB']
