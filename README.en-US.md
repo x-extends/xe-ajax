@@ -449,7 +449,24 @@ XEAjax.getJSON('/api/user/info')
 
 ## Upload/Download (v3.4.9+)
 
+### 参数
+
+| Name | Type | Description |
+|------|------|-----|
+| onUploadProgress | Function (event) | 上传进度监听 |
+| onDownloadProgress | Function (event) | 下载进度监听 |
+| fixed | Number | default 2 |
+
 ### Progress
+
+| Name | Type | Description |
+|------|------|-----|
+| value | Number | Current progress % |
+| loaded | Object | Transmitted size {value, size, unit} |
+| total | Object | Total size {value, size, unit} |
+| speed | Object | Transmission speed/s {value, size, unit} |
+| remaining | Number | RemainingTime/s |
+| time | Number | timestamp |
 
 Listener request progress.
 
@@ -465,26 +482,27 @@ XEAjax.doPost('/api/upload', formBody)
 // create a Progress.
 let progress = new XEAjax.Progress()
 // listener upload
-progress.onupload = evnt => {
-  console.log(`Progress:${progress.value}%; Speed:${Math.round(progress.speed / 1024)} KB/s; Loaded:${Math.round(progress.loaded / 1024)} KB; Time Remaining:${Math.ceil((progress.total - progress.loaded) / progress.speed)}s`)
+progress.onUploadProgress = evnt => {
+  console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
 }
 var file = document.querySelector('#myFile').files[0]
 var formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody, {progress})
-// Progress:5%; Speed:36769 KB/s; Loaded:3824 KB; ime Remaining:2s
-// Progress:19%; Speed:23360 KB/s; Loaded:13568 KB; ime Remaining:3s
-// Progress:45%; Speed:35071 KB/s; Loaded:31648 KB; ime Remaining:2s
-// Progress:69%; Speed:22268 KB/s; Loaded:48352 KB; ime Remaining:1s
-// Progress:86%; Speed:29737 KB/s; Loaded:60064 KB; ime Remaining:1s
-// Progress:100%; Speed:4153 KB/s; Loaded:69904 KB; ime Remaining:0s
+// Progress:1% 176KB/14.26MB; Speed:1.69MB/s; Remaining:8s
+// Progress:3% 368KB/14.26MB; Speed:640KB/s; Remaining:22s
+// Progress:8% 1.16MB/14.26MB; Speed:1.56MB/s; Remaining:8s
+// ...
+// Progress:99% 14.08MB/14.26MB; Speed:119.6KB/s; Remaining:2s
+// Progress:100% 14.26MB/14.26MB; Speed:114.4KB/s; Remaining:0s
+// Upload time:23s
 
 // Download
 // create Progress object.
 let progress = new XEAjax.Progress()
 // listener load
-progress.onload = evnt => {
-  console.log(`Progress:${progress.value}%; Speed:${Math.round(progress.speed / 1024)} KB/s; Loaded:${Math.round(progress.loaded / 1024)} KB; ime Remaining:${Math.ceil((progress.total - progress.loaded) / progress.speed)}s`)
+progress.onDownloadProgress = evnt => {
+  console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
 }
 XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
 ```

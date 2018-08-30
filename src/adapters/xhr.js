@@ -49,14 +49,14 @@ function sendXHR (request, finish, failed) {
     failed('E_A')
   }
   if (progress) {
-    var onupload = progress.onupload
-    var onload = progress.onload
+    var uploadProgress = progress.onUploadProgress
+    var downloadProgress = progress.onDownloadProgress
     var upload = xhr.upload
-    if (onupload && upload) {
-      loadListener(upload, onupload, progress)
+    if (uploadProgress && upload) {
+      loadListener(upload, uploadProgress, progress)
     }
-    if (onload) {
-      loadListener(xhr, onload, progress)
+    if (downloadProgress) {
+      loadListener(xhr, downloadProgress, progress)
     }
   }
   xhr.open(request.method, url, true)
@@ -84,26 +84,47 @@ function sendXHR (request, finish, failed) {
 
 // 进度监听处理
 function loadListener (target, callback, progress) {
+  var handleTime = new Date()
+  var _progress = utils.IS_DEF ? progress._progress : progress
   var prepareFn = function () {
-    progress.time = new Date().getTime()
+    _progress.time = new Date().getTime()
   }
   target.onloadstart = prepareFn
   target.onprogress = function (evnt) {
-    var prevDateTime = progress.time
+    var prevDateTime = _progress.time || handleTime
     var currDateTime = new Date().getTime()
-    var prevLoaded = progress.loaded
+    var prevLoaded = _progress.loaded ? _progress.loaded.value : 0
     var total = evnt.total
     var loaded = evnt.loaded
+    var speed = (loaded - prevLoaded) / (currDateTime - prevDateTime) * 1000
     if (evnt.lengthComputable) {
-      progress.value = Math.round(loaded / total * 100)
+      _progress.value = Math.round(loaded / total * 100)
     }
-    progress.total = total
-    progress.loaded = loaded
-    progress.time = currDateTime
-    progress.speed = (loaded - prevLoaded) / (currDateTime - prevDateTime) * 1000
+    _progress.total = formatUnit(total, progress)
+    _progress.loaded = formatUnit(loaded, progress)
+    _progress.speed = formatUnit(speed, progress)
+    _progress.time = currDateTime
+    _progress.remaining = Math.ceil((total - loaded) / speed)
     callback(evnt)
   }
   target.onloadend = prepareFn
+}
+
+var sUnits = ['B', 'KB', 'MB', 'GB', 'TB']
+var sUnitRatio = 1024
+var sUnitLen = sUnits.length
+function formatUnit (bSize, progress) {
+  var unit = ''
+  var size = bSize
+  for (var index = 0; index < sUnitLen; index++) {
+    unit = sUnits[index]
+    if (size >= sUnitRatio) {
+      size = size / sUnitRatio
+    } else {
+      break
+    }
+  }
+  return {value: bSize, size: parseFloat(size.toFixed(progress.fixed)), unit: unit}
 }
 
 // 处理响应头

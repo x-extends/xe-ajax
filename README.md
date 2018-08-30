@@ -455,9 +455,24 @@ XEAjax.getJSON('/api/user/info')
 
 ## 上传/下载 (v3.4.9+)
 
-### Progress 进度监听对象
+### 参数
 
-用于监听请求进度
+| 属性 | 类型 | 描述 |
+|------|------|-----|
+| onUploadProgress | Function (event) | 上传进度监听 |
+| onDownloadProgress | Function (event) | 下载进度监听 |
+| fixed | Number | 默认2位数 |
+
+### Progress 对象
+
+| 属性 | 类型 | 描述 |
+|------|------|-----|
+| value | Number | 当前进度 % |
+| loaded | Object | 已传输大小 {value: 原始大小B, size: 转换后大小, unit: 转换后单位} |
+| total | Object | 总大小 {value: 原始大小B, size: 转换后大小, unit: 转换后单位} |
+| speed | Object | 传输速度/秒 {value: 原始大小B, size: 转换后大小, unit: 转换后单位} |
+| remaining | Number | 剩余时间/秒 |
+| time | Number | 时间戳 |
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -472,26 +487,27 @@ XEAjax.doPost('/api/upload', formBody)
 // 创建一个进度监听对象
 let progress = new XEAjax.Progress()
 // 监听上传进度
-progress.onupload = evnt => {
-  console.log(`进度：${progress.value}%; 速度：${Math.round(progress.speed / 1024)} KB/秒; 已上传：${Math.round(progress.loaded / 1024)} KB; 剩余时间：${Math.ceil((progress.total - progress.loaded) / progress.speed)}秒`)
+progress.onUploadProgress = evnt => {
+  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; 速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
 }
 var file = document.querySelector('#myFile').files[0]
 var formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody, {progress})
-// 进度：5%; 速度：36769 KB/秒; 已上传：3824 KB; 剩余时间：2秒
-// 进度：19%; 速度：23360 KB/秒; 已上传：13568 KB; 剩余时间：3秒
-// 进度：45%; 速度：35071 KB/秒; 已上传：31648 KB; 剩余时间：2秒
-// 进度：69%; 速度：22268 KB/秒; 已上传：48352 KB; 剩余时间：1秒
-// 进度：86%; 速度：29737 KB/秒; 已上传：60064 KB; 剩余时间：1秒
-// 进度：100%; 速度：4153 KB/秒; 已上传：69904 KB; 剩余时间：0秒
+// 进度：1% 176KB/14.26MB; 速度：1.69MB/秒; 剩余：8秒
+// 进度：3% 368KB/14.26MB; 速度：640KB/秒; 剩余：22秒
+// 进度：8% 1.16MB/14.26MB; 速度：1.56MB/秒; 剩余：8秒
+// ...
+// 进度：99% 14.08MB/14.26MB; 速度：119.6KB/秒; 剩余：2秒
+// 进度：100% 14.26MB/14.26MB; 速度：114.4KB/秒; 剩余：0秒
+// 上传时间：23秒
 
 // 下载进度
 // 创建一个进度监听对象
 let progress = new XEAjax.Progress()
 // 监听下载进度
-progress.onload = evnt => {
-  console.log(`进度：${progress.value}%; 速度：${Math.round(progress.speed / 1024)} KB/秒; 已下载：${Math.round(progress.loaded / 1024)} KB; 剩余时间：${Math.ceil((progress.total - progress.loaded) / progress.speed)}秒`)
+progress.onDownloadProgress = evnt => {
+  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; 速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
 }
 XEAjax.fetch('/api/download/file/1', {progress, method: 'GET'})
 ```
