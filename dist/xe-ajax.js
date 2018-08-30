@@ -752,6 +752,7 @@
     var prossQueue = []
     var _progress = utils.IS_DEF ? progress._progress : progress
     var meanSpeed = progress.meanSpeed
+    _progress.value = 0
     _progress.time = handleTime
     target.onprogress = function (evnt) {
       var currDateTime = new Date().getTime()
