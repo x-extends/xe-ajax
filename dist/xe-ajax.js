@@ -701,10 +701,10 @@
       failed()
     }
     xhr.ontimeout = function () {
-      failed('E_T')
+      failed('ERR_T')
     }
     xhr.onabort = function () {
-      failed('E_A')
+      failed('ERR_A')
     }
     if (progress) {
       var uploadProgress = progress.onUploadProgress
@@ -842,11 +842,11 @@
     })
     if (reqTimeout) {
       timer = setTimeout(function () {
-        failed('E_T')
+        failed('ERR_T')
       }, reqTimeout)
     }
     if (reqSignal && reqSignal.aborted) {
-      failed('E_A')
+      failed('ERR_A')
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
         clearTimeoutFn(timer)
@@ -924,7 +924,7 @@
       if (reqTimeout) {
         setTimeout(function () {
           jsonpClear(request, jsonpCallback)
-          finish('E_T')
+          finish('ERR_T')
         }, reqTimeout)
       }
       $dom.body.appendChild(script)
@@ -946,9 +946,9 @@
   }
 
   var errorType = {
-    E_A: 'The user aborted a request.',
-    E_T: 'Request timeout.',
-    E_F: 'Network request failed.'
+    ERR_A: 'The user aborted a request.',
+    ERR_T: 'Request timeout.',
+    ERR_F: 'Network request failed.'
   }
 
   /**
@@ -966,7 +966,7 @@
         (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
           interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
         }, function (type) {
-          interceptorExports.toRejects(request, new TypeError(errorType[type || 'E_F']), resolve, reject)
+          interceptorExports.toRejects(request, new TypeError(errorType[type || 'ERR_F']), resolve, reject)
         })
       })
     }, request.$context)

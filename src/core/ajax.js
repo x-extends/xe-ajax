@@ -11,9 +11,9 @@ var handleExports = require('../handle')
 var interceptorExports = require('../handle/interceptor')
 
 var errorType = {
-  E_A: 'The user aborted a request.',
-  E_T: 'Request timeout.',
-  E_F: 'Network request failed.'
+  ERR_A: 'The user aborted a request.',
+  ERR_T: 'Request timeout.',
+  ERR_F: 'Network request failed.'
 }
 
 /**
@@ -31,7 +31,7 @@ function XEAjax (options) {
       (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
         interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
       }, function (type) {
-        interceptorExports.toRejects(request, new TypeError(errorType[type || 'E_F']), resolve, reject)
+        interceptorExports.toRejects(request, new TypeError(errorType[type || 'ERR_F']), resolve, reject)
       })
     })
   }, request.$context)
@@ -73,7 +73,7 @@ XEAjax.use = function (plugin) {
  * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
  * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
- * @param { String } integrity 包括请求的subresource integrity值(例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=)
+ * @param { String } integrity 包括请求的subresource integrity值
  * 高级参数(不建议使用))
  * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
  * @param { Function } $http 自定义 http 请求函数

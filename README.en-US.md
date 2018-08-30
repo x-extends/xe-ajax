@@ -118,7 +118,7 @@ import XEAjax from 'xe-ajax'
 | * **referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
 | * **referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
 | * **keepalive** | String | The keepalive option can be used to allow the request to outlive the page |  |
-| * **integrity** | String | Contains the subresource integrity value of the request (e.g., sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
+| * **integrity** | String | Contains the subresource integrity value of the request |  |
 | jsonp | String | set jsonp callback parameter name | 'callback' |
 | jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
 | timeout | Number | set a timeout in ms |  |

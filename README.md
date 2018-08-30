@@ -128,7 +128,7 @@ import XEAjax from 'xe-ajax'
 | * **referrer** | String | 可以设置no-referrer,client或URL | 'client' |
 | * **referrerPolicy** | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
 | * **keepalive** | String | 选项可用于允许请求超过页面的生存时间 |  |
-| * **integrity** | String | 包括请求的subresource integrity值 (例如：sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=) |  |
+| * **integrity** | String | 包括请求的subresource integrity值 |  |
 | jsonp | String | jsonp入参属性名 | 'callback' |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置超时 |  |

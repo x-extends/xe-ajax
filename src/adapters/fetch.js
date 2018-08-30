@@ -28,11 +28,11 @@ function sendFetch (request, finish, failed) {
   })
   if (reqTimeout) {
     timer = setTimeout(function () {
-      failed('E_T')
+      failed('ERR_T')
     }, reqTimeout)
   }
   if (reqSignal && reqSignal.aborted) {
-    failed('E_A')
+    failed('ERR_A')
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeoutFn(timer)

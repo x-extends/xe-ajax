@@ -43,10 +43,10 @@ function sendXHR (request, finish, failed) {
     failed()
   }
   xhr.ontimeout = function () {
-    failed('E_T')
+    failed('ERR_T')
   }
   xhr.onabort = function () {
-    failed('E_A')
+    failed('ERR_A')
   }
   if (progress) {
     var uploadProgress = progress.onUploadProgress
@@ -124,7 +124,7 @@ function loadListener (target, callback, progress) {
           _progress.speed = formatUnit(speed, progress)
           _progress.remaining = Math.ceil((lastItem.total - lastItem.loaded) / speed)
           prossQueue = []
-          callback(lastItem)
+          callback(lastItem.evnt)
         }
       } else {
         clearInterval(prossInterval)
