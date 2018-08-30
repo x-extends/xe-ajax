@@ -524,7 +524,8 @@ import XEAjax from 'xe-ajax'
 
 // 创建一个控制器对象
 // 如果当前环境支持 AbortController，则使用原生的 AbortController
-let controller = new XEAjax.AbortController() // 或者使用原生 let controller = new AbortController()
+let controller = new XEAjax.AbortController()
+// let controller = new AbortController() // 使用原生
 // 获取signal
 let signal = controller.signal
 // 给请求加入控制器 signal

@@ -519,8 +519,8 @@ import XEAjax from 'xe-ajax'
 
 // Create a controller.
 // If the current environment supports AbortController, native AbortController is used
-let controller = new XEAjax.AbortController() // let controller = new AbortController()
-// get signal
+let controller = new XEAjax.AbortController()
+// let controller = new AbortController()
 let signal = controller.signal
 // Associate the signal and controller with the fetch request.
 XEAjax.fetchGet('/api/user/list', {id: 1}, {signal})
