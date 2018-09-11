@@ -469,6 +469,7 @@ XEAjax.getJSON('/api/user/info')
 
 | 属性 | 类型 | 描述 |
 |------|------|-----|
+| autoCompute | Boolean | 是否自动计算进度,默认true |
 | value | Number | 当前进度 % |
 | loaded | Object | 已传输大小 {value: 原始大小B, size: 转换后大小, unit: 转换后单位} |
 | total | Object | 总大小 {value: 原始大小B, size: 转换后大小, unit: 转换后单位} |

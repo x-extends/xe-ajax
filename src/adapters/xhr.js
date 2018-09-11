@@ -51,12 +51,21 @@ function sendXHR (request, finish, failed) {
   if (progress) {
     var uploadProgress = progress.onUploadProgress
     var downloadProgress = progress.onDownloadProgress
+    var autoCompute = progress.autoCompute
     var upload = xhr.upload
     if (uploadProgress && upload) {
-      loadListener(upload, uploadProgress, progress)
+      if (autoCompute) {
+        loadListener(upload, uploadProgress, progress)
+      } else {
+        upload.onprogress = uploadProgress
+      }
     }
     if (downloadProgress) {
-      loadListener(xhr, downloadProgress, progress)
+      if (autoCompute) {
+        loadListener(xhr, downloadProgress, progress)
+      } else {
+        xhr.onprogress = downloadProgress
+      }
     }
   }
   xhr.open(request.method, url, true)

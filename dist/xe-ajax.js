@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.9-beta.0
+ * xe-ajax.js v3.4.9
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -285,11 +285,12 @@
 
   function XEProgress (options) {
     Object.assign(this, {
+      autoCompute: true,
       fixed: 2,
       meanSpeed: 0,
       onDownloadProgress: null,
       onUploadProgress: null
-    }, options, { _progress: {} })
+    }, options, { _progress: { value: 0, total: 0, loaded: 0 } })
   }
 
   if (utils.IS_DEF) {
@@ -715,12 +716,21 @@
     if (progress) {
       var uploadProgress = progress.onUploadProgress
       var downloadProgress = progress.onDownloadProgress
+      var autoCompute = progress.autoCompute
       var upload = xhr.upload
       if (uploadProgress && upload) {
-        loadListener(upload, uploadProgress, progress)
+        if (autoCompute) {
+          loadListener(upload, uploadProgress, progress)
+        } else {
+          upload.onprogress = uploadProgress
+        }
       }
       if (downloadProgress) {
-        loadListener(xhr, downloadProgress, progress)
+        if (autoCompute) {
+          loadListener(xhr, downloadProgress, progress)
+        } else {
+          xhr.onprogress = downloadProgress
+        }
       }
     }
     xhr.open(request.method, url, true)
@@ -979,7 +989,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.9-beta.0'
+  XEAjax.version = '3.4.9'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.Progress = XEProgress
