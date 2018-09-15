@@ -204,14 +204,13 @@ XEAjax.setup({
 ```JavaScript
 const XEAjax = require('xe-ajax')
 
-let options = {
+XEAjax.ajax({
   url: '/api/user/list',
   method: 'GET',
   params: {
     id: 1
   }
-}
-XEAjax.ajax(options)
+})
   .then(response => {
     if (response.ok) {
       // success
@@ -229,13 +228,12 @@ XEAjax.ajax(options)
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-let options = {
+XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {
     name: 'test'
   }
-}
-XEAjax.fetch('/api/user/list', options)
+})
   .then(response => {
     if (response.ok) {
       // success
@@ -248,7 +246,7 @@ XEAjax.fetch('/api/user/list', options)
   })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.text().then(text => {
       // text
@@ -264,7 +262,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.blob().then(blob => {
       // blob
@@ -272,7 +270,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.arrayBuffer().then(arrayBuffer => {
       // arrayBuffer
@@ -280,7 +278,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.formData().then(formData => {
       // formData
@@ -308,14 +306,11 @@ formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 
 // Submit body and query params
-let body3 = {
-  name: 'u333',
-  password: '123456'
-}
-let query = {
-  id: 111
-}
-XEAjax.fetchPost('/api/user/save', body3, {params: query})
+XEAjax.fetchPost('/api/user/save', {name: 'u333',password: '123456'}, {params: {id: 111}})
+
+XEAjax.fetchGet('/api/user/list')
+XEAjax.fetchPut('/api/user/update', {name: 'u222'})
+XEAjax.fetchDelete('/api/user/delete/111')
 ```
 
 ### fetch to Response Schema (v3.4.0+)
@@ -371,7 +366,6 @@ XEAjax.postJSON('/api/user/save', formBody)
 import XEAjax from 'xe-ajax'
 
 // Case 1:
-// Set jsonp callback parameter name, default is 'callback'
 // http://xuliangzhan.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
 XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
@@ -384,7 +378,6 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
   })
 
 // Case 2:
-// Set jsonp callback function name, default is a random number with jsonp_xeajax_ prefix
 // http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
 // jsonp_xeajax_1521272815608_2({message: 'success'})
 XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
@@ -393,10 +386,9 @@ XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 
   })
 
 // Case 3:
-// Set jsonp callback parameter name and callback function name
-// http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func3
-// func3({message: 'success'})
-XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func3'})
+// http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func
+// func({message: 'success'})
+XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
   .then(data => {
     // data
   })
@@ -427,12 +419,12 @@ XEAjax.doAll(iterable2)
 ### Nested requests
 
 ```JavaScript
-import XEAjax from 'xe-ajax'
+import { fetchGet, doGet, getJSON } from 'xe-ajax'
 
 // This should be avoided in the project.
-XEAjax.fetchGet('/api/user/info')
+fetchGet('/api/user/info')
   .then(response => response.json())
-  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id}))
+  .then(data => fetchGet('/api/user/details', {id: data.id}))
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -440,13 +432,13 @@ XEAjax.fetchGet('/api/user/info')
       })
     }
   })
-XEAjax.doGet('/api/user/info')
-  .then(result => XEAjax.doGet('/api/user/details', {id: result.data.id}))
+doGet('/api/user/info')
+  .then(result => doGet('/api/user/details', {id: result.data.id}))
   .then(result => {
     // result.data
   })
-XEAjax.getJSON('/api/user/info')
-  .then(data => XEAjax.getJSON('/api/user/details', {id: data.id}))
+getJSON('/api/user/info')
+  .then(data => getJSON('/api/user/details', {id: data.id}))
   .then(data => {
     // data
   })

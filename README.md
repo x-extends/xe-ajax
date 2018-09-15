@@ -187,6 +187,7 @@ XEAjax.setup({
     'Accept': 'application/json, text/plain, \*/\*;'
   },
   validateStatus (response) {
+    // 如何需要实现复杂的场景判断，请使用拦截器
     return response.status >= 200 && response.status < 300
   },
   transformParams (params, request) {
@@ -219,14 +220,13 @@ XEAjax.setup({
 ```JavaScript
 const XEAjax = require('xe-ajax')
 
-let options = {
+XEAjax.ajax({
   url: '/api/user/list',
   method: 'GET',
   params: {
     id: 1
   }
-}
-XEAjax.ajax(options)
+})
   .then(response => {
     if (response.ok) {
       // 请求成功
@@ -245,13 +245,12 @@ XEAjax.ajax(options)
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-let options = {
+XEAjax.fetch('/api/user/list', {
   method: 'POST',
   body: {
     name: 'test'
   }
-}
-XEAjax.fetch('/api/user/list', options)
+})
   .then(response => {
     if (response.ok) {
       // 请求成功
@@ -264,7 +263,7 @@ XEAjax.fetch('/api/user/list', options)
   })
 
 // Response Text
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.text().then(text => {
       // text
@@ -272,7 +271,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.json().then(data => {
       // data
@@ -280,7 +279,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response Blob
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.blob().then(blob => {
       // blob
@@ -288,7 +287,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response ArrayBuffer
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.arrayBuffer().then(arrayBuffer => {
       // arrayBuffer
@@ -296,7 +295,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response FormData
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetch('/api/user/list')
   .then(response => {
     response.formData().then(formData => {
       // formData
@@ -324,14 +323,11 @@ formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 
 // 查询参数和数据同时提交
-let body3 = {
-  name: 'u333',
-  password: '123456'
-}
-let query = {
-  id: 111
-}
-XEAjax.fetchPost('/api/user/save', body3, {params: query})
+XEAjax.fetchPost('/api/user/save', {name: 'u333',password: '123456'}, {params: {id: 111}})
+
+XEAjax.fetchGet('/api/user/list')
+XEAjax.fetchPut('/api/user/update', {name: 'u222'})
+XEAjax.fetchDelete('/api/user/delete/111')
 ```
 
 ### 根据请求状态码（成功或失败），返回结果为 Response 数据的 Peomise 对象 (v3.4.0+)
@@ -399,9 +395,9 @@ XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 
   })
 
 // 例子3
-// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func3
-// 服务端返回结果: func3({message: 'success'})
-XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func3'})
+// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func
+// 服务端返回结果: func({message: 'success'})
+XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
   .then(data => {
     // data
   })
@@ -432,12 +428,12 @@ XEAjax.doAll(iterable2)
 ### 嵌套请求
 
 ```JavaScript
-import XEAjax from 'xe-ajax'
+import { fetchGet, doGet, getJSON } from 'xe-ajax'
 
-// 相互依赖的嵌套请求(项目中应该避免这种情况)
-XEAjax.fetchGet('/api/user/info')
+// 相互依赖的嵌套请求
+fetchGet('/api/user/info')
   .then(response => response.json())
-  .then(data => XEAjax.fetchGet('/api/user/details', {id: data.id}))
+  .then(data => fetchGet('/api/user/details', {id: data.id}))
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -445,13 +441,13 @@ XEAjax.fetchGet('/api/user/info')
       })
     }
   })
-XEAjax.doGet('/api/user/info')
-  .then(result => XEAjax.doGet('/api/user/details', {id: result.data.id}))
+doGet('/api/user/info')
+  .then(result => doGet('/api/user/details', {id: result.data.id}))
   .then(result => {
     // result.data
   })
-XEAjax.getJSON('/api/user/info')
-  .then(data => XEAjax.getJSON('/api/user/details', {id: data.id}))
+getJSON('/api/user/info')
+  .then(data => getJSON('/api/user/details', {id: data.id}))
   .then(data => {
     // data
   })
@@ -533,7 +529,7 @@ import XEAjax from 'xe-ajax'
 // 创建一个控制器对象
 // 如果当前环境支持 AbortController，则使用原生的 AbortController
 let controller = new XEAjax.AbortController()
-// let controller = new AbortController() // 使用原生
+// let controller = new AbortController() // 或者使用原生
 // 获取signal
 let signal = controller.signal
 // 给请求加入控制器 signal
@@ -550,6 +546,8 @@ setTimeout(() => {
 ```
 
 ## 拦截器 (v3.0+)
+
+拦截器可以对请求之前和请求之后的任何参数以及数据做处理，注意要调用next执行下一步，否则将停止执行。
 
 ### Request 拦截器
 
@@ -573,8 +571,6 @@ XEAjax.interceptors.request.use((request, next) => {
 ```
 
 ### Response 拦截器
-
-拦截器可以对请求之前和请求之后的任何参数以及数据做处理，注意要调用next执行下一步，否则将停止执行。
 
 XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
 
