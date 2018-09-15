@@ -240,7 +240,7 @@ XEAjax.ajax(options)
   })
 ```
 
-### fetch 调用
+### fetch 调用，返回一个结果为 Response 对象的 Promise
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -334,7 +334,7 @@ let query = {
 XEAjax.fetchPost('/api/user/save', body3, {params: query})
 ```
 
-### 根据状态响应请求结果、包括状态信息 (v3.4.0+)
+### 根据请求状态码（成功或失败），返回结果为 Response 数据的 Peomise 对象 (v3.4.0+)
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -355,7 +355,7 @@ XEAjax.doPut('/api/user/update', {name: 'u222'})
 XEAjax.doDelete('/api/user/delete/111')
 ```
 
-### 根据状态响应 json 调用
+### 根据请求状态码（成功或失败），返回结果为 json 数据的 Peomise 对象
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
