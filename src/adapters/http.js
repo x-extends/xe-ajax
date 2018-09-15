@@ -105,7 +105,7 @@ function sendHttp (request, finish, failed) {
       return httpRequest(request, finish, failed)
     }, function (resp) {
       clearTimeoutFn(timer)
-      finish(handleExports.toResponse(resp, request))
+      handleExports.toResponse(resp, request).then(finish)
     }, function (e) {
       clearTimeoutFn(timer)
       failed()

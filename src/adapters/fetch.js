@@ -36,7 +36,7 @@ function sendFetch (request, finish, failed) {
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
       clearTimeoutFn(timer)
-      finish(handleExports.toResponse(resp, request))
+      handleExports.toResponse(resp, request).then(finish)
     })['catch'](function (e) {
       clearTimeoutFn(timer)
       failed()

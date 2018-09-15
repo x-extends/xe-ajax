@@ -163,11 +163,13 @@ function formatUnit (bSize, progress) {
 // 处理响应头
 function parseXHRHeaders (xhr) {
   var headers = {}
-  var allResponseHeaders = utils.trim(xhr.getAllResponseHeaders())
-  utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
-    var index = row.indexOf(':')
-    headers[utils.trim(row.slice(0, index))] = utils.trim(row.slice(index + 1))
-  })
+  var headerList = utils.trim(xhr.getAllResponseHeaders()).split('\n')
+  var len = headerList.length
+  for (var row, rowIndex, index = 0; index < len; index++) {
+    row = headerList[index]
+    rowIndex = row.indexOf(':')
+    headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
+  }
   return headers
 }
 

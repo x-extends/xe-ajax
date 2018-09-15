@@ -183,9 +183,6 @@
     bodyType: 'json-data',
     headers: {
       'Accept': 'application/json, text/plain, */*'
-    },
-    validateStatus: function (response) {
-      return response.status >= 200 && response.status < 300
     }
   }
 
@@ -538,10 +535,15 @@
     return result
   }
 
+  function validateStatus (response) {
+    return response.status >= 200 && response.status < 300
+  }
+
   function XEResponse (body, options, request) {
     this._body = body
     this._request = request
     var status = options.status
+    var validStatus = request.validateStatus || validateStatus
     var _response = this._response = {
       body: new XEReadableStream(body, request, this),
       bodyUsed: false,
@@ -553,10 +555,10 @@
       type: 'basic'
     }
     if (utils.IS_DEF) {
-      _response.ok = request.validateStatus(this)
+      _response.ok = validStatus(this)
     } else {
       utils.assign(this, _response)
-      this.ok = request.validateStatus(this)
+      this.ok = validStatus(this)
     }
   }
 
@@ -638,34 +640,42 @@
     }, request.$context)
   }
 
+  function isNativeResponse (obj) {
+    return obj && typeof Response !== 'undefined' && obj.constructor === Response
+  }
+
   function isResponse (obj) {
-    if (obj) {
-      var objConstructor = obj.constructor
-      return (typeof Response !== 'undefined' && objConstructor === Response) || objConstructor === XEResponse
-    }
-    return false
+    return obj && obj.constructor === XEResponse
   }
 
   function getStringifyBody (reqBody) {
     return utils.isStr(reqBody) ? reqBody : JSON.stringify(reqBody)
   }
 
+  function getResponse (reqBody, resp, request) {
+    var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
+    if (utils.IS_A) {
+      reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
+    } else {
+      reqBody = getStringifyBody(reqBody)
+    }
+    return new XEResponse(reqBody, options, request)
+  }
+
+  // result to Response
+  function toResponse (resp, request) {
+    var XEPromise = request.$Promise || Promise
+    if (isNativeResponse(resp)) {
+      return request.validateStatus ? resp.text().then(function (text) {
+        return getResponse(text, resp, request)
+      }) : XEPromise.resolve(resp)
+    }
+    return XEPromise.resolve(isResponse(resp) ? resp : getResponse(resp.body, resp, request))
+  }
+
   var handleExports = {
     isResponse: isResponse,
-    // result to Response
-    toResponse: function (resp, request) {
-      if (isResponse(resp)) {
-        return resp
-      }
-      var reqBody = resp.body
-      var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
-      if (utils.IS_A) {
-        reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
-      } else {
-        reqBody = getStringifyBody(reqBody)
-      }
-      return new XEResponse(reqBody, options, request)
-    }
+    toResponse: toResponse
   }
 
   /**
@@ -828,11 +838,13 @@
   // 处理响应头
   function parseXHRHeaders (xhr) {
     var headers = {}
-    var allResponseHeaders = utils.trim(xhr.getAllResponseHeaders())
-    utils.arrayEach(allResponseHeaders.split('\n'), function (row) {
-      var index = row.indexOf(':')
-      headers[utils.trim(row.slice(0, index))] = utils.trim(row.slice(index + 1))
-    })
+    var headerList = utils.trim(xhr.getAllResponseHeaders()).split('\n')
+    var len = headerList.length
+    for (var row, rowIndex, index = 0; index < len; index++) {
+      row = headerList[index]
+      rowIndex = row.indexOf(':')
+      headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
+    }
     return headers
   }
 
@@ -867,7 +879,7 @@
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
         clearTimeoutFn(timer)
-        finish(handleExports.toResponse(resp, request))
+        handleExports.toResponse(resp, request).then(finish)
       })['catch'](function (e) {
         clearTimeoutFn(timer)
         failed()
@@ -922,7 +934,7 @@
     }
     if (utils.isFn(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
-        finish(handleExports.toResponse({ status: 200, body: resp }, request))
+        handleExports.toResponse({ status: 200, body: resp }, request).then(finish)
       })['catch'](function () {
         failed()
       })

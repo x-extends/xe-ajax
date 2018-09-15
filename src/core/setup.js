@@ -12,9 +12,6 @@ var setupDefaults = {
   bodyType: 'json-data',
   headers: {
     'Accept': 'application/json, text/plain, */*'
-  },
-  validateStatus: function (response) {
-    return response.status >= 200 && response.status < 300
   }
 }
 

@@ -186,6 +186,9 @@ XEAjax.setup({
   headers: {
     'Accept': 'application/json, text/plain, \*/\*;'
   },
+  validateStatus (response) {
+    return response.status >= 200 && response.status < 300
+  },
   transformParams (params, request) {
     // 用于在请求发送之前改变URL参数
     if (request.method === 'GET') {
@@ -211,10 +214,10 @@ XEAjax.setup({
 
 ## 示例
 
-### 完整调用
+### 基本使用
 
 ```JavaScript
-import XEAjax from 'xe-ajax'
+const XEAjax = require('xe-ajax')
 
 let options = {
   url: '/api/user/list',
@@ -571,6 +574,8 @@ XEAjax.interceptors.request.use((request, next) => {
 
 ### Response 拦截器
 
+拦截器可以对请求之前和请求之后的任何参数以及数据做处理，注意要调用next执行下一步，否则将停止执行。
+
 XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
 
 ```JavaScript
@@ -620,29 +625,26 @@ XEAjax.interceptors.response.use((response, next) => {
 
 ## 混合函数
 
-### ./customs.js
+### ./ajax.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-const cacheMap = {}
-export function getOnce () {
-  if (cacheMap[url]) {
-    return cacheMap[url]
-  }
-  return cacheMap[url] = XEAjax.fetchGet.apply(this, arguments)
-}
+export function fn1 () {}
+export function fn2 () {}
+// ...
 ```
 
 ### ./main.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
-import customs from './customs'
+import ajaxFns from './ajax'
 
-XEAjax.mixin(customs)
+XEAjax.mixin(ajaxFns)
 
-XEAjax.getOnce('/api/static/data')
+XEAjax.fn1()
+XEAjax.fn2()
 ```
 
 ## 项目

@@ -4,10 +4,15 @@ var utils = require('../core/utils')
 var XEReadableStream = require('./readableStream')
 var XEHeaders = require('./headers')
 
+function validateStatus (response) {
+  return response.status >= 200 && response.status < 300
+}
+
 function XEResponse (body, options, request) {
   this._body = body
   this._request = request
   var status = options.status
+  var validStatus = request.validateStatus || validateStatus
   var _response = this._response = {
     body: new XEReadableStream(body, request, this),
     bodyUsed: false,
@@ -19,10 +24,10 @@ function XEResponse (body, options, request) {
     type: 'basic'
   }
   if (utils.IS_DEF) {
-    _response.ok = request.validateStatus(this)
+    _response.ok = validStatus(this)
   } else {
     utils.assign(this, _response)
-    this.ok = request.validateStatus(this)
+    this.ok = validStatus(this)
   }
 }
 

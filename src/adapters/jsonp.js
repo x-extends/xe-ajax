@@ -22,7 +22,7 @@ function sendJSONP (request, finish, failed) {
   }
   if (utils.isFn(request.$jsonp)) {
     return request.$jsonp(script, request).then(function (resp) {
-      finish(handleExports.toResponse({status: 200, body: resp}, request))
+      handleExports.toResponse({status: 200, body: resp}, request).then(finish)
     })['catch'](function () {
       failed()
     })

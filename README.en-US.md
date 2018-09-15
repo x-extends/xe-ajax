@@ -175,6 +175,9 @@ XEAjax.setup({
   headers: {
     'Accept': 'application/json, text/plain, \*/\*;'
   },
+  validateStatus (response) {
+    return response.status >= 200 && response.status < 300
+  },
   transformParams (params, request) {
     if (request.method === 'GET') {
       params.queryDate = params.queryDate.getTime()
@@ -199,7 +202,7 @@ XEAjax.setup({
 ### ajax
 
 ```JavaScript
-import XEAjax from 'xe-ajax'
+const XEAjax = require('xe-ajax')
 
 let options = {
   url: '/api/user/list',
@@ -464,6 +467,7 @@ XEAjax.getJSON('/api/user/info')
 
 | Name | Type | Description |
 |------|------|-----|
+| autoCompute | Boolean | Whether to automatically calculate |
 | value | Number | Current progress % |
 | loaded | Object | Transmitted size {value, size, unit} |
 | total | Object | Total size {value, size, unit} |
@@ -610,34 +614,31 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## Functions of mixing
+## mixing
 
-### ./customs.js
+### ./ajax.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-const cacheMap = {}
-export function getOnce () {
-  if (cacheMap[url]) {
-    return cacheMap[url]
-  }
-  return cacheMap[url] = XEAjax.fetchGet.apply(this, arguments)
-}
+export function fn1 () {}
+export function fn2 () {}
+// ...
 ```
 
 ### ./main.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
-import customs from './customs'
+import ajaxFns from './ajax'
 
-XEAjax.mixin(customs)
+XEAjax.mixin(ajaxFns)
 
-XEAjax.getOnce('/api/user/message')
+XEAjax.fn1()
+XEAjax.fn2()
 ```
 
-## Project Demos
+## Demos
 
 [project examples.](https://github.com/xuliangzhan/examples)
 
