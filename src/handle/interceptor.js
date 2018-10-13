@@ -3,9 +3,6 @@
 var utils = require('../core/utils')
 var handleExports = require('../handle')
 
-/**
- * interceptor queue
- */
 var reqQueue = {resolves: [], rejects: []}
 var respQueue = {resolves: [], rejects: []}
 
@@ -23,7 +20,7 @@ function useInterceptors (queue) {
 }
 
 /**
- * request interceptor
+ * Request 拦截器
  */
 function requests (request) {
   var XEPromise = request.$Promise || Promise
@@ -41,7 +38,7 @@ function requests (request) {
 }
 
 /**
- * response interceptor
+ * Response 拦截器
  */
 function responseInterceptor (calls, request, response) {
   var XEPromise = request.$Promise || Promise
@@ -67,7 +64,7 @@ var interceptors = {
   }
 }
 
-// default interceptor
+// 默认拦截器
 interceptors.request.use(function (request, next) {
   var reqHeaders = request.headers
   var reqBody = request.body

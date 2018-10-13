@@ -2,6 +2,11 @@
 
 var utils = require('../core/utils')
 
+/**
+ * 进度条
+ *
+ * @param {Object} options 参数
+ */
 function XEProgress (options) {
   Object.assign(this, {
     autoCompute: true,

@@ -13,6 +13,11 @@ function getSignalIndex (item) {
   return -1
 }
 
+/**
+ * 取消控制器
+ *
+ * @param {XERequest} request XERequest 对象
+ */
 XEAbortSignalPolyfill.prototype.install = function (request) {
   var reqSignal = request.signal
   if (reqSignal) {
@@ -29,7 +34,6 @@ function XEAbortControllerPolyfill () {
   this.signal = new XEAbortSignalPolyfill()
 }
 
-// Abort Request
 XEAbortControllerPolyfill.prototype.abort = function () {
   var index = getSignalIndex(this.signal)
   if (index > -1) {

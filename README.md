@@ -187,7 +187,10 @@ XEAjax.setup({
     'Accept': 'application/json, text/plain, \*/\*;'
   },
   validateStatus (response) {
-    // 如何需要实现复杂的场景判断，请使用拦截器
+    // 注：如何需要实现复杂的场景判断，请使用拦截器
+    //
+    // 如果是 fetch 函数，则会将状态赋值给 ok 属性
+    // 如果 do* 和 *JSON 函数，如果状态返回 false 则会进入 catch
     return response.status >= 200 && response.status < 300
   },
   transformParams (params, request) {
@@ -199,6 +202,7 @@ XEAjax.setup({
   },
   paramsSerializer (params, request) {
     // 自定义URL序列化函数,最终拼接在url
+    // 执行顺序 transformParams > paramsSerializer
     return XEUtils.serialize(params)
   }，
   transformBody (body, request) {
@@ -208,6 +212,7 @@ XEAjax.setup({
   },
   stringifyBody (body, request) {
     // 自定义格式化提交数据函数
+    // 执行顺序 transformBody > stringifyBody
     return JSON.stringify(body)
   }
 })

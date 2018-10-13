@@ -26,7 +26,7 @@ function getResponse (reqBody, resp, request) {
   return new XEResponse(reqBody, options, request)
 }
 
-// result to Response
+// 将请求结果转为 Respone 对象
 function toResponse (resp, request) {
   var XEPromise = request.$Promise || Promise
   if (isNativeResponse(resp)) {

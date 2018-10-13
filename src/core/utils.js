@@ -109,7 +109,7 @@ var utils = {
 
   objectEach: objectEach,
 
-  // Serialize Body
+  // Serialize body
   serialize: function (body) {
     var params = []
     objectEach(body, function (item, key) {

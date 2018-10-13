@@ -17,7 +17,7 @@ var errorType = {
 }
 
 /**
-  * 支持: nodejs和浏览器 fetch
+  * 支持: nodejs、browser
   *
   * @param { Object} options
   * @return { Promise }
@@ -44,14 +44,14 @@ XEAjax.Progress = XEProgress
 XEAjax.AbortController = XEAbortController
 
 /**
- * installation
+ * Installation
  */
 XEAjax.use = function (plugin) {
   plugin.install(XEAjax)
 }
 
 /**
- * options
+ * 参数说明
  *
  * 基础参数
  * @param { String } url 请求地址
@@ -61,7 +61,6 @@ XEAjax.use = function (plugin) {
  * @param { Object } body 提交参数
  * @param { String } bodyType 提交参数方式可以设置json-data,form-data(json-data)
  * @param { String } jsonp 调用jsonp服务,回调属性默认callback
- * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
  * @param { Number } timeout 设置超时
  * @param { Object } headers 请求头
  * @param { Function } transformParams(params, request) 用于改变URL参数
@@ -69,7 +68,8 @@ XEAjax.use = function (plugin) {
  * @param { Function } transformBody(body, request) 用于改变提交数据
  * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
  * @param { Function } validateStatus(response) 自定义校验请求是否成功
- * 只有在原生支持 fetch 的环境下才有效
+ * 只有在支持 fetch 的环境下才有效
+ * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
  * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
  * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
  * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url

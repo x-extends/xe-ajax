@@ -19,7 +19,7 @@ function responseHeaders (response) {
   return result
 }
 
-// To fetch response
+// To fetch Response
 function requestToFetchResponse (method) {
   return function () {
     return XEAjax(method.apply(this, arguments))
@@ -60,12 +60,12 @@ function createResponseSchema (method, isRespSchema) {
   }
 }
 
-// To response
+// To Response
 function requestToResponse (method) {
   return createResponseSchema(method, true)
 }
 
-// To json
+// To JSON
 function requestToJSON (method) {
   return createResponseSchema(method)
 }
