@@ -131,7 +131,7 @@ import XEAjax from 'xe-ajax'
 | * **integrity** | String | 包括请求的subresource integrity值 |  |
 | jsonp | String | jsonp入参属性名 | 'callback' |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
-| timeout | Number | 设置超时 |  |
+| timeout | Number | 设置请求超时 |  |
 | headers | Object | 请求头 |  |
 | transformParams | Function (params,request) | 用于改变URL参数 |  |
 | paramsSerializer | Function (params,request) | 自定义URL序列化函数 |  |
@@ -302,21 +302,21 @@ XEAjax.fetch('/api/user/list')
     })
   })
 
-// 使用 application/json 方式提交，默认使用 JSON.stringify 序列化数据
+// 使用 "application/json" 方式提交，默认使用 JSON.stringify 序列化数据
 let body1 = {
   name: 'u111',
   password: '123456'
 }
 XEAjax.fetchPost('/api/user/save', body1, {bodyType: 'json-data'})
 
-// 使用 application/x-www-form-urlencoded 方式提交，默认使用 XEAjax.serialize 序列化数据
+// 使用 "application/x-www-form-urlencoded" 方式提交，默认使用 XEAjax.serialize 序列化数据
 let body2 = {
   name: 'u222',
   password: '123456'
 }
 XEAjax.fetchPost('/api/user/save', body2, {bodyType: 'form-data'})
 
-// 模拟表单 multipart/form-data 提交
+// 模拟表单 "multipart/form-data" 提交
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)

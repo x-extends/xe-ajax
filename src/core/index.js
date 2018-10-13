@@ -19,7 +19,7 @@ function responseHeaders (response) {
   return result
 }
 
-// to fetch response
+// To fetch response
 function requestToFetchResponse (method) {
   return function () {
     return XEAjax(method.apply(this, arguments))
@@ -44,7 +44,6 @@ function createResponseSchema (method, isRespSchema) {
     }).then(function (response) {
       return new XEPromise(function (resolve, reject) {
         var finish = response.ok ? resolve : reject
-        // response.text() 解决兼容 Safari 10.1 及 Webkit 部分版本
         response.text().then(function (data) {
           try {
             return JSON.parse(data)
@@ -61,17 +60,17 @@ function createResponseSchema (method, isRespSchema) {
   }
 }
 
-// to response
+// To response
 function requestToResponse (method) {
   return createResponseSchema(method, true)
 }
 
-// to json
+// To json
 function requestToJSON (method) {
   return createResponseSchema(method)
 }
 
-// Promise.all
+// 和 Promise.all 类似，支持传对象参数
 function doAll (iterable) {
   var XEPromise = XEAjax.$Promise || Promise
   var context = XEAjax.$context
@@ -141,7 +140,7 @@ var ajaxExports = {
 }
 
 /**
- * functions of mixing
+ * 混合函数
  *
  * @param {Object} methods
  */

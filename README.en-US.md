@@ -9,7 +9,7 @@ The asynchronous fetch function based on [Promise API](https://developer.mozilla
 
 ## Browser Support
 
-xe-ajax depends on a native Promise implementation to be supported. If your environment doesn't support Promises, you can babel-polyfill or bluebird.js.
+xe-ajax Depends on a native Promise implementation to be supported. If your environment doesn't support Promises, you can babel-polyfill or bluebird.js.
 
 ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_7-8/internet-explorer_7-8_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png)
 --- | --- | --- | --- | --- | --- |
@@ -95,9 +95,9 @@ import XEAjax from 'xe-ajax'
 
 ### Arguments
 
-* **url** is the url to fetch
-* **params/body** the data to be sent.
-* **options** is an optional options object
+* **url** Is the url to fetch
+* **params/body** The data to be sent.
+* **options** Is an optional options object
 
 ### Options
 
@@ -105,29 +105,29 @@ import XEAjax from 'xe-ajax'
 
 | Name | Type | Description | default value |
 |------|------|-----|----|
-| url | String | is the url to fetch |  |
-| baseURL | String | base URL | context path |
-| method | String | request method | 'GET' |
-| params | Object | request params |  |
-| body | Object | request body |  |
-| bodyType | String | submit type, You can set: json-data,form-data | 'json-data' |
+| url | String | Fetch URL |  |
+| baseURL | String | Base URL | context path |
+| method | String | Request method | 'GET' |
+| params | Object | Request params |  |
+| body | Object | Request body. |  |
+| bodyType | String | Submit type, You can set: json-data,form-data | 'json-data' |
 | mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | 'cors' |
-| cache | String | handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
-| credentials | String | set the cookie to be sent along with the request, You can set: omit,same-origin,include | 'same-origin' |
+| cache | String | Handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
+| credentials | String | Set the cookie to be sent along with the request, You can set: omit,same-origin,include | 'same-origin' |
 | redirect | String | The redirect mode to use, You can set: follow,error,manual | 'follow' |
 | * **referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
 | * **referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
-| * **keepalive** | String | The keepalive option can be used to allow the request to outlive the page |  |
-| * **integrity** | String | Contains the subresource integrity value of the request |  |
-| jsonp | String | set jsonp callback parameter name | 'callback' |
-| jsonpCallback | String | set jsonp callback function name | default is a random number with json_xeajax_ prefix |
-| timeout | Number | set a timeout in ms |  |
-| headers | Object | optional header fields | {'Accept': 'application/json, text/plain, */*'} |
-| transformParams | Function (params,request) | change the URL parameter before sending the request. |  |
-| paramsSerializer | Function (params,request) | the custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
-| transformBody | Function (body,request) | change the commit body before sending the request. |  |
-| stringifyBody | Function (body,request) | customize the body stringify function. | JSON.stringify |
-| validateStatus | Function (response) | verify that the request is successful. | response.status >= 200 && response.status < 300 |
+| * **keepalive** | String | The keepalive option can be used to allow the request to outlive the page. |  |
+| * **integrity** | String | Contains the subresource integrity value of the request. |  |
+| jsonp | String | set jsonp Callback parameter name. | 'callback' |
+| jsonpCallback | String | Set jsonp callback function name. | Default is a random number with json_xeajax_ prefix |
+| timeout | Number | Setting the request timeout. |  |
+| headers | Object | Optional header fields. | {'Accept': 'application/json, text/plain, */*'} |
+| transformParams | Function (params,request) | Change the URL parameter before sending the request. |  |
+| paramsSerializer | Function (params,request) | The custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
+| transformBody | Function (body,request) | Change the commit body before sending the request. |  |
+| stringifyBody | Function (body,request) | Customize the body stringify function. | JSON.stringify |
+| validateStatus | Function (response) | Verify that the request is successful. | response.status >= 200 && response.status < 300 |
 
 ### Headers
 
@@ -163,7 +163,7 @@ import XEAjax from 'xe-ajax'
 | arrayBuffer | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with an ArrayBuffer. |
 | formData | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a FormData object. |
 
-## Default global settings
+## Default Global Settings
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -285,27 +285,27 @@ XEAjax.fetch('/api/user/list')
     })
   })
 
-// Submit application/json, default uses JSON.stringify(request.body)
+// Submit 'application/json', default uses JSON.stringify(request.body)
 let body1 = {
   name: 'u111',
   password: '123456'
 }
 XEAjax.fetchPost('/api/user/save', body1, {bodyType: 'json-data'})
 
-// Submit application/x-www-form-urlencoded, default uses XEAjax.serialize(request.body)
+// Submit 'application/x-www-form-urlencoded', default uses XEAjax.serialize(request.body)
 let body2 = {
   name: 'u222',
   password: '123456'
 }
 XEAjax.fetchPost('/api/user/save', body2, {bodyType: 'form-data'})
 
-// Submit multipart/form-data
+// Submit 'multipart/form-data'
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/user/save', formBody)
 
-// Submit body and query params
+// Submit body and query params.
 XEAjax.fetchPost('/api/user/save', {name: 'u333',password: '123456'}, {params: {id: 111}})
 
 XEAjax.fetchGet('/api/user/list')
@@ -319,7 +319,7 @@ XEAjax.fetchDelete('/api/user/delete/111')
 import XEAjax from 'xe-ajax'
 
 // The response for a request contains the following information.
-// result => {data, status, statusText, headers}
+// Result => {data, status, statusText, headers}
 
 // The completion or failure is based on state check.
 XEAjax.doGet('/api/user/list').then(result => {
@@ -394,7 +394,7 @@ XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {json
   })
 ```
 
-### Multiple requests
+### Multiple Requests
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -416,7 +416,7 @@ iterable2.push({url: '/api/user/save', body: {name: 'n1'}}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 
-### Nested requests
+### Nested Requests
 
 ```JavaScript
 import { fetchGet, doGet, getJSON } from 'xe-ajax'
@@ -446,20 +446,18 @@ getJSON('/api/user/info')
 
 ## Upload/Download (v3.4.9+)
 
-### 参数
-
 | Name | Type | Description |
 |------|------|-----|
 | onUploadProgress | Function (event) | Upload progress |
 | onDownloadProgress | Function (event) | Download progress |
-| meanSpeed | Number | Default 0 off,Set the rate to equalization mode and calculate the average rate every millisecond |
+| meanSpeed | Number | Default 0 off,Set the rate to equalization mode and calculate the average rate every millisecond. |
 | fixed | Number | default 2 |
 
 ### Progress
 
 | Name | Type | Description |
 |------|------|-----|
-| autoCompute | Boolean | Whether to automatically calculate |
+| autoCompute | Boolean | Whether to automatically calculate. |
 | value | Number | Current progress % |
 | loaded | Object | Transmitted size {value, size, unit} |
 | total | Object | Total size {value, size, unit} |
@@ -481,9 +479,8 @@ XEAjax.postJSON('/api/upload', formBody)
 
 
 // Upload
-// create a Progress.
+// Create a Progress.
 let progress = new XEAjax.Progress()
-// listener upload
 progress.onUploadProgress = evnt => {
   console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
 }
@@ -500,9 +497,8 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 
 
 // Download
-// create Progress object.
+// Create Progress object.
 let progress = new XEAjax.Progress()
-// listener load
 progress.onDownloadProgress = evnt => {
   console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
 }
@@ -549,7 +545,7 @@ XEAjax.interceptors.request.use((request, next) => {
   // Can be used for unified permission intercept, set request header, Token authentication, parameters, etc.
 
   // Set params
-  // request.params.version = Date.now()
+  // Request.params.version = Date.now()
 
   // Set Token validation to prevent XSRF/CSRF attacks.
   request.headers.set('X-Token', cookie('x-id'))
@@ -573,7 +569,7 @@ XEAjax.interceptors.response.use((response, next) => {
   // Example: check login failover.
   if (response.status === 403) {
     router.replace({path: '/login'})
-    // break up
+    // Break up
   } else {
     // Call next(), execute the next interceptor.
     next()

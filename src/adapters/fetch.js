@@ -12,7 +12,8 @@ var handleExports = require('../handle')
  * @param { Function } failed
  */
 function sendFetch (request, finish, failed) {
-  var timer = ''
+  var timer = null
+  var isTimeout = false
   var $fetch = request.$fetch || self.fetch
   var reqTimeout = request.timeout
   var options = {
@@ -28,6 +29,7 @@ function sendFetch (request, finish, failed) {
   })
   if (reqTimeout) {
     timer = setTimeout(function () {
+      isTimeout = true
       failed('ERR_T')
     }, reqTimeout)
   }
@@ -35,11 +37,15 @@ function sendFetch (request, finish, failed) {
     failed('ERR_A')
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
-      clearTimeoutFn(timer)
-      handleExports.toResponse(resp, request).then(finish)
+      if (!isTimeout) {
+        clearTimeoutFn(timer)
+        handleExports.toResponse(resp, request).then(finish)
+      }
     })['catch'](function (e) {
-      clearTimeoutFn(timer)
-      failed()
+      if (!isTimeout) {
+        clearTimeoutFn(timer)
+        failed()
+      }
     })
   }
 }

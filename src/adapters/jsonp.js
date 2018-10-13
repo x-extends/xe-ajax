@@ -14,8 +14,11 @@ var $dom = $global ? $global.document : ''
  * @param { Function } failed
  */
 function sendJSONP (request, finish, failed) {
+  var timer = null
+  var isTimeout = false
   var reqTimeout = request.timeout
   var jsonpCallback = request.jsonpCallback
+  var clearTimeoutFn = clearTimeout
   var script = request.script = $dom.createElement('script')
   if (!jsonpCallback) {
     jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
@@ -29,17 +32,24 @@ function sendJSONP (request, finish, failed) {
   } else {
     var url = request.getUrl()
     $global[jsonpCallback] = function (body) {
-      jsonpClear(request, jsonpCallback)
-      finish({status: 200, body: body})
+      if (!isTimeout) {
+        clearTimeoutFn(timer)
+        jsonpClear(request, jsonpCallback)
+        finish({status: 200, body: body})
+      }
     }
     script.type = 'text/javascript'
     script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + jsonpCallback
     script.onerror = function () {
-      jsonpClear(request, jsonpCallback)
-      finish()
+      if (!isTimeout) {
+        clearTimeoutFn(timer)
+        jsonpClear(request, jsonpCallback)
+        finish()
+      }
     }
     if (reqTimeout) {
-      setTimeout(function () {
+      timer = setTimeout(function () {
+        isTimeout = true
         jsonpClear(request, jsonpCallback)
         finish('ERR_T')
       }, reqTimeout)

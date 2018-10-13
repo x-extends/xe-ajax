@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.9
+ * xe-ajax.js v3.4.10
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -855,7 +855,8 @@
    * @param { Function } failed
    */
   function sendFetch (request, finish, failed) {
-    var timer = ''
+    var timer = null
+    var isTimeout = false
     var $fetch = request.$fetch || self.fetch
     var reqTimeout = request.timeout
     var options = {
@@ -871,6 +872,7 @@
     })
     if (reqTimeout) {
       timer = setTimeout(function () {
+        isTimeout = true
         failed('ERR_T')
       }, reqTimeout)
     }
@@ -878,11 +880,15 @@
       failed('ERR_A')
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
-        clearTimeoutFn(timer)
-        handleExports.toResponse(resp, request).then(finish)
+        if (!isTimeout) {
+          clearTimeoutFn(timer)
+          handleExports.toResponse(resp, request).then(finish)
+        }
       })['catch'](function (e) {
-        clearTimeoutFn(timer)
-        failed()
+        if (!isTimeout) {
+          clearTimeoutFn(timer)
+          failed()
+        }
       })
     }
   }
@@ -926,8 +932,11 @@
    * @param { Function } failed
    */
   function sendJSONP (request, finish, failed) {
+    var timer = null
+    var isTimeout = false
     var reqTimeout = request.timeout
     var jsonpCallback = request.jsonpCallback
+    var clearTimeoutFn = clearTimeout
     var script = request.script = $dom.createElement('script')
     if (!jsonpCallback) {
       jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
@@ -941,17 +950,24 @@
     } else {
       var url = request.getUrl()
       $global[jsonpCallback] = function (body) {
-        jsonpClear(request, jsonpCallback)
-        finish({ status: 200, body: body })
+        if (!isTimeout) {
+          clearTimeoutFn(timer)
+          jsonpClear(request, jsonpCallback)
+          finish({ status: 200, body: body })
+        }
       }
       script.type = 'text/javascript'
       script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + request.jsonp + '=' + jsonpCallback
       script.onerror = function () {
-        jsonpClear(request, jsonpCallback)
-        finish()
+        if (!isTimeout) {
+          clearTimeoutFn(timer)
+          jsonpClear(request, jsonpCallback)
+          finish()
+        }
       }
       if (reqTimeout) {
-        setTimeout(function () {
+        timer = setTimeout(function () {
+          isTimeout = true
           jsonpClear(request, jsonpCallback)
           finish('ERR_T')
         }, reqTimeout)
@@ -1001,7 +1017,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.9'
+  XEAjax.version = '3.4.10'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.Progress = XEProgress
@@ -1067,7 +1083,7 @@
     return result
   }
 
-  // to fetch response
+  // To fetch response
   function requestToFetchResponse (method) {
     return function () {
       return XEAjax(method.apply(this, arguments))
@@ -1092,7 +1108,6 @@
       }).then(function (response) {
         return new XEPromise(function (resolve, reject) {
           var finish = response.ok ? resolve : reject
-          // response.text() 解决兼容 Safari 10.1 及 Webkit 部分版本
           response.text().then(function (data) {
             try {
               return JSON.parse(data)
@@ -1109,17 +1124,17 @@
     }
   }
 
-  // to response
+  // To response
   function requestToResponse (method) {
     return createResponseSchema(method, true)
   }
 
-  // to json
+  // To json
   function requestToJSON (method) {
     return createResponseSchema(method)
   }
 
-  // Promise.all
+  // 和 Promise.all 类似，支持传对象参数
   function doAll (iterable) {
     var XEPromise = XEAjax.$Promise || Promise
     var context = XEAjax.$context
@@ -1189,7 +1204,7 @@
   }
 
   /**
-   * functions of mixing
+   * 混合函数
    *
    * @param {Object} methods
    */
