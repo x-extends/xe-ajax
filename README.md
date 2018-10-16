@@ -179,7 +179,7 @@ import XEAjax from 'xe-ajax'
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  baseURL: 'http://xuliangzhan.com',
+  baseURL: 'https://xuliangzhan.com',
   bodyType: 'json-data',
   credentials: 'include',
   log: false,
@@ -226,7 +226,7 @@ XEAjax.setup({
 const XEAjax = require('xe-ajax')
 
 XEAjax.ajax({
-  url: '/api/user/list',
+  url: '/api/test/message/list',
   method: 'GET',
   params: {
     id: 1
@@ -250,7 +250,7 @@ XEAjax.ajax({
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-XEAjax.fetch('/api/user/list', {
+XEAjax.fetch('/api/test/message/save', {
   method: 'POST',
   body: {
     name: 'test'
@@ -268,7 +268,7 @@ XEAjax.fetch('/api/user/list', {
   })
 
 // Response Text
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.text().then(text => {
       // text
@@ -276,7 +276,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response JSON
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.json().then(data => {
       // data
@@ -284,7 +284,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response Blob
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.blob().then(blob => {
       // blob
@@ -292,7 +292,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response ArrayBuffer
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.arrayBuffer().then(arrayBuffer => {
       // arrayBuffer
@@ -300,7 +300,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response FormData
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.formData().then(formData => {
       // formData
@@ -310,29 +310,29 @@ XEAjax.fetch('/api/user/list')
 // 使用 "application/json" 方式提交，默认使用 JSON.stringify 序列化数据
 let body1 = {
   name: 'u111',
-  password: '123456'
+  content: '123456'
 }
-XEAjax.fetchPost('/api/user/save', body1, {bodyType: 'json-data'})
+XEAjax.fetchPost('/api/test/message/save', body1, {bodyType: 'json-data'})
 
 // 使用 "application/x-www-form-urlencoded" 方式提交，默认使用 XEAjax.serialize 序列化数据
 let body2 = {
   name: 'u222',
-  password: '123456'
+  content: '123456'
 }
-XEAjax.fetchPost('/api/user/save', body2, {bodyType: 'form-data'})
+XEAjax.fetchPost('/api/test/message/save', body2, {bodyType: 'form-data'})
 
 // 模拟表单 "multipart/form-data" 提交
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
-XEAjax.fetchPost('/api/user/save', formBody)
+XEAjax.fetchPost('/api/test/message/save', formBody)
 
 // 查询参数和数据同时提交
-XEAjax.fetchPost('/api/user/save', {name: 'u333',password: '123456'}, {params: {id: 111}})
+XEAjax.fetchPost('/api/test/message/save', {name: 'u333', content: '123456'}, {params: {id: 111}})
 
-XEAjax.fetchGet('/api/user/list')
-XEAjax.fetchPut('/api/user/update', {name: 'u222'})
-XEAjax.fetchDelete('/api/user/delete/111')
+XEAjax.fetchGet('/api/test/message/list')
+XEAjax.fetchPut('/api/test/message/update', {name: 'u222'})
+XEAjax.fetchDelete('/api/test/message/delete/1')
 ```
 
 ### 根据请求状态码（成功或失败），返回结果为 Response 数据的 Peomise 对象 (v3.4.0+)
@@ -344,16 +344,16 @@ import XEAjax from 'xe-ajax'
 // result => {data, status, statusText, headers}
 
 // 根据 validateStatus 状态校验判断完成还是失败
-XEAjax.doGet('/api/user/list').then(result => {
+XEAjax.doGet('/api/test/message/list').then(result => {
   // 请求成功 result.data
 }).catch(result => {
   // 请求失败
 })
 
-XEAjax.doGet('/api/user/list/15/1')
-XEAjax.doPost('/api/user/save', {name: 'u111'})
-XEAjax.doPut('/api/user/update', {name: 'u222'})
-XEAjax.doDelete('/api/user/delete/111')
+XEAjax.doGet('/api/test/message/list/15/1')
+XEAjax.doPost('/api/test/message/save', {name: 'u111'})
+XEAjax.doPut('/api/test/message/update', {name: 'u222'})
+XEAjax.doDelete('/api/test/message/delete/1')
 ```
 
 ### 根据请求状态码（成功或失败），返回结果为 json 数据的 Peomise 对象
@@ -362,16 +362,16 @@ XEAjax.doDelete('/api/user/delete/111')
 import XEAjax from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败,直接可以获取响应结果
-XEAjax.getJSON('/api/user/list').then(data => {
+XEAjax.getJSON('/api/test/message/list').then(data => {
   // 请求成功 data
 }).catch(data => {
   // 请求失败
 })
 
-XEAjax.getJSON('/api/user/list/15/1')
-XEAjax.postJSON('/api/user/save', {name: 'u111'})
-XEAjax.putJSON('/api/user/update', {name: 'u222'})
-XEAjax.deleteJSON('/api/user/delete/111')
+XEAjax.getJSON('/api/test/message/list/15/1')
+XEAjax.postJSON('/api/test/message/save', {name: 'u111'})
+XEAjax.putJSON('/api/test/message/update', {name: 'u222'})
+XEAjax.deleteJSON('/api/test/message/delete/1')
 ```
 
 ### jsonp 调用
@@ -380,9 +380,9 @@ XEAjax.deleteJSON('/api/user/delete/111')
 import XEAjax from 'xe-ajax'
 
 // 例子1
-// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
-// 服务端返回结果: jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
+// 请求路径: https://xuliangzhan.com/jsonp/test/message/list?callback=jsonp_xeajax_1521272815608_1
+// 服务端返回结果: jsonp_xeajax_1521272815608_1([...])
+XEAjax.fetchJsonp('/jsonp/test/message/list')
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -392,17 +392,17 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
   })
 
 // 例子2
-// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
-// 服务端返回结果: jsonp_xeajax_1521272815608_2({message: 'success'})
-XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
+// 请求路径: https://xuliangzhan.com/jsonp/test/message/list?cb=jsonp_xeajax_1521272815608_2
+// 服务端返回结果: jsonp_xeajax_1521272815608_2([...])
+XEAjax.doJsonp('/jsonp/test/message/list', null, {jsonp: 'cb'})
   .then(response => {
     // response.data
   })
 
 // 例子3
-// 请求路径: http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func
-// 服务端返回结果: func({message: 'success'})
-XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
+// 请求路径: https://xuliangzhan.com/jsonp/test/message/list/page/10/1?id=222&cb=func
+// 服务端返回结果: func({page: {...}, result: [...])
+XEAjax.jsonp('/jsonp/test/message/list/page/10/1', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
   .then(data => {
     // data
   })
@@ -414,9 +414,9 @@ XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {json
 import XEAjax from 'xe-ajax'
 
 let iterable1 = []
-iterable1.push(XEAjax.fetchGet('/api/user/list'))
-iterable1.push(XEAjax.doGet('/api/user/list'))
-iterable1.push(XEAjax.postJSON('/api/user/save'), {name: 'n1'})
+iterable1.push(XEAjax.fetchGet('/api/test/message/list'))
+iterable1.push(XEAjax.doGet('/api/test/message/list'))
+iterable1.push(XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
 Promise.all(iterable1).then(datas => {
   // 所有异步完成之后执行
 }).catch(e => {
@@ -425,8 +425,8 @@ Promise.all(iterable1).then(datas => {
 
 // doAll 使用对象参数, 用法和 Promise.all 一致
 let iterable2 = []
-iterable2.push({url: '/api/user/list'})
-iterable2.push({url: '/api/user/save', body: {name: 'n1'}}, method: 'POST'})
+iterable2.push({url: '/api/test/message/list'})
+iterable2.push({url: '/api/test/message/save', body: {name: 'n1'}}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 
@@ -436,9 +436,9 @@ XEAjax.doAll(iterable2)
 import { fetchGet, doGet, getJSON } from 'xe-ajax'
 
 // 相互依赖的嵌套请求
-fetchGet('/api/user/info')
+fetchGet('/api/test/message/info', {id: 3})
   .then(response => response.json())
-  .then(data => fetchGet('/api/user/details', {id: data.id}))
+  .then(data => fetchGet(`/api/test/message/delete/${data.id}`))
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -446,13 +446,13 @@ fetchGet('/api/user/info')
       })
     }
   })
-doGet('/api/user/info')
-  .then(result => doGet('/api/user/details', {id: result.data.id}))
+doGet('/api/test/message/info', {id: 3})
+  .then(result => doGet(`/api/test/message/delete/${result.data.id}`))
   .then(result => {
     // result.data
   })
-getJSON('/api/user/info')
-  .then(data => getJSON('/api/user/details', {id: data.id}))
+getJSON('/api/test/message/info', {id: 3})
+  .then(data => getJSON(`/api/test/message/delete/${data.id}`))
   .then(data => {
     // data
   })
@@ -538,7 +538,7 @@ let controller = new XEAjax.AbortController()
 // 获取signal
 let signal = controller.signal
 // 给请求加入控制器 signal
-XEAjax.fetchGet('/api/user/list', {id: 1}, {signal})
+XEAjax.fetchGet('/api/test/message/list', {id: 1}, {signal})
   .then(response => {
     // 请求成功
   }).catch(e => {

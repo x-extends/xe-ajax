@@ -169,7 +169,7 @@ import XEAjax from 'xe-ajax'
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  baseURL: 'http://xuliangzhan.com',
+  baseURL: 'https://xuliangzhan.com',
   bodyType: 'json-data',
   credentials: 'include',
   headers: {
@@ -205,7 +205,7 @@ XEAjax.setup({
 const XEAjax = require('xe-ajax')
 
 XEAjax.ajax({
-  url: '/api/user/list',
+  url: '/api/test/message/list',
   method: 'GET',
   params: {
     id: 1
@@ -228,7 +228,7 @@ XEAjax.ajax({
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-XEAjax.fetch('/api/user/list', {
+XEAjax.fetch('/api/test/message/save', {
   method: 'POST',
   body: {
     name: 'test'
@@ -246,7 +246,7 @@ XEAjax.fetch('/api/user/list', {
   })
 
 // Response Text
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.text().then(text => {
       // text
@@ -254,7 +254,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response JSON
-XEAjax.fetchGet('/api/user/list')
+XEAjax.fetchGet('/api/test/message/list')
   .then(response => {
     response.json().then(data => {
       // data
@@ -262,7 +262,7 @@ XEAjax.fetchGet('/api/user/list')
   })
 
 // Response Blob
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.blob().then(blob => {
       // blob
@@ -270,7 +270,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response ArrayBuffer
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.arrayBuffer().then(arrayBuffer => {
       // arrayBuffer
@@ -278,7 +278,7 @@ XEAjax.fetch('/api/user/list')
   })
 
 // Response FormData
-XEAjax.fetch('/api/user/list')
+XEAjax.fetch('/api/test/message/list')
   .then(response => {
     response.formData().then(formData => {
       // formData
@@ -290,27 +290,27 @@ let body1 = {
   name: 'u111',
   password: '123456'
 }
-XEAjax.fetchPost('/api/user/save', body1, {bodyType: 'json-data'})
+XEAjax.fetchPost('/api/test/message/save', body1, {bodyType: 'json-data'})
 
 // Submit 'application/x-www-form-urlencoded', default uses XEAjax.serialize(request.body)
 let body2 = {
   name: 'u222',
   password: '123456'
 }
-XEAjax.fetchPost('/api/user/save', body2, {bodyType: 'form-data'})
+XEAjax.fetchPost('/api/test/message/save', body2, {bodyType: 'form-data'})
 
 // Submit 'multipart/form-data'
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
-XEAjax.fetchPost('/api/user/save', formBody)
+XEAjax.fetchPost('/api/test/message/save', formBody)
 
 // Submit body and query params.
-XEAjax.fetchPost('/api/user/save', {name: 'u333',password: '123456'}, {params: {id: 111}})
+XEAjax.fetchPost('/api/test/message/save', {name: 'u333',password: '123456'}, {params: {id: 111}})
 
-XEAjax.fetchGet('/api/user/list')
-XEAjax.fetchPut('/api/user/update', {name: 'u222'})
-XEAjax.fetchDelete('/api/user/delete/111')
+XEAjax.fetchGet('/api/test/message/list')
+XEAjax.fetchPut('/api/test/message/update', {name: 'u222'})
+XEAjax.fetchDelete('/api/test/message/delete/1')
 ```
 
 ### fetch to Response Schema (v3.4.0+)
@@ -322,16 +322,16 @@ import XEAjax from 'xe-ajax'
 // Result => {data, status, statusText, headers}
 
 // The completion or failure is based on state check.
-XEAjax.doGet('/api/user/list').then(result => {
+XEAjax.doGet('/api/test/message/list').then(result => {
   // success result.data
 }).catch(result => {
   // failed
 })
 
-XEAjax.doGet('/api/user/list/15/1')
-XEAjax.doPost('/api/user/save', {name: 'u111'})
-XEAjax.doPut('/api/user/update', {name: 'u222'})
-XEAjax.doDelete('/api/user/delete/111')
+XEAjax.doGet('/api/test/message/list/15/1')
+XEAjax.doPost('/api/test/message/save', {name: 'u111'})
+XEAjax.doPut('/api/test/message/update', {name: 'u222'})
+XEAjax.doDelete('/api/test/message/delete/1')
 ```
 
 ### fetch to JSON
@@ -340,24 +340,24 @@ XEAjax.doDelete('/api/user/delete/111')
 import XEAjax from 'xe-ajax'
 
 // The completion or failure is based on state check.
-XEAjax.getJSON('/api/user/list').then(data => {
+XEAjax.getJSON('/api/test/message/list').then(data => {
   // success
 }).catch(data => {
   // failed
 })
 
-XEAjax.getJSON('/api/user/list/15/1').then(({page, result}) => {
+XEAjax.getJSON('/api/test/message/list/15/1').then(({page, result}) => {
   // success
 })
 
-XEAjax.postJSON('/api/user/save', {name: 'test'})
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-XEAjax.postJSON('/api/user/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+XEAjax.postJSON('/api/test/message/save', {name: 'test'})
+XEAjax.postJSON('/api/test/message/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+XEAjax.postJSON('/api/test/message/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
-XEAjax.postJSON('/api/user/save', formBody)
+XEAjax.postJSON('/api/test/message/save', formBody)
 ```
 
 ### jsonp
@@ -368,7 +368,7 @@ import XEAjax from 'xe-ajax'
 // Case 1:
 // http://xuliangzhan.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
-XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
+XEAjax.fetchJsonp('/api/jsonp/public/message')
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -380,7 +380,7 @@ XEAjax.fetchJsonp('http://xuliangzhan.com/api/jsonp/public/message')
 // Case 2:
 // http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
 // jsonp_xeajax_1521272815608_2({message: 'success'})
-XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 'cb'})
+XEAjax.doJsonp('/api/jsonp/public/message', null, {jsonp: 'cb'})
   .then(response => {
     // response.data
   })
@@ -388,7 +388,7 @@ XEAjax.doJsonp('http://xuliangzhan.com/api/jsonp/public/message', null, {jsonp: 
 // Case 3:
 // http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func
 // func({message: 'success'})
-XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
+XEAjax.jsonp('/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
   .then(data => {
     // data
   })
@@ -400,9 +400,9 @@ XEAjax.jsonp('http://xuliangzhan.com/api/jsonp/public/message', {id: 222}, {json
 import XEAjax from 'xe-ajax'
 
 let iterable1 = []
-iterable1.push(XEAjax.fetchGet('/api/user/list'))
-iterable1.push(XEAjax.doGet('/api/user/list'))
-iterable1.push(XEAjax.postJSON('/api/user/save'), {name: 'n1'})
+iterable1.push(XEAjax.fetchGet('/api/test/message/list'))
+iterable1.push(XEAjax.doGet('/api/test/message/list'))
+iterable1.push(XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
 Promise.all(iterable1).then(datas => {
   // all finish
 }).catch(e => {
@@ -411,8 +411,8 @@ Promise.all(iterable1).then(datas => {
 
 // doAll Use object parameters, The use is consistent with that of Promise.
 let iterable2 = []
-iterable2.push({url: '/api/user/list'})
-iterable2.push({url: '/api/user/save', body: {name: 'n1'}}, method: 'POST'})
+iterable2.push({url: '/api/test/message/list'})
+iterable2.push({url: '/api/test/message/save', body: {name: 'n1'}}, method: 'POST'})
 XEAjax.doAll(iterable2)
 ```
 
@@ -422,9 +422,9 @@ XEAjax.doAll(iterable2)
 import { fetchGet, doGet, getJSON } from 'xe-ajax'
 
 // This should be avoided in the project.
-fetchGet('/api/user/info')
+fetchGet('/api/test/message/info', {id: 3})
   .then(response => response.json())
-  .then(data => fetchGet('/api/user/details', {id: data.id}))
+  .then(data => fetchGet(`/api/test/message/delete/${data.id}`))
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -432,13 +432,13 @@ fetchGet('/api/user/info')
       })
     }
   })
-doGet('/api/user/info')
-  .then(result => doGet('/api/user/details', {id: result.data.id}))
+doGet('/api/test/message/info', {id: 3})
+  .then(result => doGet(`/api/test/message/delete/${result.data.id}`))
   .then(result => {
     // result.data
   })
-getJSON('/api/user/info')
-  .then(data => getJSON('/api/user/details', {id: data.id}))
+getJSON('/api/test/message/info', {id: 3})
+  .then(data => getJSON(`/api/test/message/delete/${data.id}`))
   .then(data => {
     // data
   })
@@ -520,7 +520,7 @@ let controller = new XEAjax.AbortController()
 // let controller = new AbortController()
 let signal = controller.signal
 // Associate the signal and controller with the fetch request.
-XEAjax.fetchGet('/api/user/list', {id: 1}, {signal})
+XEAjax.fetchGet('/api/test/message/list', {id: 1}, {signal})
   .then(response => {
     // finish
   }).catch(function (e) {
