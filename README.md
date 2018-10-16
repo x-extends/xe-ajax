@@ -624,7 +624,9 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## 混合函数
+## 扩展函数
+
+允许用您自己的实用函数扩展到XEAjax
 
 ### ./ajax.js
 
