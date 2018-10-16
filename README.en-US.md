@@ -53,12 +53,10 @@ npm install xe-ajax --save
 
 ```JavaScript
 const XEAjax = require('xe-ajax')
-```
 
-### ES6 Module import
-
-```JavaScript
-import XEAjax from 'xe-ajax'
+XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then(({page, result}) => {
+  // success
+})
 ```
 
 ## API
