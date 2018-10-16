@@ -55,7 +55,7 @@ npm install xe-ajax --save
 const XEAjax = require('xe-ajax')
 
 XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then(({page, result}) => {
-  // success
+  console.log(result)
 })
 ```
 
