@@ -328,7 +328,7 @@ XEAjax.doGet('/api/test/message/list').then(result => {
   // failed
 })
 
-XEAjax.doGet('/api/test/message/list/15/1')
+XEAjax.doGet('/api/test/message/list/page/15/1')
 XEAjax.doPost('/api/test/message/save', {name: 'u111'})
 XEAjax.doPut('/api/test/message/update', {name: 'u222'})
 XEAjax.doDelete('/api/test/message/delete/1')
@@ -346,7 +346,7 @@ XEAjax.getJSON('/api/test/message/list').then(data => {
   // failed
 })
 
-XEAjax.getJSON('/api/test/message/list/15/1').then(({page, result}) => {
+XEAjax.getJSON('/api/test/message/list/page/15/1').then(({page, result}) => {
   // success
 })
 

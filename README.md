@@ -350,7 +350,7 @@ XEAjax.doGet('/api/test/message/list').then(result => {
   // 请求失败
 })
 
-XEAjax.doGet('/api/test/message/list/15/1')
+XEAjax.doGet('/api/test/message/list/page/15/1')
 XEAjax.doPost('/api/test/message/save', {name: 'u111'})
 XEAjax.doPut('/api/test/message/update', {name: 'u222'})
 XEAjax.doDelete('/api/test/message/delete/1')
@@ -368,7 +368,7 @@ XEAjax.getJSON('/api/test/message/list').then(data => {
   // 请求失败
 })
 
-XEAjax.getJSON('/api/test/message/list/15/1')
+XEAjax.getJSON('/api/test/message/list/page/15/1')
 XEAjax.postJSON('/api/test/message/save', {name: 'u111'})
 XEAjax.putJSON('/api/test/message/update', {name: 'u222'})
 XEAjax.deleteJSON('/api/test/message/delete/1')
