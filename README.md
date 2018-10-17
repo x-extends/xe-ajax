@@ -411,21 +411,36 @@ XEAjax.jsonp('/jsonp/test/message/list/page/10/1', {id: 222}, {jsonp: 'cb',jsonp
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-let iterable1 = []
-iterable1.push(XEAjax.fetchGet('/api/test/message/list'))
-iterable1.push(XEAjax.doGet('/api/test/message/list'))
-iterable1.push(XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
-Promise.all(iterable1).then(datas => {
+// 并发多个
+Promise.all([
+  XEAjax.fetchGet('/api/test/message/list'),
+  XEAjax.doGet('/api/test/message/list'),
+  XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
+]).then(datas => {
   // 所有异步完成之后执行
 }).catch(e => {
-  // 请求失败时执行
+  // 发生异常
+})
+
+// 竞速，哪个先请求完成执行哪个
+Promise.race([
+  XEAjax.getJSON('/api/test/message/list'),
+  XEAjax.getJSON('/api/test/message/list')
+]).then(datas => {
+  // 任意一个请求完成后执行
+}).catch(e => {
+  // 发生异常
 })
 
 // doAll 使用对象参数, 用法和 Promise.all 一致
 let iterable2 = []
 iterable2.push({url: '/api/test/message/list'})
 iterable2.push({url: '/api/test/message/save', body: {name: 'n1'}}, method: 'POST'})
-XEAjax.doAll(iterable2)
+XEAjax.doAll(iterable2).then(datas => {
+  // 所有异步完成之后执行
+}).catch(e => {
+  // 发生异常
+})
 ```
 
 ### 嵌套请求

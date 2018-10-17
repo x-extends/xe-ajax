@@ -397,12 +397,21 @@ XEAjax.jsonp('/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback:
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-let iterable1 = []
-iterable1.push(XEAjax.fetchGet('/api/test/message/list'))
-iterable1.push(XEAjax.doGet('/api/test/message/list'))
-iterable1.push(XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
-Promise.all(iterable1).then(datas => {
+Promise.all([
+  XEAjax.fetchGet('/api/test/message/list'),
+  XEAjax.doGet('/api/test/message/list'),
+  XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
+]).then(datas => {
   // all finish
+}).catch(e => {
+  // error
+})
+
+Promise.race([
+  XEAjax.getJSON('/api/test/message/list'),
+  XEAjax.getJSON('/api/test/message/list')
+]).then(datas => {
+  // finish
 }).catch(e => {
   // error
 })
@@ -411,7 +420,11 @@ Promise.all(iterable1).then(datas => {
 let iterable2 = []
 iterable2.push({url: '/api/test/message/list'})
 iterable2.push({url: '/api/test/message/save', body: {name: 'n1'}}, method: 'POST'})
-XEAjax.doAll(iterable2)
+XEAjax.doAll(iterable2).then(datas => {
+  // all finish
+}).catch(e => {
+  // error
+})
 ```
 
 ### Nested Requests
