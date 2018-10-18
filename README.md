@@ -663,10 +663,6 @@ XEAjax.fn1()
 XEAjax.fn2()
 ```
 
-## 项目
-
-[项目示例](https://github.com/xuliangzhan/examples)  
-
 ## License
 
 Copyright (c) 2017-present, Xu Liangzhan

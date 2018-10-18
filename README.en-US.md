@@ -637,10 +637,6 @@ XEAjax.fn1()
 XEAjax.fn2()
 ```
 
-## Demos
-
-[project examples.](https://github.com/xuliangzhan/examples)
-
 ## License
 
 Copyright (c) 2017-present, Xu Liangzhan
