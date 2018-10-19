@@ -455,6 +455,21 @@ getJSON('/api/test/message/info', {id: 3})
   })
 ```
 
+## Promises, async/await
+
+```JavaScript
+import { getJSON } from 'xe-ajax'
+
+async function init() {
+  let list = await getJSON('/api/test/message/list')
+  let data = await getJSON('/api/test/message/info', {id: list[0].id})
+  console.log(list)
+  console.log(data)
+}
+
+init()
+```
+
 ## Upload/Download (v3.4.9+)
 
 | Name | Type | Description |

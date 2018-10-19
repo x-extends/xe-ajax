@@ -471,6 +471,21 @@ getJSON('/api/test/message/info', {id: 3})
   })
 ```
 
+## 使用 async/await 处理异步
+
+```JavaScript
+import { getJSON } from 'xe-ajax'
+
+async function init() {
+  let list = await getJSON('/api/test/message/list')
+  let data = await getJSON('/api/test/message/info', {id: list[0].id})
+  console.log(list)
+  console.log(data)
+}
+
+init()
+```
+
 ## 上传/下载 (v3.4.9+)
 
 ### 参数
