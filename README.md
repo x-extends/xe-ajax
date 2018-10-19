@@ -76,30 +76,30 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 * doAll ( iterable )
 * ajax ( options )
 * ~
-* fetch ( url, options )
-* fetchHead ( url, options )
-* fetchDelete ( url, options )
-* fetchJsonp ( url, params, options )
-* fetchGet ( url, params, options )
-* fetchPost ( url, body, options )
-* fetchPut ( url, body, options )
-* fetchPatch ( url, body, options )
+* fetch ( url[, options] )
+* fetchHead ( url[, options] )
+* fetchDelete ( url[, options] )
+* fetchJsonp ( url[, params, options] )
+* fetchGet ( url[, params, options] )
+* fetchPost ( url[, body, options] )
+* fetchPut ( url[, body, options] )
+* fetchPatch ( url[, body, options] )
 * ~
-* doHead ( url, options )
-* doDelete ( url, options )
-* doJsonp ( url, params, options )
-* doGet ( url, params, options )
-* doPost ( url, body, options )
-* doPut ( url, body, options )
-* doPatch ( url, body, options )
+* doHead ( url[, options] )
+* doDelete ( url[, options] )
+* doJsonp ( url[, params, options] )
+* doGet ( url[, params, options] )
+* doPost ( url[, body, options] )
+* doPut ( url[, body, options] )
+* doPatch ( url[, body, options] )
 * ~
-* headJSON ( url, options )
-* deleteJSON ( url, options )
-* jsonp ( url, params, options )
-* getJSON ( url, params, options )
-* postJSON ( url, body, options )
-* putJSON ( url, body, options )
-* patchJSON ( url, body, options )
+* headJSON ( url[, options] )
+* deleteJSON ( url[, options] )
+* jsonp ( url[, params, options] )
+* getJSON ( url[, params, options] )
+* postJSON ( url[, body, options] )
+* putJSON ( url[, body, options] )
+* patchJSON ( url[, body, options] )
 
 ### 入参
 
@@ -116,9 +116,9 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 | url | String | 请求地址 |  |
 | baseURL | String | 基础路径 | 默认上下文路径 |
 | method | String | 请求方法 | 'GET' |
-| params | Object/Array | 请求参数 |  |
-| body | Object/Array | 提交参数 |  |
-| bodyType | String | 提交参数方式，可以设置json-data,form-data | 'json-data' |
+| params | Object | 请求查询参数内容 |  |
+| body | Object | 提交主体内容 |  |
+| bodyType | String | 提交主体内容方式，可以设置json-data,form-data | 'json-data' |
 | mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 'cors' |
 | cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 'same-origin' |
@@ -130,12 +130,12 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 | jsonp | String | jsonp入参属性名 | 'callback' |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置请求超时 |  |
-| headers | Object | 请求头 |  |
+| headers | Object | 请求头包含信息 |  |
 | transformParams | Function (params,request) | 用于改变URL参数 |  |
 | paramsSerializer | Function (params,request) | 自定义URL序列化函数 |  |
 | transformBody | Function (body,request) | 用于改变提交数据 |  |
 | stringifyBody | Function (body,request) | 自定义转换提交数据的函数 |  |
-| validateStatus | Function (response) | 自定义校验请求是否成功 | response.status >= 200 && response.status < 300 |
+| validateStatus | Function (response) | 自定义校验请求是否成功 | 默认200-299 |
 
 ### Headers
 
@@ -155,21 +155,21 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 | 属性 | 类型 | 描述 |
 |------|------|-----|
-| body | ReadableStream | 数据流 |
-| bodyUsed | Boolean | 内容是否已被读取 |
-| headers | Headers | 响应头 |
-| status | Number | 状态码 |
-| statusText | String | 状态信息 |
-| url | String | 返回请求路径 |
-| ok | Boolean | 请求完成还是失败 |
-| redirected | Boolean | 是否重定向了 |
-| type | String | 类型 |
-| clone | Function | 返回一个新的 Response 对象 |
-| json | Function | 获取 json 数据 |
-| test | Function | 获取 text 数据 |
-| blob | Function | 获取 Blob 对象 |
-| arrayBuffer | Function | 获取 ArrayBuffer 对象 |
-| formData | Function | 获取 FormData 对象 |
+| body | ReadableStream | 返回一个只读的数据流 |
+| bodyUsed | Boolean | 返回一个只读的布尔值，表示内容是否已被读取 |
+| headers | Headers | 返回一个只读的响应头对象 |
+| status | Number | 返回一个只读的响应状态码 |
+| statusText | String | 返回一个只读的与状态码相对应的状态消息 |
+| url | String | 返回一个只读的请求路径 |
+| ok | Boolean | 返回一个只读的布尔值，表示响应是否成功 |
+| redirected | Boolean | 返回一个只读的布尔值，表示响应是否为重定向请求的结果 |
+| type | String | 返回一个只读的响应的类型 |
+| clone | Function | 复制一个新的 Response 对象 |
+| json | Function | 返回一个内容为 JSON 的 Promise 对象 |
+| test | Function |返回一个内容为 Test 的 Promise 对象 |
+| blob | Function | 返回一个内容为 Blob 的 Promise 对象 |
+| arrayBuffer | Function | 返回一个内容为 ArrayBuffer 的 Promise 对象 |
+| formData | Function | 返回一个内容为 FormData 的 Promise 对象 |
 
 ## 全局参数设置
 
@@ -584,7 +584,7 @@ setTimeout(() => {
 
 ### Request 拦截器
 
-XEAjax.interceptors.request.use(Function([request, next]))
+XEAjax.interceptors.request.use(Function(request, next))
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -605,7 +605,16 @@ XEAjax.interceptors.request.use((request, next) => {
 
 ### Response 拦截器
 
-XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
+XEAjax.interceptors.response.use(Function(response, next[, request]), Function(response, next))
+
+next( [, newResponse] )
+
+| 属性 | 类型 | 描述 |
+|------|------|-----|
+| status | Number | 设置响应的状态码 |
+| statusText | String | 设置与状态码对应的状态消息 |
+| body | Object | 设置响应主体内容 |
+| headers | Headers、Object | 设置响应的头信息 |
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -618,28 +627,21 @@ XEAjax.interceptors.response.use((response, next) => {
   if (response.status === 403) {
     router.replace({path: '/login'})
   } else {
-    // 调用 next(),继续执行下一个拦截器
     next()
   }
-}, (e, next) => {
-  // 请求发生错误
-  // 调用 next(),继续执行下一个拦截器
-  next()
 })
 
 // 请求完成之后重置响应数据
 XEAjax.interceptors.response.use((response, next) => {
-  // 对所有请求返回统一的数据结构
-  // 格式: {status: 200, statusText: 'OK', body: {}, headers: {}}
-
   // 例如，对所有请求结果进行处理，返回统一的结构
   response.json().then(data => {
+    let { status, statusText, headers } = response
     let body = {
-      status: response.status === 200 ? 'success' : 'error',
+      message: status === 200 ? 'success' : 'error',
       result: data
     }
     // 重置响应数据并继续执行下一个拦截器
-    next({status: response.status, body: body})
+    next({status, statusText, headers, body})
   })
 }, (e, next) => {
   // 对所有请求错误返回统一的数据结构
@@ -648,7 +650,7 @@ XEAjax.interceptors.response.use((response, next) => {
     result: null
   }
   // 重置响应数据并继续执行下一个拦截器
-  next({status: 200, body: body})
+  next({status: 200, body})
 })
 ```
 

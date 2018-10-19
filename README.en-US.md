@@ -93,9 +93,9 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### Arguments
 
-* **url** Is the url to fetch
-* **params/body** The data to be sent.
-* **options** Is an optional options object
+* **url** Request interface contains the URL of the request.
+* **params/body** The params/body contents to be sent.
+* **options** Is an optional options object.
 
 ### Options
 
@@ -103,11 +103,11 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 | Name | Type | Description | default value |
 |------|------|-----|----|
-| url | String | Fetch URL |  |
-| baseURL | String | Base URL | context path |
-| method | String | Request method | 'GET' |
-| params | Object | Request params |  |
-| body | Object | Request body. |  |
+| url | String | Request interface contains the URL of the request. |  |
+| baseURL | String | Request base URL | Context path |
+| method | String | The method read-only property of the Request interface contains the request's method | 'GET' |
+| params | Object | Request the params contents. |  |
+| body | Object | Request the body contents. |  |
 | bodyType | String | Submit type, You can set: json-data,form-data | 'json-data' |
 | mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | 'cors' |
 | cache | String | Handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
@@ -125,7 +125,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 | paramsSerializer | Function (params,request) | The custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
 | transformBody | Function (body,request) | Change the commit body before sending the request. |  |
 | stringifyBody | Function (body,request) | Customize the body stringify function. | JSON.stringify |
-| validateStatus | Function (response) | Verify that the request is successful. | response.status >= 200 && response.status < 300 |
+| validateStatus | Function (response) | Verify that the request is successful. | 200-299 |
 
 ### Headers
 
@@ -145,15 +145,15 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 | Name | Type | Description |
 |------|------|-----|
-| body | ReadableStream | A simple getter used to expose a ReadableStream of the body contents. |
-| bodyUsed | Boolean | Stores a Boolean that declares whether the body has been used in a response yet. |
-| headers | Headers | Contains the Headers object associated with the response. |
-| status | Number | HTTP status code |
-| statusText | String | Contains the status message corresponding to the status code |
-| url | String | Contains the URL of the response. |
-| ok | Boolean | Contains a boolean stating whether the response was successful (status in the range 200-299) or not. |
-| redirected | Boolean | Indicates whether or not the response is the result of a redirect; that is, its URL list has more than one entry. |
-| type | String | Contains the type of the response |
+| body | ReadableStream | The body read-only property of the Body mixin is a simple getter used to expose a ReadableStream of the body contents. |
+| bodyUsed | Boolean | The bodyUsed read-only property of the Body mixin contains a Boolean that indicates whether the body has been read yet. |
+| headers | Headers | The headers read-only property of the Response interface contains the Headers object associated with the response. |
+| status | Number | The status read-only property of the Response interface contains the status code of the response. |
+| statusText | String | The statusText read-only property of the Response interface contains the status message corresponding to the status code. |
+| url | String | The url read-only property of the Response interface contains the URL of the response. The value of the url property will be the final URL obtained after any redirects.  |
+| ok | Boolean | The ok read-only property of the Response interface contains a Boolean stating whether the response was successful. |
+| redirected | Boolean | The read-only redirected property of the Response interface indicates whether or not the response is the result of a request you made which was redirected. |
+| type | String | The type read-only property of the Response interface contains the type of the response. |
 | clone | Function | Creates a clone of a Response object. |
 | json | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with the result of parsing the body text as JSON. |
 | test | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a USVString (text). |
@@ -561,7 +561,7 @@ setTimeout(() => {
 
 ### Request interceptor
 
-XEAjax.interceptors.request.use(Function([request, next]))
+XEAjax.interceptors.request.use(Function(request, next))
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -583,7 +583,16 @@ XEAjax.interceptors.request.use((request, next) => {
 
 ### Response interceptor
 
-XEAjax.interceptors.response.use(Function([response, next, request]), Function([response, next]))
+XEAjax.interceptors.response.use(Function(response, next[, request]), Function(response, next))
+
+next( [, newResponse] )
+
+| Name | Type | Description |
+|------|------|-----|
+| status | Number | Setting the status code of the response. |
+| statusText | String | Setting the status message corresponding to the status code. |
+| body | Object | Setting the body contents. |
+| headers | Headers、Object | Setting the Headers object associated with the response. |
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -600,22 +609,18 @@ XEAjax.interceptors.response.use((response, next) => {
     // Call next(), execute the next interceptor.
     next()
   }
-}, (e, next) => {
-  // failed
-  // Call next(), execute the next interceptor.
-  next()
 })
 
 // Intercept and reset the response data after the request is complete.
-// Format: {status: 200, statusText: 'OK', body: {}, headers: {}}
 XEAjax.interceptors.response.use((response, next) => {
   response.json().then(data => {
+    let { status, statusText, headers } = response
     let body = {
-      message: response.status === 200 ? 'success' : 'error',
+      message: status === 200 ? 'success' : 'error',
       result: data
     }
     // Reset the response data and continue with the next interceptor.
-    next({status: 200, body: body})
+    next({status, statusText, headers, body})
   })
 }, (e, next) => {
   // Turn all the exception errors to finish.
@@ -624,7 +629,7 @@ XEAjax.interceptors.response.use((response, next) => {
     result: null
   }
   // Reset the response data and continue with the next interceptor.
-  next({status: 200, body: body})
+  next({status: 200, body})
 })
 ```
 
