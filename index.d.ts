@@ -1,4 +1,4 @@
-export interface XEAjaxRequestOptions {
+export interface XEAjaxRequest<T> {
   url?: string;
   baseURL?: string;
   method?: string;
@@ -24,7 +24,7 @@ export interface XEAjaxRequestOptions {
   validateStatus?: (response: Response) => boolean;
 }
 
-export interface XEAjaxResponse<T> {
+export interface XEAjaxResponseSchema<T> {
   data: any;
   status: number;
   statusText: string;
@@ -42,7 +42,7 @@ export interface XEProgress<T> {
   loaded: number;
 }
 
-export interface XEAjaxRequestInterceptors {
+export interface XERequestInterceptors {
   /**
    * 使用
    * @param resolve 请求发送之前执行
@@ -55,13 +55,13 @@ export interface XEAjaxRequestInterceptors {
    */
   use(
     resolve: (
-      request: XEAjaxRequestOptions,
+      request: XEAjaxRequest<any>,
       next: () => void
     ) => void
   );
 }
 
-export interface XEAjaxResponseInterceptors {
+export interface XEResponseInterceptors {
   /**
    * 使用
    * @param onRejected 请求完成之后执行
@@ -96,7 +96,7 @@ export interface XEAjaxResponseInterceptors {
     onRejected: (
       response: Response,
       next: (resp?: object) => void,
-      request?: XEAjaxRequestOptions
+      request?: XEAjaxRequest<any>
     ) => void,
     onRejectd: (
       error: TypeError,
@@ -139,7 +139,7 @@ export interface XEAjaxMethods {
     })
     ```
    */
-  setup: (options: XEAjaxRequestOptions) => void;
+  setup: (options: XEAjaxRequest<any>) => void;
 
   /**
    * 允许用您自己的实用函数扩展到 XEAjax
@@ -187,11 +187,11 @@ export interface XEAjaxMethods {
     /**
      * 请求之前拦截器
      */
-    request: XEAjaxRequestInterceptors;
+    request: XERequestInterceptors;
     /**
      * 响应之后拦截器
      */
-    response: XEAjaxResponseInterceptors;
+    response: XEResponseInterceptors;
   };
 
   /**
@@ -248,7 +248,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  ajax(options: XEAjaxRequestOptions): Promise<Response>;
+  ajax(options: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * doAll 使用对象参数, 用法和 Promise.all 一致
@@ -284,7 +284,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  fetchJsonp(url: string, params?: any, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchJsonp(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 GET 请求，返回一个结果为 Response 的 Promise 对象
@@ -301,7 +301,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  fetchGet(url: string, params?: any, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchGet(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 POST 请求，返回一个结果为 Response 的 Promise 对象
@@ -331,7 +331,7 @@ export interface XEAjaxMethods {
     XEAjax.fetchPost('/api/test/message/save', formBody)
     ```
    */
-  fetchPost(url: string, body?: any, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchPost(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 PUT 请求，返回一个结果为 Response 的 Promise 对象
@@ -353,7 +353,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  fetchPut(url: string, body?: any, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchPut(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 DELETE 请求，返回一个结果为 Response 的 Promise 对象
@@ -369,21 +369,21 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  fetchDelete(url: string, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchDelete(url: string, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 PATCH 请求，返回一个结果为 Response 的 Promise 对象
    * @param url 请求地址
    * @param options 可选参数
    */
-  fetchPatch(url: string, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchPatch(url: string, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 HEAD 请求，返回一个结果为 Response 的 Promise 对象
    * @param url 请求地址
    * @param options 可选参数
    */
-  fetchHead(url: string, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetchHead(url: string, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送请求，返回一个结果为 Response 的 Promise 对象
@@ -399,7 +399,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  fetch(url: string, options?: XEAjaxRequestOptions): Promise<Response>;
+  fetch(url: string, options?: XEAjaxRequest<any>): Promise<Response>;
 
   /**
    * 发送 Jsonp 请求，返回一个包含响应信息的 Peomise 对象
@@ -417,7 +417,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  doJsonp(url: string, params?: any, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doJsonp(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 GET 请求，返回一个包含响应信息的 Peomise 对象
@@ -435,7 +435,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  doGet(url: string, params?: any, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doGet(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 POST 请求，返回一个包含响应信息的 Peomise 对象
@@ -466,7 +466,7 @@ export interface XEAjaxMethods {
     XEAjax.doPost('/api/test/message/save', formBody)
     ```
    */
-  doPost(url: string, body?: any, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doPost(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 PUT 请求，返回一个包含响应信息的 Peomise 对象
@@ -489,7 +489,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  doPut(url: string, body?: any, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doPut(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 DELETE 请求，返回一个包含响应信息的 Peomise 对象
@@ -506,7 +506,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  doDelete(url: string, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doDelete(url: string, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 PATCH 请求，返回一个包含响应信息的 Peomise 对象
@@ -514,7 +514,7 @@ export interface XEAjaxMethods {
    * @param options 可选参数
    * @since 3.4.0
    */
-  doPatch(url: string, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doPatch(url: string, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 HEAD 请求，返回一个包含响应信息的 Peomise 对象
@@ -522,7 +522,7 @@ export interface XEAjaxMethods {
    * @param options 可选参数
    * @since 3.4.0
    */
-  doHead(url: string, options?: XEAjaxRequestOptions): Promise<XEAjaxResponse<any>>;
+  doHead(url: string, options?: XEAjaxRequest<any>): Promise<XEAjaxResponseSchema<any>>;
 
   /**
    * 发送 Jsonp 请求，返回响应结果为 JSON 的 Peomise 对象
@@ -539,7 +539,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  jsonp(url: string, params?: any, options?: XEAjaxRequestOptions): Promise<any>;
+  jsonp(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<any>;
 
   /**
    * 发送 GET 请求，返回响应结果为 JSON 的 Peomise 对象
@@ -556,7 +556,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  getJSON(url: string, params?: any, options?: XEAjaxRequestOptions): Promise<any>;
+  getJSON(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<any>;
 
   /**
    * 发送 POST 请求，返回响应结果为 JSON 的 Peomise 对象
@@ -586,7 +586,7 @@ export interface XEAjaxMethods {
     XEAjax.postJSON('/api/test/message/save', formBody)
     ```
    */
-  postJSON(url: string, body?: any, options?: XEAjaxRequestOptions): Promise<any>;
+  postJSON(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<any>;
 
   /**
    * 发送 PUT 请求，返回响应结果为 JSON 的 Peomise 对象
@@ -608,7 +608,7 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  putJSON(url: string, body?: any, options?: XEAjaxRequestOptions): Promise<any>;
+  putJSON(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<any>;
 
   /**
    * 发送 DELETE 请求，返回响应结果为 JSON 的 Peomise 对象
@@ -624,21 +624,21 @@ export interface XEAjaxMethods {
       })
     ```
    */
-  deleteJSON(url: string, options?: XEAjaxRequestOptions): Promise<any>;
+  deleteJSON(url: string, options?: XEAjaxRequest<any>): Promise<any>;
 
   /**
    * 发送 PATCH 请求，返回响应结果为 JSON 的 Peomise 对象
    * @param url 请求地址
    * @param options 可选参数
    */
-  patchJSON(url: string, options?: XEAjaxRequestOptions): Promise<any>;
+  patchJSON(url: string, options?: XEAjaxRequest<any>): Promise<any>;
 
   /**
    * 发送 HEAD 请求，返回响应结果为 JSON 的 Peomise 对象
    * @param url 请求地址
    * @param options 可选参数
    */
-  headJSON(url: string, options?: XEAjaxRequestOptions): Promise<any>;
+  headJSON(url: string, options?: XEAjaxRequest<any>): Promise<any>;
 }
 
 /**
