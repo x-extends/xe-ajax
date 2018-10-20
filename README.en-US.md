@@ -611,7 +611,7 @@ XEAjax.interceptors.response.use((response, next) => {
   }
 })
 
-// Intercept and reset the response data after the request is complete.
+// Intercept and change the response data after the request is complete.
 XEAjax.interceptors.response.use((response, next) => {
   response.json().then(data => {
     let { status, statusText, headers } = response
@@ -619,7 +619,7 @@ XEAjax.interceptors.response.use((response, next) => {
       message: status === 200 ? 'success' : 'error',
       result: data
     }
-    // Reset the response data and continue with the next interceptor.
+    // Change the response data and continue with the next interceptor.
     next({status, statusText, headers, body})
   })
 }, (e, next) => {
@@ -628,7 +628,7 @@ XEAjax.interceptors.response.use((response, next) => {
     message: 'error',
     result: null
   }
-  // Reset the response data and continue with the next interceptor.
+  // Change the response data and continue with the next interceptor.
   next({status: 200, body})
 })
 ```

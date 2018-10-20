@@ -116,7 +116,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 | url | String | 请求地址 |  |
 | baseURL | String | 基础路径 | 默认上下文路径 |
 | method | String | 请求方法 | 'GET' |
-| params | Object | 请求查询参数内容 |  |
+| params | Object | 表单查询参数 |  |
 | body | Object | 提交主体内容 |  |
 | bodyType | String | 提交主体内容方式，可以设置json-data,form-data | 'json-data' |
 | mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 'cors' |
@@ -180,7 +180,6 @@ XEAjax.setup({
   baseURL: 'https://xuliangzhan.com',
   bodyType: 'json-data',
   credentials: 'include',
-  log: false,
   headers: {
     'Accept': 'application/json, text/plain, \*/\*;'
   },
@@ -201,7 +200,7 @@ XEAjax.setup({
   paramsSerializer (params, request) {
     // 自定义URL序列化函数,最终拼接在url
     // 执行顺序 transformParams > paramsSerializer
-    return XEUtils.serialize(params)
+    return XEAjax.serialize(params)
   }，
   transformBody (body, request) {
     // 用于在请求发送之前改变提交数据
@@ -243,7 +242,7 @@ XEAjax.ajax({
   })
 ```
 
-### fetch 调用，返回一个结果为 Response 对象的 Promise
+### fetch 调用，返回一个结果为 Response 的 Promise 对象
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -333,7 +332,7 @@ XEAjax.fetchPut('/api/test/message/update', {name: 'u222'})
 XEAjax.fetchDelete('/api/test/message/delete/1')
 ```
 
-### 根据请求状态码（成功或失败），返回结果为 Response 数据的 Peomise 对象 (v3.4.0+)
+### 根据请求状态码（成功或失败），返回一个包含响应信息的 Peomise 对象 (v3.4.0+)
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -354,7 +353,7 @@ XEAjax.doPut('/api/test/message/update', {name: 'u222'})
 XEAjax.doDelete('/api/test/message/delete/1')
 ```
 
-### 根据请求状态码（成功或失败），返回结果为 json 数据的 Peomise 对象
+### 根据请求状态码（成功或失败），返回响应结果为 JSON 的 Peomise 对象
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -631,32 +630,32 @@ XEAjax.interceptors.response.use((response, next) => {
   }
 })
 
-// 请求完成之后重置响应数据
+// 请求完成之后改变响应结果
 XEAjax.interceptors.response.use((response, next) => {
-  // 例如，对所有请求结果进行处理，返回统一的结构
+  // 例如，对所有请求结果进行处理，返回统一的数据
   response.json().then(data => {
     let { status, statusText, headers } = response
     let body = {
       message: status === 200 ? 'success' : 'error',
       result: data
     }
-    // 重置响应数据并继续执行下一个拦截器
+    // 改变响应结果并继续执行下一个拦截器
     next({status, statusText, headers, body})
   })
 }, (e, next) => {
-  // 对所有请求错误返回统一的数据结构
+  // 对所有请求错误返回统一的数据
   let body = {
     message: 'error',
     result: null
   }
-  // 重置响应数据并继续执行下一个拦截器
+  // 改变响应结果并继续执行下一个拦截器
   next({status: 200, body})
 })
 ```
 
 ## 扩展函数
 
-允许用您自己的实用函数扩展到XEAjax
+允许用您自己的实用函数扩展到 XEAjax
 
 ### ./ajax.js
 

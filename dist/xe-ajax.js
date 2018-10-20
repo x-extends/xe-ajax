@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.10
+ * xe-ajax.js v3.4.11
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -1023,7 +1023,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.10'
+  XEAjax.version = '3.4.11'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.Progress = XEProgress
