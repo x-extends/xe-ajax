@@ -17,12 +17,9 @@ xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-poly
 
 ## CDN 安装
 
-使用 script 方式安装，XEAjax 会定义为全局变量  
-生产环境请使用 xe-ajax.min.js，更小的压缩版本，可以带来更快的速度体验。
-
 ### cdnjs 获取最新版本
 
-[点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)已发布的所有 npm 包源码
+[点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)
 
 ```JavaScript
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
@@ -30,7 +27,7 @@ xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-poly
 
 ### unpkg 获取最新版本
 
-[点击浏览](https://unpkg.com/xe-ajax/)已发布的所有 npm 包源码
+[点击浏览](https://unpkg.com/xe-ajax/)
 
 ```JavaScript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>

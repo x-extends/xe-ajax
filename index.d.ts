@@ -19,7 +19,7 @@ export interface XEAjaxRequest<T> {
   headers?: Headers | object;
   transformParams?: (params: any) => any;
   paramsSerializer?: (params: any) => string;
-  transformBody?:(body: any) => any;
+  transformBody?: (body: any) => any;
   stringifyBody?: (body: any) => any;
   validateStatus?: (response: Response) => boolean;
 }
@@ -107,7 +107,7 @@ export interface XEResponseInterceptors {
 
 export interface XEAjaxMethods {
   version: string;
-  use: (plugin: (XEAjax: any) => void) => void;
+  use(plugin: (XEAjax: any) => void): void;
 
   /**
    * 设置全局参数
@@ -139,21 +139,13 @@ export interface XEAjaxMethods {
     })
     ```
    */
-  setup: (options: XEAjaxRequest<any>) => void;
+  setup(options: XEAjaxRequest<any>): void;
 
   /**
    * 允许用您自己的实用函数扩展到 XEAjax
    * @param methods 扩展函数集
-   * @example 
-    ```javascript
-    XEAjax.mixin({
-      fn1 () {
-        
-      }
-    })
-    ```
    */
-  mixin: (methods: object) => void;
+  mixin(methods: object): void;
 
   /**
    * 将表单序列化为可以在 Ajax 请求中发送到服务器的查询字符串。
@@ -164,7 +156,7 @@ export interface XEAjaxMethods {
     // 'id=1&name=u2'
     ```
    */
-  serialize: (params: object) => string;
+  serialize(params: object): string;
 
   /**
    * 请求之前、响应之后拦截器
@@ -642,7 +634,16 @@ export interface XEAjaxMethods {
 }
 
 /**
- * 基于 Promise API 的异步请求函数，支持 nodejs、browser 环境。
+ * 基于 Promise API 的异步请求函数，支持 nodejs、browser 环境
+ * @example 
+ ```javascript
+ XEAjax.ajax({url: '/api/test/message/list'})
+  .then(response => {
+    // Success
+  }).catch(e => {
+    // Failure
+  })
+ ```
  */
 declare var XEAjax: XEAjaxMethods;
 
