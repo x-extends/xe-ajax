@@ -61,7 +61,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ## API
 
-### Provides three commonly used convenience functions
+### Base functions
 
 * doAll ( iterable )
 * ajax ( options )
@@ -74,7 +74,9 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 * fetchPost ( url[, body, options] )
 * fetchPut ( url[, body, options] )
 * fetchPatch ( url[, body, options] )
-* ~
+
+### Convenience function
+
 * doHead ( url[, options] )
 * doDelete ( url[, options] )
 * doJsonp ( url[, params, options] )

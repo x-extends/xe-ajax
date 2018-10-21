@@ -68,7 +68,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ## API
 
-### 提供三种常用的便捷函数
+### 基本函数
 
 * doAll ( iterable )
 * ajax ( options )
@@ -81,7 +81,9 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 * fetchPost ( url[, body, options] )
 * fetchPut ( url[, body, options] )
 * fetchPatch ( url[, body, options] )
-* ~
+
+### 便捷函数
+
 * doHead ( url[, options] )
 * doDelete ( url[, options] )
 * doJsonp ( url[, params, options] )

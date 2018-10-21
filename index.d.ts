@@ -477,7 +477,7 @@ export interface XEAjaxMethods {
       .then(result => {
 
       }).catch(e => {
-        
+
       })
     ```
    */
