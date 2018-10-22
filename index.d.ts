@@ -234,9 +234,11 @@ export interface XEAjaxMethods {
         name: 'u2'
       }
     }).then(response => {
-
+      response.json().then(data => {
+          console.log(result.data)
+        })
       }).catch(e => {
-
+        console.log(e)
       })
     ```
    */
@@ -255,7 +257,7 @@ export interface XEAjaxMethods {
     ]).then(datas => {
       // 所有异步完成之后执行
     }).catch(e => {
-
+      console.log(e)
     })
     ```
    */
@@ -270,9 +272,9 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.fetchJsonp('/jsonp/test/message/list')
       .then(response => {
-
-      }).catch(e => {
-
+        response.json().then(data => {
+          console.log(result.data)
+        })
       })
     ```
    */
@@ -287,9 +289,9 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.fetchGet('/api/test/message/list')
       .then(response => {
-
-      }).catch(e => {
-        
+        response.json().then(data => {
+          console.log(result.data)
+        })
       })
     ```
    */
@@ -339,9 +341,9 @@ export interface XEAjaxMethods {
     }
     XEAjax.fetchPut('/api/test/message/update', body)
       .then(response => {
-
-      }).catch(e => {
-        
+        response.json().then(data => {
+          console.log(result.data)
+        })
       })
     ```
    */
@@ -355,9 +357,9 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.fetchDelete('/api/test/message/delete/1')
       .then(response => {
-
-      }).catch(e => {
-        
+        response.json().then(data => {
+          console.log(result.data)
+        })
       })
     ```
    */
@@ -385,9 +387,9 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.fetch('/api/test/message/list')
       .then(response => {
-
-      }).catch(e => {
-        
+        response.json().then(data => {
+          console.log(result.data)
+        })
       })
     ```
    */
@@ -402,10 +404,8 @@ export interface XEAjaxMethods {
    * @example 
     ```javascript
     XEAjax.doJsonp('/jsonp/test/message/list')
-      .then(resp => {
-
-      }).catch(e => {
-
+      .then(result => {
+        console.log(result.data)
       })
     ```
    */
@@ -421,7 +421,7 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.doGet('/api/test/message/list')
       .then(result => {
-
+        console.log(result.data)
       }).catch(e => {
         
       })
@@ -475,7 +475,7 @@ export interface XEAjaxMethods {
     }
     XEAjax.doPut('/api/test/message/update', body)
       .then(result => {
-
+        console.log(result.data)
       }).catch(e => {
 
       })
@@ -492,7 +492,7 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.doDelete('/api/test/message/delete/1')
       .then(result => {
-
+        console.log(result.data)
       }).catch(e => {
         
       })
@@ -525,7 +525,7 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.jsonp('/jsonp/test/message/list')
       .then(data => {
-
+        console.log(data)
       }).catch(e => {
 
       })
@@ -542,7 +542,7 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.getJSON('/api/test/message/list')
       .then(data => {
-
+        console.log(data)
       }).catch(e => {
         
       })
@@ -593,8 +593,8 @@ export interface XEAjaxMethods {
       content: '123456'
     }
     XEAjax.putJSON('/api/test/message/update', body)
-      .then(resp => {
-
+      .then(data => {
+        console.log(data)
       }).catch(e => {
         
       })
@@ -610,7 +610,7 @@ export interface XEAjaxMethods {
     ```javascript
     XEAjax.deleteJSON('/api/test/message/delete/1')
       .then(data => {
-
+        console.log(data)
       }).catch(e => {
         
       })
