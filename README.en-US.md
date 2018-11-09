@@ -158,7 +158,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 | type | String | The type read-only property of the Response interface contains the type of the response. |
 | clone | Function | Creates a clone of a Response object. |
 | json | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with the result of parsing the body text as JSON. |
-| test | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a USVString (text). |
+| text | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a USVString (text). |
 | blob | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a Blob. |
 | arrayBuffer | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with an ArrayBuffer. |
 | formData | Function | Takes a Response stream and reads it to completion. It returns a promise that resolves with a FormData object. |

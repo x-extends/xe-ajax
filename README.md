@@ -165,7 +165,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 | type | String | 返回一个只读的响应的类型 |
 | clone | Function | 复制一个新的 Response 对象 |
 | json | Function | 返回一个内容为 JSON 的 Promise 对象 |
-| test | Function |返回一个内容为 Test 的 Promise 对象 |
+| text | Function |返回一个内容为 Text 的 Promise 对象 |
 | blob | Function | 返回一个内容为 Blob 的 Promise 对象 |
 | arrayBuffer | Function | 返回一个内容为 ArrayBuffer 的 Promise 对象 |
 | formData | Function | 返回一个内容为 FormData 的 Promise 对象 |
