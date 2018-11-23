@@ -667,6 +667,9 @@ export function get (url, options) {
 export function post (url, body, options) {
   return XEAjax.doPost(url, body, options)
 }
+export function put (url, body, options) {
+  return XEAjax.doPut(url, body, options)
+}
 // ...
 ```
 
@@ -680,6 +683,7 @@ XEAjax.mixin(ajaxFns)
 
 XEAjax.get('/api/test/message/list', {params: {id: 123}})
 XEAjax.post('/api/test/message/save', {name: 'test1'})
+XEAjax.put('/api/test/message/update', {id: 123, name: 'test1'})
 ```
 
 ## License
