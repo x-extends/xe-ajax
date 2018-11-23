@@ -661,8 +661,12 @@ XEAjax.interceptors.response.use((response, next) => {
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-export function fn1 () {}
-export function fn2 () {}
+export function get (url, options) {
+  return XEAjax.doGet(url, null, options)
+}
+export function post (url, body, options) {
+  return XEAjax.doPost(url, body, options)
+}
 // ...
 ```
 
@@ -674,8 +678,8 @@ import ajaxFns from './ajax'
 
 XEAjax.mixin(ajaxFns)
 
-XEAjax.fn1()
-XEAjax.fn2()
+XEAjax.get('/api/test/message/list', {params: {id: 123}})
+XEAjax.post('/api/test/message/save', {name: 'test1'})
 ```
 
 ## License
