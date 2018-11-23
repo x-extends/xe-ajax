@@ -37,11 +37,12 @@ function objectEach (obj, iteratee, context) {
   }
 }
 
-function parseParam (resultVal, resultKey, isArr) {
+function stringifyParams (resultVal, resultKey, isArr) {
   var result = []
   objectEach(resultVal, function (item, key) {
-    if (isPlainObject(item) || isArray(item)) {
-      result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
+    var _arr = isArray(item)
+    if (isPlainObject(item) || _arr) {
+      result = result.concat(stringifyParams(item, resultKey + '[' + key + ']', _arr))
     } else {
       result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item === null ? '' : item))
     }
@@ -114,8 +115,9 @@ var utils = {
     var params = []
     objectEach(body, function (item, key) {
       if (item !== undefined) {
-        if (isPlainObject(item) || isArray(item)) {
-          params = params.concat(parseParam(item, key, isArray(item)))
+        var _arr = isArray(item)
+        if (isPlainObject(item) || _arr) {
+          params = params.concat(stringifyParams(item, key, _arr))
         } else {
           params.push(encode(key) + '=' + encode(item === null ? '' : item))
         }

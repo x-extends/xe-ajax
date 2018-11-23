@@ -37,7 +37,7 @@ function XEAjax (options) {
   }, request.$context)
 }
 
-XEAjax.version = '3.4.11'
+XEAjax.version = '3.4.13'
 XEAjax.interceptors = interceptorExports.interceptors
 XEAjax.serialize = utils.serialize
 XEAjax.Progress = XEProgress

@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.12
+ * xe-ajax.js v3.4.13
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -48,11 +48,12 @@
     }
   }
 
-  function parseParam (resultVal, resultKey, isArr) {
+  function stringifyParams (resultVal, resultKey, isArr) {
     var result = []
     objectEach(resultVal, function (item, key) {
-      if (isPlainObject(item) || isArray(item)) {
-        result = result.concat(parseParam(item, resultKey + '[' + key + ']', isArray(item)))
+      var _arr = isArray(item)
+      if (isPlainObject(item) || _arr) {
+        result = result.concat(stringifyParams(item, resultKey + '[' + key + ']', _arr))
       } else {
         result.push(encode(resultKey + '[' + (isArr ? '' : key) + ']') + '=' + encode(item === null ? '' : item))
       }
@@ -125,8 +126,9 @@
       var params = []
       objectEach(body, function (item, key) {
         if (item !== undefined) {
-          if (isPlainObject(item) || isArray(item)) {
-            params = params.concat(parseParam(item, key, isArray(item)))
+          var _arr = isArray(item)
+          if (isPlainObject(item) || _arr) {
+            params = params.concat(stringifyParams(item, key, _arr))
           } else {
             params.push(encode(key) + '=' + encode(item === null ? '' : item))
           }
@@ -1023,7 +1025,7 @@
     }, request.$context)
   }
 
-  XEAjax.version = '3.4.11'
+  XEAjax.version = '3.4.13'
   XEAjax.interceptors = interceptorExports.interceptors
   XEAjax.serialize = utils.serialize
   XEAjax.Progress = XEProgress
