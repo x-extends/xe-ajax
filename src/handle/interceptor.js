@@ -71,7 +71,7 @@ interceptors.request.use(function (request, next) {
   var reqMethod = request.method
   if (reqBody && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
     if (!utils.isFData(reqBody)) {
-      reqHeaders.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
+      reqHeaders.set('Content-Type', utils.isURLSParams(reqBody) || request.bodyType === 'form-data' ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8')
     }
   }
   if (utils.isCrossOrigin(request.getUrl())) {

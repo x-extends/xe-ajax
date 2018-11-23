@@ -303,21 +303,27 @@ XEAjax.fetch('/api/test/message/list')
     })
   })
 
-// 使用 "application/json" 方式提交，默认使用 JSON.stringify 序列化数据
+// 使用 "application/json" 方式提交
 let body1 = {
   name: 'u111',
   content: '123456'
 }
 XEAjax.fetchPost('/api/test/message/save', body1, {bodyType: 'json-data'})
 
-// 使用 "application/x-www-form-urlencoded" 方式提交，默认使用 XEAjax.serialize 序列化数据
+// 使用 "application/x-www-form-urlencoded" 方式提交
 let body2 = {
   name: 'u222',
   content: '123456'
 }
 XEAjax.fetchPost('/api/test/message/save', body2, {bodyType: 'form-data'})
 
-// 模拟表单 "multipart/form-data" 提交
+// 使用 "application/x-www-form-urlencoded" 方式提交
+let body3 = new URLSearchParams();
+body3.append('name', 'u222');
+body3.append('content', '123456');
+XEAjax.fetchPost('/api/test/message/save', body3);
+
+// 使用 "multipart/form-data" 方式提交
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
@@ -656,7 +662,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
 允许用您自己的实用函数扩展到 XEAjax
 
-### ./ajax.js
+### common/ajax/index.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -664,24 +670,27 @@ import XEAjax from 'xe-ajax'
 export function get (url, options) {
   return XEAjax.doGet(url, null, options)
 }
-export function post (url, body, options) {
-  return XEAjax.doPost(url, body, options)
+export function delete (url, options) {
+  return XEAjax.doDelete(url, options)
 }
-export function put (url, body, options) {
-  return XEAjax.doPut(url, body, options)
+export function post (url, data, options) {
+  return XEAjax.doPost(url, data, options)
 }
-// ...
+export function put (url, data, options) {
+  return XEAjax.doPut(url, data, options)
+}
 ```
 
 ### ./main.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
-import ajaxFns from './ajax'
+import ajaxFns from '@/common/ajax'
 
 XEAjax.mixin(ajaxFns)
 
 XEAjax.get('/api/test/message/list', {params: {id: 123}})
+XEAjax.delete('/api/test/message/delete/123')
 XEAjax.post('/api/test/message/save', {name: 'test1'})
 XEAjax.put('/api/test/message/update', {id: 123, name: 'test1'})
 ```

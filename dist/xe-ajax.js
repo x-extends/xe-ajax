@@ -77,6 +77,10 @@
       return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
     },
 
+    isURLSParams: function (obj) {
+      return typeof URLSearchParams !== STRING_UNDEFINED && obj instanceof URLSearchParams
+    },
+
     isCrossOrigin: function (url) {
       if (!isNodeJS) {
         var matchs = ('' + url).match(/(\w+:)\/{2}((.*?)\/|(.*)$)/)
@@ -444,7 +448,7 @@
     var reqMethod = request.method
     if (reqBody && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
       if (!utils.isFData(reqBody)) {
-        reqHeaders.set('Content-Type', request.bodyType === 'json-data' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded')
+        reqHeaders.set('Content-Type', utils.isURLSParams(reqBody) || request.bodyType === 'form-data' ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8')
       }
     }
     if (utils.isCrossOrigin(request.getUrl())) {
@@ -499,7 +503,7 @@
       if (transformParams) {
         params = this.params = transformParams(params || {}, this)
       }
-      if (params && !utils.isFData(params)) {
+      if (params && !utils.isFData(params) && !utils.isURLSParams(params)) {
         params = utils.isStr(params) ? params : (this.paramsSerializer || utils.serialize)(utils.assign(_param, params), this)
       } else {
         params = utils.serialize(_param)
@@ -533,7 +537,9 @@
       if (stringifyBody) {
         result = stringifyBody(body, this)
       } else {
-        if (utils.isFData(body) || utils.isStr(body)) {
+        if (utils.isURLSParams(body)) {
+          result = body.toString()
+        } else if (utils.isFData(body) || utils.isStr(body)) {
           result = body
         } else {
           result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)

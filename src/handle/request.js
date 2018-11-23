@@ -32,7 +32,7 @@ requestPro.getUrl = function () {
     if (transformParams) {
       params = this.params = transformParams(params || {}, this)
     }
-    if (params && !utils.isFData(params)) {
+    if (params && !utils.isFData(params) && !utils.isURLSParams(params)) {
       params = utils.isStr(params) ? params : (this.paramsSerializer || utils.serialize)(utils.assign(_param, params), this)
     } else {
       params = utils.serialize(_param)
@@ -66,7 +66,9 @@ requestPro.getBody = function () {
     if (stringifyBody) {
       result = stringifyBody(body, this)
     } else {
-      if (utils.isFData(body) || utils.isStr(body)) {
+      if (utils.isURLSParams(body)) {
+        result = body.toString()
+      } else if (utils.isFData(body) || utils.isStr(body)) {
         result = body
       } else {
         result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)

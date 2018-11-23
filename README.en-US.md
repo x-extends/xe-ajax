@@ -285,19 +285,25 @@ XEAjax.fetch('/api/test/message/list')
     })
   })
 
-// Submit 'application/json', default uses JSON.stringify(request.body)
+// Submit 'application/json'
 let body1 = {
   name: 'u111',
   password: '123456'
 }
 XEAjax.fetchPost('/api/test/message/save', body1, {bodyType: 'json-data'})
 
-// Submit 'application/x-www-form-urlencoded', default uses XEAjax.serialize(request.body)
+// Submit 'application/x-www-form-urlencoded'
 let body2 = {
   name: 'u222',
   password: '123456'
 }
 XEAjax.fetchPost('/api/test/message/save', body2, {bodyType: 'form-data'})
+
+// Submit "application/x-www-form-urlencoded"
+let body3 = new URLSearchParams();
+body3.append('name', 'u222');
+body3.append('content', '123456');
+XEAjax.fetchPost('/api/test/message/save', body3);
 
 // Submit 'multipart/form-data'
 let file = document.querySelector('#myFile').files[0]
@@ -637,7 +643,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
 ## mixing
 
-### ./ajax.js
+### common/ajax/index.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
@@ -645,24 +651,27 @@ import XEAjax from 'xe-ajax'
 export function get (url, options) {
   return XEAjax.doGet(url, null, options)
 }
-export function post (url, body, options) {
-  return XEAjax.doPost(url, body, options)
+export function delete (url, options) {
+  return XEAjax.doDelete(url, options)
 }
-export function put (url, body, options) {
-  return XEAjax.doPut(url, body, options)
+export function post (url, data, options) {
+  return XEAjax.doPost(url, data, options)
 }
-// ...
+export function put (url, data, options) {
+  return XEAjax.doPut(url, data, options)
+}
 ```
 
 ### ./main.js
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
-import ajaxFns from './ajax'
+import ajaxFns from '@/common/ajax'
 
 XEAjax.mixin(ajaxFns)
 
 XEAjax.get('/api/test/message/list', {params: {id: 123}})
+XEAjax.delete('/api/test/message/delete/123')
 XEAjax.post('/api/test/message/save', {name: 'test1'})
 XEAjax.put('/api/test/message/update', {id: 123, name: 'test1'})
 ```

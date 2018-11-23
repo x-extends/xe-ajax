@@ -66,6 +66,10 @@ var utils = {
     return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
   },
 
+  isURLSParams: function (obj) {
+    return typeof URLSearchParams !== STRING_UNDEFINED && obj instanceof URLSearchParams
+  },
+
   isCrossOrigin: function (url) {
     if (!isNodeJS) {
       var matchs = ('' + url).match(/(\w+:)\/{2}((.*?)\/|(.*)$)/)
