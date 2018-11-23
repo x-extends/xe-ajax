@@ -300,10 +300,10 @@ let body2 = {
 XEAjax.fetchPost('/api/test/message/save', body2, {bodyType: 'form-data'})
 
 // Submit "application/x-www-form-urlencoded"
-let body3 = new URLSearchParams();
-body3.append('name', 'u222');
-body3.append('content', '123456');
-XEAjax.fetchPost('/api/test/message/save', body3);
+let searchParams = new URLSearchParams();
+searchParams.append('name', 'u222');
+searchParams.append('content', '123456');
+XEAjax.fetchPost('/api/test/message/save', searchParams);
 
 // Submit 'multipart/form-data'
 let file = document.querySelector('#myFile').files[0]
