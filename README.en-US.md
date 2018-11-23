@@ -101,7 +101,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### Options
 
-*: Only the highest version of the browser is supported.
+*: Only the latest version of the browser is supported.
 
 | Name | Type | Description | default value |
 |------|------|-----|----|
@@ -498,8 +498,8 @@ Listener request progress.
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-var file = document.querySelector('#myFile').files[0]
-var formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody)
 XEAjax.doPost('/api/upload', formBody)
@@ -512,8 +512,8 @@ let progress = new XEAjax.Progress()
 progress.onUploadProgress = evnt => {
   console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
 }
-var file = document.querySelector('#myFile').files[0]
-var formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody, {progress})
 // Progress:1% 176KB/14.26MB; Speed:1.69MB/s; Remaining:8s

@@ -108,7 +108,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### options 参数
 
-*: 只支持最高版本的浏览器。
+*: 只支持最新版本的浏览器。
 
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
@@ -186,7 +186,7 @@ XEAjax.setup({
     // 注：如何需要实现复杂的场景判断，请使用拦截器
     //
     // 如果是 fetch 函数，则会将状态赋值给 ok 属性
-    // 如果 do* 和 *JSON 函数，如果状态返回 false 则会进入 catch
+    // 除了 fetch 函数，其他函数如果状态返回 false 则会进入 catch
     return response.status >= 200 && response.status < 300
   },
   transformParams (params, request) {
@@ -511,8 +511,8 @@ init()
 import XEAjax from 'xe-ajax'
 
 // 上传、下载
-var file = document.querySelector('#myFile').files[0]
-var formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody)
 XEAjax.doPost('/api/upload', formBody)
@@ -526,8 +526,8 @@ let progress = new XEAjax.Progress()
 progress.onUploadProgress = evnt => {
   console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; 速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
 }
-var file = document.querySelector('#myFile').files[0]
-var formBody = new FormData()
+let file = document.querySelector('#myFile').files[0]
+let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody, {progress})
 // 进度：1% 176KB/14.26MB; 速度：1.69MB/秒; 剩余：8秒
