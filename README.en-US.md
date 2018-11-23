@@ -307,9 +307,9 @@ XEAjax.fetchPost('/api/test/message/save', searchParams);
 
 // Submit 'multipart/form-data'
 let file = document.querySelector('#myFile').files[0]
-let formBody = new FormData()
-formBody.append('file', file)
-XEAjax.fetchPost('/api/test/message/save', formBody)
+let formData = new FormData()
+formData.append('file', file)
+XEAjax.fetchPost('/api/test/message/save', formData)
 
 // Submit body and query params.
 XEAjax.fetchPost('/api/test/message/save', {name: 'u333',password: '123456'}, {params: {id: 111}})

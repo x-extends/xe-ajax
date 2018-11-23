@@ -325,9 +325,9 @@ XEAjax.fetchPost('/api/test/message/save', searchParams);
 
 // 使用 "multipart/form-data" 方式提交
 let file = document.querySelector('#myFile').files[0]
-let formBody = new FormData()
-formBody.append('file', file)
-XEAjax.fetchPost('/api/test/message/save', formBody)
+let formData = new FormData()
+formData.append('file', file)
+XEAjax.fetchPost('/api/test/message/save', formData)
 
 // 查询参数和数据同时提交
 XEAjax.fetchPost('/api/test/message/save', {name: 'u333', content: '123456'}, {params: {id: 111}})
