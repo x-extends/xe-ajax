@@ -70,35 +70,34 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### 基本函数
 
-* doAll ( iterable )
-* ajax ( options )
-* ~
-* fetch ( url[, options] )
-* fetchHead ( url[, options] )
-* fetchDelete ( url[, options] )
-* fetchJsonp ( url[, params, options] )
-* fetchGet ( url[, params, options] )
-* fetchPost ( url[, body, options] )
-* fetchPut ( url[, body, options] )
-* fetchPatch ( url[, body, options] )
+* [setup ( options )](#全局参数设置)
+* [doAll ( iterable )](#并发多个请求)
+* [ajax ( options )](#基本使用)
+* [fetch ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [fetchHead ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [fetchDelete ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [fetchJsonp ( url[, params, options] )](#jsonp-调用)
+* [fetchGet ( url[, params, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [fetchPost ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [fetchPut ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [fetchPatch ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
 
 ### 便捷函数
 
-* doHead ( url[, options] )
-* doDelete ( url[, options] )
-* doJsonp ( url[, params, options] )
-* doGet ( url[, params, options] )
-* doPost ( url[, body, options] )
-* doPut ( url[, body, options] )
-* doPatch ( url[, body, options] )
-* ~
-* headJSON ( url[, options] )
-* deleteJSON ( url[, options] )
-* jsonp ( url[, params, options] )
-* getJSON ( url[, params, options] )
-* postJSON ( url[, body, options] )
-* putJSON ( url[, body, options] )
-* patchJSON ( url[, body, options] )
+* [doHead ( url[, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+* [doDelete ( url[, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+* [doJsonp ( url[, params, options] )](#jsonp-调用)
+* [doGet ( url[, params, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+* [doPost ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+* [doPut ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+* [doPatch ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+* [headJSON ( url[, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* [deleteJSON ( url[, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* [jsonp ( url[, params, options] )](#jsonp-调用)
+* [getJSON ( url[, params, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* [postJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* [putJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* [patchJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
 
 ### 入参
 
@@ -450,12 +449,12 @@ XEAjax.doAll(iterable2).then(datas => {
 ### 嵌套请求
 
 ```JavaScript
-import { fetchGet, doGet, getJSON } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 // 相互依赖的嵌套请求
-fetchGet('/api/test/message/info', {id: 3})
+XEAjax.fetchGet('/api/test/message/info', {id: 3})
   .then(response => response.json())
-  .then(data => fetchGet(`/api/test/message/delete/${data.id}`))
+  .then(data => XEAjax.fetchGet(`/api/test/message/delete/${data.id}`))
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -463,13 +462,13 @@ fetchGet('/api/test/message/info', {id: 3})
       })
     }
   })
-doGet('/api/test/message/info', {id: 3})
-  .then(result => doGet(`/api/test/message/delete/${result.data.id}`))
+XEAjax.doGet('/api/test/message/info', {id: 3})
+  .then(result => XEAjax.doGet(`/api/test/message/delete/${result.data.id}`))
   .then(result => {
     // result.data
   })
-getJSON('/api/test/message/info', {id: 3})
-  .then(data => getJSON(`/api/test/message/delete/${data.id}`))
+XEAjax.getJSON('/api/test/message/info', {id: 3})
+  .then(data => XEAjax.getJSON(`/api/test/message/delete/${data.id}`))
   .then(data => {
     // data
   })
@@ -478,11 +477,11 @@ getJSON('/api/test/message/info', {id: 3})
 ## 使用 async/await 处理异步
 
 ```JavaScript
-import { getJSON } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 async function init() {
-  let list = await getJSON('/api/test/message/list')
-  let data = await getJSON('/api/test/message/info', {id: list[0].id})
+  let list = await XEAjax.getJSON('/api/test/message/list')
+  let data = await XEAjax.getJSON('/api/test/message/info', {id: list[0].id})
   console.log(list)
   console.log(data)
 }

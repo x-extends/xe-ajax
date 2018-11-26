@@ -63,35 +63,34 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### Base functions
 
-* doAll ( iterable )
-* ajax ( options )
-* ~
-* fetch ( url[, options] )
-* fetchHead ( url[, options] )
-* fetchDelete ( url[, options] )
-* fetchJsonp ( url[, params, options] )
-* fetchGet ( url[, params, options] )
-* fetchPost ( url[, body, options] )
-* fetchPut ( url[, body, options] )
-* fetchPatch ( url[, body, options] )
+* [setup ( options )](#default-global-settings)
+* [doAll ( iterable )](#multiple-requests)
+* [ajax ( options )](#ajax)
+* [fetch ( url[, options] )](#fetch-to-response)
+* [fetchHead ( url[, options] )](#fetch-to-response)
+* [fetchDelete ( url[, options] )](#fetch-to-response)
+* [fetchJsonp ( url[, params, options] )](#jsonp)
+* [fetchGet ( url[, params, options] )](#fetch-to-response)
+* [fetchPost ( url[, body, options] )](#fetch-to-response)
+* [fetchPut ( url[, body, options] )](#fetch-to-response)
+* [fetchPatch ( url[, body, options] )](#fetch-to-response)
 
 ### Convenience function
 
-* doHead ( url[, options] )
-* doDelete ( url[, options] )
-* doJsonp ( url[, params, options] )
-* doGet ( url[, params, options] )
-* doPost ( url[, body, options] )
-* doPut ( url[, body, options] )
-* doPatch ( url[, body, options] )
-* ~
-* headJSON ( url[, options] )
-* deleteJSON ( url[, options] )
-* jsonp ( url[, params, options] )
-* getJSON ( url[, params, options] )
-* postJSON ( url[, body, options] )
-* putJSON ( url[, body, options] )
-* patchJSON ( url[, body, options] )
+* [doHead ( url[, options] )](#fetch-to-response-schema-v340)
+* [doDelete ( url[, options] )](#fetch-to-response-schema-v340)
+* [doJsonp ( url[, params, options] )](#jsonp)
+* [doGet ( url[, params, options] )](#fetch-to-response-schema-v340)
+* [doPost ( url[, body, options] )](#fetch-to-response-schema-v340)
+* [doPut ( url[, body, options] )](#fetch-to-response-schema-v340)
+* [doPatch ( url[, body, options] )](#fetch-to-response-schema-v340)
+* [headJSON ( url[, options] )](#fetch-to-json)
+* [deleteJSON ( url[, options] )](#fetch-to-json)
+* [jsonp ( url[, params, options] )](#jsonp)
+* [getJSON ( url[, params, options] )](#fetch-to-json)
+* [postJSON ( url[, body, options] )](#fetch-to-json)
+* [putJSON ( url[, body, options] )](#fetch-to-json)
+* [patchJSON ( url[, body, options] )](#fetch-to-json)
 
 ### Arguments
 
@@ -438,12 +437,12 @@ XEAjax.doAll(iterable2).then(datas => {
 ### Nested Requests
 
 ```JavaScript
-import { fetchGet, doGet, getJSON } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 // This should be avoided in the project.
-fetchGet('/api/test/message/info', {id: 3})
+XEAjax.fetchGet('/api/test/message/info', {id: 3})
   .then(response => response.json())
-  .then(data => fetchGet(`/api/test/message/delete/${data.id}`))
+  .then(data => XEAjax.fetchGet(`/api/test/message/delete/${data.id}`))
   .then(response => {
     if (response.ok) {
       response.json().then(data => {
@@ -451,13 +450,13 @@ fetchGet('/api/test/message/info', {id: 3})
       })
     }
   })
-doGet('/api/test/message/info', {id: 3})
-  .then(result => doGet(`/api/test/message/delete/${result.data.id}`))
+XEAjax.doGet('/api/test/message/info', {id: 3})
+  .then(result => XEAjax.doGet(`/api/test/message/delete/${result.data.id}`))
   .then(result => {
     // result.data
   })
-getJSON('/api/test/message/info', {id: 3})
-  .then(data => getJSON(`/api/test/message/delete/${data.id}`))
+XEAjax.getJSON('/api/test/message/info', {id: 3})
+  .then(data => XEAjax.getJSON(`/api/test/message/delete/${data.id}`))
   .then(data => {
     // data
   })
@@ -466,11 +465,11 @@ getJSON('/api/test/message/info', {id: 3})
 ## Promises, async/await
 
 ```JavaScript
-import { getJSON } from 'xe-ajax'
+import XEAjax from 'xe-ajax'
 
 async function init() {
-  let list = await getJSON('/api/test/message/list')
-  let data = await getJSON('/api/test/message/info', {id: list[0].id})
+  let list = await XEAjax.getJSON('/api/test/message/list')
+  let data = await XEAjax.getJSON('/api/test/message/info', {id: list[0].id})
   console.log(list)
   console.log(data)
 }
