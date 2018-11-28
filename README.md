@@ -1,4 +1,4 @@
-# xe-ajax
+# xe-ajax 封装 fetch 的异步请求库
 
 简体中文 | [English](https://github.com/xuliangzhan/xe-ajax/blob/master/README.en-US.md)
 
