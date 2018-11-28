@@ -63,17 +63,13 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### Base functions
 
-* [setup ( options )](#default-global-settings)
-* [doAll ( iterable )](#multiple-requests)
 * [ajax ( options )](#ajax)
 * [fetch ( url[, options] )](#fetch-to-response)
-* [fetchHead ( url[, options] )](#fetch-to-response)
-* [fetchDelete ( url[, options] )](#fetch-to-response)
-* [fetchJsonp ( url[, params, options] )](#jsonp)
-* [fetchGet ( url[, params, options] )](#fetch-to-response)
-* [fetchPost ( url[, body, options] )](#fetch-to-response)
-* [fetchPut ( url[, body, options] )](#fetch-to-response)
-* [fetchPatch ( url[, body, options] )](#fetch-to-response)
+* [doAll ( iterable )](#multiple-requests)
+* [Global settings](#default-global-settings)
+* [Interceptor](#interceptor-v30)
+* [Cancel request](#cancel-request-v320)
+* [Upload/Download](#uploaddownload-v349)
 
 ### Convenience function
 

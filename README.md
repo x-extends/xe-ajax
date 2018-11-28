@@ -70,17 +70,13 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
 
 ### 基本函数
 
-* [setup ( options )](#全局参数设置)
-* [doAll ( iterable )](#并发多个请求)
 * [ajax ( options )](#基本使用)
 * [fetch ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* [fetchHead ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* [fetchDelete ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* [fetchJsonp ( url[, params, options] )](#jsonp-调用)
-* [fetchGet ( url[, params, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* [fetchPost ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* [fetchPut ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* [fetchPatch ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* [doAll ( iterable )](#并发多个请求)
+* [全局参数设置](#全局参数设置)
+* [拦截器](#拦截器-v30)
+* [如何取消请求](#取消请求-v320)
+* [上传/下载进度监听](#上传下载-v349)
 
 ### 便捷函数
 
