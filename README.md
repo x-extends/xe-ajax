@@ -72,7 +72,7 @@ XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then((
   * [ajax ( options )](#基本使用)
   * [fetch ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
   * [doAll ( iterable )](#并发多个请求)
-  * [全局参数设置](#全局参数设置)
+  * [设置默认全局参数](#全局参数设置)
   * [拦截器](#拦截器-v30)
   * [如何取消请求](#取消请求-v320)
   * [上传/下载进度监听](#上传下载-v349)
