@@ -15,27 +15,23 @@ xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-poly
 --- | --- | --- | --- | --- | --- |
 7+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
-## CDN 安装
+## CDN install
 
-### cdnjs 获取最新版本
-
-[点击浏览](https://cdn.jsdelivr.net/npm/xe-ajax/)
+[cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 
 ```JavaScript
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-### unpkg 获取最新版本
-
-[点击浏览](https://unpkg.com/xe-ajax/)
+[unpkg](https://unpkg.com/xe-ajax/)
 
 ```JavaScript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-## AMD 安装
+## AMD install
 
-### require.js 安装示例
+### require.js
 
 ```JavaScript
 // require 配置
@@ -50,13 +46,13 @@ define(['xe-ajax'], function (XEAjax) {
 })
 ```
 
-## NPM 安装
+## NPM install
 
 ```JavaScript
 npm install xe-ajax --save
 ```
 
-### NodeJS
+### NodeJS require
 
 ```JavaScript
 const XEAjax = require('xe-ajax')

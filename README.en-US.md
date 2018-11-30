@@ -15,21 +15,21 @@ xe-ajax Depends on a native Promise implementation to be supported. If your envi
 --- | --- | --- | --- | --- | --- |
 7+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
-## CDN
+## CDN install
 
-[All cdnjs package](https://cdn.jsdelivr.net/npm/xe-ajax/)
+[cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 
 ```HTML
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-[All unpkg package](https://unpkg.com/xe-ajax/)
+[unpkg](https://unpkg.com/xe-ajax/)
 
 ```HTML
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-## AMD
+## AMD install
 
 ```JavaScript
 require.config({
@@ -43,13 +43,13 @@ define(['xe-ajax'], function (XEAjax) {
 })
 ```
 
-## NPM
+## NPM install
 
 ```JavaScript
 npm install xe-ajax --save
 ```
 
-### NodeJS
+### NodeJS install
 
 ```JavaScript
 const XEAjax = require('xe-ajax')
