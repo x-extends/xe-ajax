@@ -17,21 +17,37 @@ xe-ajax Depends on a native Promise implementation to be supported. If your envi
 --- | --- | --- | --- | --- | --- |
 7+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 6.1+ ✔ |
 
-## CDN install
+## Installing
 
-[cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
+```JavaScript
+npm install xe-ajax --save
+```
 
-```HTML
+Using nodejs
+
+```JavaScript
+const XEAjax = require('xe-ajax')
+```
+
+Using ES6
+
+```JavaScript
+import XEAjax from 'xe-ajax'
+```
+
+[Using cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
+
+```JavaScript
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-[unpkg](https://unpkg.com/xe-ajax/)
+[Using unpkg](https://unpkg.com/xe-ajax/)
 
-```HTML
+```JavaScript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
-## AMD install
+Using requirejs
 
 ```JavaScript
 require.config({
@@ -41,23 +57,7 @@ require.config({
   }
 })
 define(['xe-ajax'], function (XEAjax) {
-  // XEAjax.fetch(url)
-})
-```
-
-## NPM install
-
-```JavaScript
-npm install xe-ajax --save
-```
-
-### NodeJS install
-
-```JavaScript
-const XEAjax = require('xe-ajax')
-
-XEAjax.getJSON('https://xuliangzhan.com/api/test/message/list/page/15/1').then(({page, result}) => {
-  console.log(result)
+  XEAjax.fetch('/api/test/message/list')
 })
 ```
 
