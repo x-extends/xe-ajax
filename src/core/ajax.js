@@ -23,7 +23,7 @@ var errorType = {
   * @return { Promise }
   */
 function XEAjax (options) {
-  var opts = utils.assign({}, setupDefaults, {headers: utils.assign({}, setupDefaults.headers)}, options)
+  var opts = utils.assign({}, setupDefaults, { headers: utils.assign({}, setupDefaults.headers) }, options)
   var request = new XERequest(opts)
   var XEPromise = request.$Promise || Promise
   return new XEPromise(function (resolve, reject) {
@@ -37,7 +37,6 @@ function XEAjax (options) {
   }, request.$context)
 }
 
-XEAjax.version = '3.4.13'
 XEAjax.interceptors = interceptorExports.interceptors
 XEAjax.serialize = utils.serialize
 XEAjax.Progress = XEProgress

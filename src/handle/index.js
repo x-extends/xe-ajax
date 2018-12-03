@@ -17,7 +17,7 @@ function getStringifyBody (reqBody) {
 }
 
 function getResponse (reqBody, resp, request) {
-  var options = {status: resp.status, statusText: resp.statusText, headers: resp.headers}
+  var options = { status: resp.status, statusText: resp.statusText, headers: resp.headers }
   if (utils.IS_A) {
     reqBody = reqBody instanceof Blob ? reqBody : new Blob([getStringifyBody(reqBody)])
   } else {

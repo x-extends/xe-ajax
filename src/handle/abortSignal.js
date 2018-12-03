@@ -5,7 +5,7 @@ var utils = require('../core/utils')
 function XEAbortSignalPolyfill () {
   this.onaborted = null
   if (utils.IS_DEF) {
-    this.D_AS = {aborted: false}
+    this.D_AS = { aborted: false }
   } else {
     this.aborted = false
   }

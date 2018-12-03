@@ -6,7 +6,7 @@ var utils = require('./utils')
 var clearContext = utils.clearContext
 
 function getOptions (method, def, options) {
-  var opts = utils.assign({method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise}, def, options)
+  var opts = utils.assign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
   clearContext(XEAjax)
   return opts
 }
@@ -79,31 +79,31 @@ function doAll (iterable) {
     if (item instanceof XEPromise || item instanceof Promise) {
       return item
     }
-    return utils.isObj(item) ? XEAjax(utils.assign({$context: context, $Promise: XEPromise}, item)) : item
+    return utils.isObj(item) ? XEAjax(utils.assign({ $context: context, $Promise: XEPromise }, item)) : item
   }), context)
 }
 
 function createFetch (method) {
   return function (url, opts) {
-    return getOptions(method, {url: url}, opts)
+    return getOptions(method, { url: url }, opts)
   }
 }
 
 function createParamsFetch (method, defs) {
   return function (url, params, opts) {
-    return getOptions(method, utils.assign({url: url, params: params}, defs), opts)
+    return getOptions(method, utils.assign({ url: url, params: params }, defs), opts)
   }
 }
 
 function createBodyFetch (method) {
   return function (url, body, opts) {
-    return getOptions(method, {url: url, body: body}, opts)
+    return getOptions(method, { url: url, body: body }, opts)
   }
 }
 
 var requestHead = createFetch('HEAD')
 var requestDelete = createFetch('DELETE')
-var requestJsonp = createParamsFetch('GET', {jsonp: 'callback'})
+var requestJsonp = createParamsFetch('GET', { jsonp: 'callback' })
 var requestGet = createParamsFetch('GET')
 var requestPost = createBodyFetch('POST')
 var requestPut = createBodyFetch('PUT')

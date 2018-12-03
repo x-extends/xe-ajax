@@ -3,8 +3,8 @@
 var utils = require('../core/utils')
 var handleExports = require('../handle')
 
-var reqQueue = {resolves: [], rejects: []}
-var respQueue = {resolves: [], rejects: []}
+var reqQueue = { resolves: [], rejects: [] }
+var respQueue = { resolves: [], rejects: [] }
 
 function addCheckQueue (calls, callback) {
   if (!utils.includes(calls, callback)) {

@@ -14,7 +14,7 @@ function XEProgress (options) {
     meanSpeed: 0,
     onDownloadProgress: null,
     onUploadProgress: null
-  }, options, {_progress: {value: 0, total: 0, loaded: 0}})
+  }, options, { _progress: { value: 0, total: 0, loaded: 0 } })
 }
 
 if (utils.IS_DEF) {

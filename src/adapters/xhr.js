@@ -114,7 +114,7 @@ function loadListener (target, callback, progress) {
     _progress.speed = formatUnit(speed, progress)
     _progress.time = currDateTime
     _progress.remaining = Math.ceil((total - loaded) / speed)
-    prossQueue.push({total: total, loaded: loaded, speed: speed, evnt: evnt})
+    prossQueue.push({ total: total, loaded: loaded, speed: speed, evnt: evnt })
     if (!meanSpeed) {
       callback(evnt)
     }
@@ -157,7 +157,7 @@ function formatUnit (bSize, progress) {
       break
     }
   }
-  return {value: bSize, size: parseFloat(size.toFixed(progress.fixed)), unit: unit}
+  return { value: bSize, size: parseFloat(size.toFixed(progress.fixed)), unit: unit }
 }
 
 // 处理响应头

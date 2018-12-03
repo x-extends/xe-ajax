@@ -16,7 +16,7 @@ function getObjectIterators (obj, getIndex) {
 
 function getIteratorResult (iterator, value) {
   var done = iterator.$index++ >= iterator.$list.length
-  return {done: done, value: done ? undefined : value}
+  return { done: done, value: done ? undefined : value }
 }
 
 function XEIterator (iterator, value) {

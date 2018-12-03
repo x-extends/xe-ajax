@@ -4,7 +4,7 @@ var utils = require('../core/utils')
 var XEHeaders = require('./headers')
 
 function XERequest (options) {
-  utils.assign(this, {url: '', body: '', params: '', signal: ''}, options)
+  utils.assign(this, { url: '', body: '', params: '', signal: '' }, options)
   this.headers = new XEHeaders(options.headers)
   this.method = this.method.toLocaleUpperCase()
   this.bodyType = this.bodyType.toLowerCase()
@@ -27,7 +27,7 @@ requestPro.getUrl = function () {
   var url = this.url
   var params = this.params
   if (url) {
-    var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? {_t: Date.now()} : {}
+    var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
     var transformParams = this.transformParams
     if (transformParams) {
       params = this.params = transformParams(params || {}, this)

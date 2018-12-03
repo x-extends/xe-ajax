@@ -7,6 +7,8 @@ var utils = require('../core/utils')
 var XEResponse = require('../handle/response')
 var handleExports = require('../handle')
 
+/* eslint-disable node/no-deprecated-api */
+
 /**
  * nodejs
  * @param { XERequest } request

@@ -25,7 +25,7 @@ function sendJSONP (request, finish, failed) {
   }
   if (utils.isFn(request.$jsonp)) {
     return request.$jsonp(script, request).then(function (resp) {
-      handleExports.toResponse({status: 200, body: resp}, request).then(finish)
+      handleExports.toResponse({ status: 200, body: resp }, request).then(finish)
     })['catch'](function () {
       failed()
     })
@@ -35,7 +35,7 @@ function sendJSONP (request, finish, failed) {
       if (!isTimeout) {
         clearTimeoutFn(timer)
         jsonpClear(request, jsonpCallback)
-        finish({status: 200, body: body})
+        finish({ status: 200, body: body })
       }
     }
     script.type = 'text/javascript'
