@@ -3,7 +3,7 @@
 简体中文 | [English](https://github.com/xuliangzhan/xe-ajax/blob/master/README.en-US.md)
 
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
-[![npm build](https://travis-ci.org/xuliangzhan/xe-ajax.svg?branch=master)](https://travis-ci.org/PanJiaChen/xuliangzhan/xe-ajax)
+[![npm build](https://travis-ci.org/xuliangzhan/xe-ajax.svg?branch=master)](https://travis-ci.org/xuliangzhan/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/xe-ajax/blob/master/LICENSE)
 
