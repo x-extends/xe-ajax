@@ -72,6 +72,12 @@ define(['xe-ajax'], function (XEAjax) {
   * [Cancel request](#cancel-request-v320)
   * [Upload/Download](#uploaddownload-v349)
 * *Convenience function*
+  * [fetchHead ( url[, options] )](#fetch-to-response)
+  * [fetchDelete ( url[, options] )](#fetch-to-response)
+  * [fetchJsonp ( url[, params, options] )](#jsonp)
+  * [fetchGet ( url[, params, options] )](#fetch-to-response)
+  * [fetchPost ( url[, body, options] )](#fetch-to-response)
+  * [fetchPut ( url[, body, options] )](#fetch-to-response)
   * [doHead ( url[, options] )](#fetch-to-response-schema-v340)
   * [doDelete ( url[, options] )](#fetch-to-response-schema-v340)
   * [doJsonp ( url[, params, options] )](#jsonp)

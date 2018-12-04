@@ -73,6 +73,12 @@ define(['xe-ajax'], function (XEAjax) {
   * [如何取消请求](#取消请求-v320)
   * [上传/下载进度监听](#上传下载-v349)
 * *便捷函数*
+  * [fetchHead ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+  * [fetchDelete ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+  * [fetchJsonp ( url[, params, options] )](#jsonp-调用)
+  * [fetchGet ( url[, params, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+  * [fetchPost ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+  * [fetchPut ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
   * [doHead ( url[, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
   * [doDelete ( url[, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
   * [doJsonp ( url[, params, options] )](#jsonp-调用)
