@@ -7,7 +7,7 @@ function XEReadableStream (body, request, response) {
   this._getBody = function () {
     var stream = this
     var XEPromise = request.$Promise || Promise
-    if (utils.IS_DEF) {
+    if (utils.IS_DP) {
       response._response.bodyUsed = true
     } else {
       response.bodyUsed = true

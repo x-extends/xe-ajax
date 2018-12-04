@@ -9,7 +9,7 @@
 
 基于 [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) 的异步请求函数，支持 nodejs、browser 环境。
 
-## 兼容性
+## Browser Support
 
 xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-polyfill 或者 bluebird.js
 
@@ -94,13 +94,7 @@ define(['xe-ajax'], function (XEAjax) {
   * [putJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
   * [patchJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
 
-### 入参
-
-* url（字符串） 请求地址，可被自定义 options 属性覆盖
-* params/body（可选，对象/数组） 要发送的数据，可被自定义 options 属性覆盖
-* options （可选，对象） 参数
-
-### options 参数
+### options 完整参数
 
 *: 只支持最新版本的浏览器。
 

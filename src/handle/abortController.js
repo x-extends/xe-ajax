@@ -41,7 +41,7 @@ XEAbortControllerPolyfill.prototype.abort = function () {
     utils.arrayEach(requestItem[1], function (request) {
       var item = requestItem[0]
       request.abort()
-      if (utils.IS_DEF) {
+      if (utils.IS_DP) {
         item.D_AS.aborted = true
       } else {
         item.aborted = true

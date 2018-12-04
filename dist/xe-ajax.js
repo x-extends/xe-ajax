@@ -71,7 +71,7 @@
     IS_F: isNodeJS ? false : !!self.fetch, // 支持 fetch
     IS_A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
     IS_FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
-    IS_DEF: Object.defineProperty && ({}).__defineGetter__, // ie7-8 false
+    IS_DP: Object.defineProperty && ({}).__defineGetter__, // ie7-8 false
 
     isFData: function (obj) {
       return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
@@ -127,10 +127,11 @@
 
     // Serialize body
     serialize: function (body) {
+      var _arr
       var params = []
       objectEach(body, function (item, key) {
         if (item !== undefined) {
-          var _arr = isArray(item)
+          _arr = isArray(item)
           if (isPlainObject(item) || _arr) {
             params = params.concat(stringifyParams(item, key, _arr))
           } else {
@@ -204,9 +205,9 @@
     return result
   }
 
-  function getIteratorResult (iterator, value) {
+  function getIteratorResult (iterator, value, UNDEFINED) {
     var done = iterator.$index++ >= iterator.$list.length
-    return { done: done, value: done ? undefined : value }
+    return { done: done, value: done ? UNDEFINED : value }
   }
 
   function XEIterator (iterator, value) {
@@ -270,7 +271,7 @@
     this._getBody = function () {
       var stream = this
       var XEPromise = request.$Promise || Promise
-      if (utils.IS_DEF) {
+      if (utils.IS_DP) {
         response._response.bodyUsed = true
       } else {
         response.bodyUsed = true
@@ -288,14 +289,14 @@
 
   function XEAbortSignalPolyfill () {
     this.onaborted = null
-    if (utils.IS_DEF) {
+    if (utils.IS_DP) {
       this.D_AS = { aborted: false }
     } else {
       this.aborted = false
     }
   }
 
-  if (utils.IS_DEF) {
+  if (utils.IS_DP) {
     Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
       get: function () {
         return this.D_AS.aborted
@@ -342,7 +343,7 @@
       utils.arrayEach(requestItem[1], function (request) {
         var item = requestItem[0]
         request.abort()
-        if (utils.IS_DEF) {
+        if (utils.IS_DP) {
           item.D_AS.aborted = true
         } else {
           item.aborted = true
@@ -463,18 +464,17 @@
   var requestPro = XERequest.prototype
 
   requestPro.abort = function () {
-    var xhr = this.xhr
-    if (xhr) {
-      xhr.abort()
+    if (this.xhr) {
+      this.xhr.abort()
     }
     this.$abort = true
   }
   requestPro.getUrl = function () {
     var url = this.url
     var params = this.params
+    var transformParams = this.transformParams
+    var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: new Date().getTime() } : {}
     if (url) {
-      var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
-      var transformParams = this.transformParams
       if (transformParams) {
         params = this.params = transformParams(params || {}, this)
       }
@@ -503,9 +503,9 @@
     var result = null
     var body = this.body
     var reqMethod = this.method
+    var transformBody = this.transformBody
+    var stringifyBody = this.stringifyBody
     if (body && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
-      var transformBody = this.transformBody
-      var stringifyBody = this.stringifyBody
       if (transformBody) {
         body = this.body = transformBody(body, this) || body
       }
@@ -543,7 +543,7 @@
       headers: new XEHeaders(options.headers || {}),
       type: 'basic'
     }
-    if (utils.IS_DEF) {
+    if (utils.IS_DP) {
       _response.ok = validStatus(this)
     } else {
       utils.assign(this, _response)
@@ -554,7 +554,7 @@
   var decode = decodeURIComponent
   var responsePro = XEResponse.prototype
 
-  if (utils.IS_DEF) {
+  if (utils.IS_DP) {
     utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
       Object.defineProperty(responsePro, name, {
         get: function () {
@@ -674,15 +674,13 @@
    * @param { Function } failed
    */
   function sendXHR (request, finish, failed) {
+    var uploadProgress
+    var downloadProgress
+    var autoCompute
+    var upload
     var url = request.getUrl()
     var reqTimeout = request.timeout
     var reqCredentials = request.credentials
-    if (request.mode === 'same-origin') {
-      if (utils.isCrossOrigin(url)) {
-        failed()
-        throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
-      }
-    }
     var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
     var xhr = request.xhr = new $XMLHttpRequest()
     var progress = request.progress
@@ -692,6 +690,12 @@
         statusText: xhr.statusText,
         headers: parseXHRHeaders(xhr)
       }, request))
+    }
+    if (request.mode === 'same-origin') {
+      if (utils.isCrossOrigin(url)) {
+        failed()
+        throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
+      }
     }
     xhr._request = request
     if (xhr.onload === undefined) {
@@ -713,10 +717,10 @@
       failed('ERR_A')
     }
     if (progress) {
-      var uploadProgress = progress.onUploadProgress
-      var downloadProgress = progress.onDownloadProgress
-      var autoCompute = progress.autoCompute
-      var upload = xhr.upload
+      uploadProgress = progress.onUploadProgress
+      downloadProgress = progress.onDownloadProgress
+      autoCompute = progress.autoCompute
+      upload = xhr.upload
       if (uploadProgress && upload) {
         if (autoCompute) {
           loadListener(upload, uploadProgress, progress)
@@ -759,7 +763,7 @@
   function loadListener (target, callback, progress) {
     var handleTime = new Date().getTime()
     var prossQueue = []
-    var _progress = utils.IS_DEF ? progress._progress : progress
+    var _progress = utils.IS_DP ? progress._progress : progress
     var meanSpeed = progress.meanSpeed
     _progress.value = 0
     _progress.time = handleTime
@@ -784,17 +788,22 @@
       }
     }
     if (meanSpeed) {
+      var speed
+      var len
+      var index
+      var lastItem
+      var countSpeed
       var prossInterval = setInterval(function () {
         if (_progress.value < 100) {
-          var len = prossQueue.length
+          len = prossQueue.length
           if (len) {
-            var countSpeed = 0
-            var lastItem = null
-            for (var index = 0; index < len; index++) {
+            countSpeed = 0
+            lastItem = {}
+            for (index = 0; index < len; index++) {
               lastItem = prossQueue[0]
               countSpeed += lastItem.speed
             }
-            var speed = countSpeed / len
+            speed = countSpeed / len
             _progress.speed = formatUnit(speed, progress)
             _progress.remaining = Math.ceil((lastItem.total - lastItem.loaded) / speed)
             prossQueue = []
@@ -813,7 +822,8 @@
   function formatUnit (bSize, progress) {
     var unit = ''
     var size = bSize
-    for (var index = 0; index < sUnitLen; index++) {
+    var index = 0
+    for (; index < sUnitLen; index++) {
       unit = sUnits[index]
       if (size >= sUnitRatio) {
         size = size / sUnitRatio
@@ -826,14 +836,12 @@
 
   // 处理响应头
   function parseXHRHeaders (xhr) {
+    var rowIndex
     var headers = {}
-    var headerList = utils.trim(xhr.getAllResponseHeaders()).split('\n')
-    var len = headerList.length
-    for (var row, rowIndex, index = 0; index < len; index++) {
-      row = headerList[index]
+    utils.arrayEach(utils.trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
       rowIndex = row.indexOf(':')
       headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
-    }
+    })
     return headers
   }
 
@@ -844,7 +852,7 @@
    * @param { Function } failed
    */
   function sendFetch (request, finish, failed) {
-    var timer = null
+    var timer
     var isTimeout = false
     var $fetch = request.$fetch || self.fetch
     var reqTimeout = request.timeout
@@ -882,8 +890,7 @@
     }
   }
 
-  function getRequest (request) {
-    var reqSignal = request.signal
+  function getRequest (request, reqSignal) {
     if (!request.progress) {
       if (request.$fetch) {
         return reqSignal ? sendXHR : sendFetch
@@ -902,7 +909,7 @@
       return sendHttp
     } else if (utils.IS_F) {
       return function (request) {
-        return getRequest(request).apply(this, arguments)
+        return getRequest(request, request.signal).apply(this, arguments)
       }
     }
     return sendXHR
@@ -921,14 +928,15 @@
    * @param { Function } failed
    */
   function sendJSONP (request, finish, failed) {
-    var timer = null
+    var url
+    var timer
     var isTimeout = false
     var reqTimeout = request.timeout
     var jsonpCallback = request.jsonpCallback
     var clearTimeoutFn = clearTimeout
     var script = request.script = $dom.createElement('script')
     if (!jsonpCallback) {
-      jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
+      jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + new Date().getTime() + '_' + (++jsonpIndex)
     }
     if (utils.isFn(request.$jsonp)) {
       return request.$jsonp(script, request).then(function (resp) {
@@ -937,7 +945,7 @@
         failed()
       })
     } else {
-      var url = request.getUrl()
+      url = request.getUrl()
       $global[jsonpCallback] = function (body) {
         if (!isTimeout) {
           clearTimeoutFn(timer)
@@ -965,7 +973,7 @@
     }
   }
 
-  function jsonpClear (request, jsonpCallback) {
+  function jsonpClear (request, jsonpCallback, UNDEFINED) {
     var script = request.script
     var $body = $dom.body
     if (script.parentNode === $body) {
@@ -975,7 +983,7 @@
       delete $global[jsonpCallback]
     } catch (e) {
       // IE8
-      $global[jsonpCallback] = undefined
+      $global[jsonpCallback] = UNDEFINED
     }
   }
 

@@ -16,7 +16,7 @@ var handleExports = require('../handle')
  * @param { Function } failed
  */
 function httpRequest (request, finish, failed) {
-  var timer = null
+  var timer
   var isTimeout = false
   var reqAgent = request.agent
   var reqTimeout = request.timeout
@@ -101,10 +101,10 @@ function getHttp (urlLocat) {
 }
 
 function sendHttp (request, finish, failed) {
+  var timer
   var clearTimeoutFn = clearTimeout
+  var reqTimeout = request.timeout
   if (utils.isFn(request.$http)) {
-    var timer = ''
-    var reqTimeout = request.timeout
     if (reqTimeout) {
       timer = setTimeout(function () {
         failed('ERR_T')

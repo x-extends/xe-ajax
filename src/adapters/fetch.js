@@ -12,7 +12,7 @@ var handleExports = require('../handle')
  * @param { Function } failed
  */
 function sendFetch (request, finish, failed) {
-  var timer = null
+  var timer
   var isTimeout = false
   var $fetch = request.$fetch || self.fetch
   var reqTimeout = request.timeout
@@ -50,8 +50,7 @@ function sendFetch (request, finish, failed) {
   }
 }
 
-function getRequest (request) {
-  var reqSignal = request.signal
+function getRequest (request, reqSignal) {
   if (!request.progress) {
     if (request.$fetch) {
       return reqSignal ? sendXHR : sendFetch
@@ -70,7 +69,7 @@ function createRequestFactory () {
     return sendHttp
   } else if (utils.IS_F) {
     return function (request) {
-      return getRequest(request).apply(this, arguments)
+      return getRequest(request, request.signal).apply(this, arguments)
     }
   }
   return sendXHR

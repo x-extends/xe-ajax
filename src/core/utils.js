@@ -60,7 +60,7 @@ var utils = {
   IS_F: isNodeJS ? false : !!self.fetch, // 支持 fetch
   IS_A: !(typeof Blob === STRING_UNDEFINED || typeof FormData === STRING_UNDEFINED || typeof FileReader === STRING_UNDEFINED), // IE10+ 支持Blob
   IS_FAC: isFetchAbortController, // fetch 是否支持 AbortController AbortSignal
-  IS_DEF: Object.defineProperty && ({}).__defineGetter__, // ie7-8 false
+  IS_DP: Object.defineProperty && ({}).__defineGetter__, // ie7-8 false
 
   isFData: function (obj) {
     return typeof FormData !== STRING_UNDEFINED && obj instanceof FormData
@@ -116,10 +116,11 @@ var utils = {
 
   // Serialize body
   serialize: function (body) {
+    var _arr
     var params = []
     objectEach(body, function (item, key) {
       if (item !== undefined) {
-        var _arr = isArray(item)
+        _arr = isArray(item)
         if (isPlainObject(item) || _arr) {
           params = params.concat(stringifyParams(item, key, _arr))
         } else {

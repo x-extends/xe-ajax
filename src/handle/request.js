@@ -17,18 +17,17 @@ function XERequest (options) {
 var requestPro = XERequest.prototype
 
 requestPro.abort = function () {
-  var xhr = this.xhr
-  if (xhr) {
-    xhr.abort()
+  if (this.xhr) {
+    this.xhr.abort()
   }
   this.$abort = true
 }
 requestPro.getUrl = function () {
   var url = this.url
   var params = this.params
+  var transformParams = this.transformParams
+  var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: new Date().getTime() } : {}
   if (url) {
-    var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: Date.now() } : {}
-    var transformParams = this.transformParams
     if (transformParams) {
       params = this.params = transformParams(params || {}, this)
     }
@@ -57,9 +56,9 @@ requestPro.getBody = function () {
   var result = null
   var body = this.body
   var reqMethod = this.method
+  var transformBody = this.transformBody
+  var stringifyBody = this.stringifyBody
   if (body && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
-    var transformBody = this.transformBody
-    var stringifyBody = this.stringifyBody
     if (transformBody) {
       body = this.body = transformBody(body, this) || body
     }

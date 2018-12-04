@@ -14,14 +14,15 @@ var $dom = $global ? $global.document : ''
  * @param { Function } failed
  */
 function sendJSONP (request, finish, failed) {
-  var timer = null
+  var url
+  var timer
   var isTimeout = false
   var reqTimeout = request.timeout
   var jsonpCallback = request.jsonpCallback
   var clearTimeoutFn = clearTimeout
   var script = request.script = $dom.createElement('script')
   if (!jsonpCallback) {
-    jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + Date.now() + '_' + (++jsonpIndex)
+    jsonpCallback = request.jsonpCallback = 'jsonp_xe_' + new Date().getTime() + '_' + (++jsonpIndex)
   }
   if (utils.isFn(request.$jsonp)) {
     return request.$jsonp(script, request).then(function (resp) {
@@ -30,7 +31,7 @@ function sendJSONP (request, finish, failed) {
       failed()
     })
   } else {
-    var url = request.getUrl()
+    url = request.getUrl()
     $global[jsonpCallback] = function (body) {
       if (!isTimeout) {
         clearTimeoutFn(timer)
@@ -58,7 +59,7 @@ function sendJSONP (request, finish, failed) {
   }
 }
 
-function jsonpClear (request, jsonpCallback) {
+function jsonpClear (request, jsonpCallback, UNDEFINED) {
   var script = request.script
   var $body = $dom.body
   if (script.parentNode === $body) {
@@ -68,7 +69,7 @@ function jsonpClear (request, jsonpCallback) {
     delete $global[jsonpCallback]
   } catch (e) {
     // IE8
-    $global[jsonpCallback] = undefined
+    $global[jsonpCallback] = UNDEFINED
   }
 }
 

@@ -93,12 +93,6 @@ define(['xe-ajax'], function (XEAjax) {
   * [putJSON ( url[, body, options] )](#fetch-to-json)
   * [patchJSON ( url[, body, options] )](#fetch-to-json)
 
-### Arguments
-
-* **url** Request interface contains the URL of the request.
-* **params/body** The params/body contents to be sent.
-* **options** Is an optional options object.
-
 ### Options
 
 *: Only the latest version of the browser is supported.

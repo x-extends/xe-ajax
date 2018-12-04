@@ -17,7 +17,7 @@ function XEProgress (options) {
   }, options, { _progress: { value: 0, total: 0, loaded: 0 } })
 }
 
-if (utils.IS_DEF) {
+if (utils.IS_DP) {
   utils.arrayEach('time,speed,loaded,value,total,remaining'.split(','), function (name) {
     Object.defineProperty(XEProgress.prototype, name, {
       get: function () {

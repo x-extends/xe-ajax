@@ -10,15 +10,13 @@ var XEResponse = require('../handle/response')
  * @param { Function } failed
  */
 function sendXHR (request, finish, failed) {
+  var uploadProgress
+  var downloadProgress
+  var autoCompute
+  var upload
   var url = request.getUrl()
   var reqTimeout = request.timeout
   var reqCredentials = request.credentials
-  if (request.mode === 'same-origin') {
-    if (utils.isCrossOrigin(url)) {
-      failed()
-      throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
-    }
-  }
   var $XMLHttpRequest = request.$XMLHttpRequest || XMLHttpRequest
   var xhr = request.xhr = new $XMLHttpRequest()
   var progress = request.progress
@@ -28,6 +26,12 @@ function sendXHR (request, finish, failed) {
       statusText: xhr.statusText,
       headers: parseXHRHeaders(xhr)
     }, request))
+  }
+  if (request.mode === 'same-origin') {
+    if (utils.isCrossOrigin(url)) {
+      failed()
+      throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
+    }
   }
   xhr._request = request
   if (xhr.onload === undefined) {
@@ -49,10 +53,10 @@ function sendXHR (request, finish, failed) {
     failed('ERR_A')
   }
   if (progress) {
-    var uploadProgress = progress.onUploadProgress
-    var downloadProgress = progress.onDownloadProgress
-    var autoCompute = progress.autoCompute
-    var upload = xhr.upload
+    uploadProgress = progress.onUploadProgress
+    downloadProgress = progress.onDownloadProgress
+    autoCompute = progress.autoCompute
+    upload = xhr.upload
     if (uploadProgress && upload) {
       if (autoCompute) {
         loadListener(upload, uploadProgress, progress)
@@ -95,7 +99,7 @@ function sendXHR (request, finish, failed) {
 function loadListener (target, callback, progress) {
   var handleTime = new Date().getTime()
   var prossQueue = []
-  var _progress = utils.IS_DEF ? progress._progress : progress
+  var _progress = utils.IS_DP ? progress._progress : progress
   var meanSpeed = progress.meanSpeed
   _progress.value = 0
   _progress.time = handleTime
@@ -120,17 +124,22 @@ function loadListener (target, callback, progress) {
     }
   }
   if (meanSpeed) {
+    var speed
+    var len
+    var index
+    var lastItem
+    var countSpeed
     var prossInterval = setInterval(function () {
       if (_progress.value < 100) {
-        var len = prossQueue.length
+        len = prossQueue.length
         if (len) {
-          var countSpeed = 0
-          var lastItem = null
-          for (var index = 0; index < len; index++) {
+          countSpeed = 0
+          lastItem = {}
+          for (index = 0; index < len; index++) {
             lastItem = prossQueue[0]
             countSpeed += lastItem.speed
           }
-          var speed = countSpeed / len
+          speed = countSpeed / len
           _progress.speed = formatUnit(speed, progress)
           _progress.remaining = Math.ceil((lastItem.total - lastItem.loaded) / speed)
           prossQueue = []
@@ -149,7 +158,8 @@ var sUnitLen = sUnits.length
 function formatUnit (bSize, progress) {
   var unit = ''
   var size = bSize
-  for (var index = 0; index < sUnitLen; index++) {
+  var index = 0
+  for (; index < sUnitLen; index++) {
     unit = sUnits[index]
     if (size >= sUnitRatio) {
       size = size / sUnitRatio
@@ -162,14 +172,12 @@ function formatUnit (bSize, progress) {
 
 // 处理响应头
 function parseXHRHeaders (xhr) {
+  var rowIndex
   var headers = {}
-  var headerList = utils.trim(xhr.getAllResponseHeaders()).split('\n')
-  var len = headerList.length
-  for (var row, rowIndex, index = 0; index < len; index++) {
-    row = headerList[index]
+  utils.arrayEach(utils.trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
     rowIndex = row.indexOf(':')
     headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
-  }
+  })
   return headers
 }
 

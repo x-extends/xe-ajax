@@ -23,7 +23,7 @@ function XEResponse (body, options, request) {
     headers: new XEHeaders(options.headers || {}),
     type: 'basic'
   }
-  if (utils.IS_DEF) {
+  if (utils.IS_DP) {
     _response.ok = validStatus(this)
   } else {
     utils.assign(this, _response)
@@ -34,7 +34,7 @@ function XEResponse (body, options, request) {
 var decode = decodeURIComponent
 var responsePro = XEResponse.prototype
 
-if (utils.IS_DEF) {
+if (utils.IS_DP) {
   utils.arrayEach('body,bodyUsed,url,headers,status,statusText,ok,redirected,type'.split(','), function (name) {
     Object.defineProperty(responsePro, name, {
       get: function () {
