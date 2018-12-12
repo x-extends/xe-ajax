@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.4.14",
+  "version": "3.5.0",
   "description": "Using the Fetch API,Support the Node.js and browser environment.",
   "main": "index.js",
   "typing": "index.d.ts",
@@ -9,6 +9,10 @@
     "unit": "jest",
     "test": "npm run lint && npm run unit"
   },
+  "files": [
+    "src",
+    "dist/*.js"
+  ],
   "devDependencies": {
     "eslint": "^5.9.0",
     "eslint-config-standard": "^12.0.0",

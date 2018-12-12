@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.4.14
+ * xe-ajax.js v3.5.0
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -316,10 +316,10 @@
   }
 
   /**
- * 取消控制器
- *
- * @param {XERequest} request XERequest 对象
- */
+   * 取消控制器
+   *
+   * @param {XERequest} request XERequest 对象
+   */
   XEAbortSignalPolyfill.prototype.install = function (request) {
     var reqSignal = request.signal
     if (reqSignal) {
@@ -373,8 +373,8 @@
   }
 
   /**
- * Request 拦截器
- */
+   * Request 拦截器
+   */
   function requests (request) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(request, request.$context)
@@ -391,8 +391,8 @@
   }
 
   /**
- * Response 拦截器
- */
+   * Response 拦截器
+   */
   function responseInterceptor (calls, request, response) {
     var XEPromise = request.$Promise || Promise
     var thenInterceptor = XEPromise.resolve(response, request.$context)
@@ -668,11 +668,11 @@
   }
 
   /**
- * xhr
- * @param { XERequest } request
- * @param { Function } finish
- * @param { Function } failed
- */
+   * xhr
+   * @param { XERequest } request
+   * @param { Function } finish
+   * @param { Function } failed
+   */
   function sendXHR (request, finish, failed) {
     var uploadProgress
     var downloadProgress
@@ -846,11 +846,11 @@
   }
 
   /**
- * fetch
- * @param { XERequest } request
- * @param { Function } finish
- * @param { Function } failed
- */
+   * fetch
+   * @param { XERequest } request
+   * @param { Function } finish
+   * @param { Function } failed
+   */
   function sendFetch (request, finish, failed) {
     var timer
     var isTimeout = false
@@ -922,11 +922,11 @@
   var $dom = $global ? $global.document : ''
 
   /**
- * jsonp
- * @param { XERequest } request
- * @param { Function } finish
- * @param { Function } failed
- */
+   * jsonp
+   * @param { XERequest } request
+   * @param { Function } finish
+   * @param { Function } failed
+   */
   function sendJSONP (request, finish, failed) {
     var url
     var timer
@@ -982,7 +982,7 @@
     try {
       delete $global[jsonpCallback]
     } catch (e) {
-    // IE8
+      // IE8
       $global[jsonpCallback] = UNDEFINED
     }
   }
@@ -994,11 +994,11 @@
   }
 
   /**
-  * 支持: nodejs、browser
-  *
-  * @param { Object} options
-  * @return { Promise }
-  */
+    * 支持: nodejs、browser
+    *
+    * @param { Object} options
+    * @return { Promise }
+    */
   function XEAjax (options) {
     var opts = utils.assign({}, setupDefaults, { headers: utils.assign({}, setupDefaults.headers) }, options)
     var request = new XERequest(opts)
@@ -1020,45 +1020,45 @@
   XEAjax.AbortController = XEAbortController
 
   /**
- * Installation
- */
+   * Installation
+   */
   XEAjax.use = function (plugin) {
     plugin.install(XEAjax)
   }
 
   /**
- * 参数说明
- *
- * 基础参数
- * @param { String } url 请求地址
- * @param { String } baseURL 基础路径，默认上下文路径
- * @param { String } method 请求方法(默认GET)
- * @param { Object } params 请求参数，序列化后会拼接在url
- * @param { Object } body 提交参数
- * @param { String } bodyType 提交参数方式可以设置json-data,form-data(json-data)
- * @param { String } jsonp 调用jsonp服务,回调属性默认callback
- * @param { Number } timeout 设置超时
- * @param { Object } headers 请求头
- * @param { Function } transformParams(params, request) 用于改变URL参数
- * @param { Function } paramsSerializer(params, request) 自定义URL序列化函数
- * @param { Function } transformBody(body, request) 用于改变提交数据
- * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
- * @param { Function } validateStatus(response) 自定义校验请求是否成功
- * 只有在支持 fetch 的环境下才有效
- * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
- * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
- * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
- * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
- * @param { String } integrity 包括请求的subresource integrity值
- * 高级参数(不建议使用))
- * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
- * @param { Function } $http 自定义 http 请求函数
- * @param { Function } $fetch 自定义 fetch 请求函数
- * @param { Function } $jsonp 自定义 jsonp 处理函数
- * @param { Function } $Promise 自定义 Promise 函数
- * @param { Function } $context 自定义上下文
- * @param { Function } $options 自定义参数
- */
+   * 参数说明
+   *
+   * 基础参数
+   * @param { String } url 请求地址
+   * @param { String } baseURL 基础路径，默认上下文路径
+   * @param { String } method 请求方法(默认GET)
+   * @param { Object } params 请求参数，序列化后会拼接在url
+   * @param { Object } body 提交参数
+   * @param { String } bodyType 提交参数方式可以设置json-data,form-data(json-data)
+   * @param { String } jsonp 调用jsonp服务,回调属性默认callback
+   * @param { Number } timeout 设置超时
+   * @param { Object } headers 请求头
+   * @param { Function } transformParams(params, request) 用于改变URL参数
+   * @param { Function } paramsSerializer(params, request) 自定义URL序列化函数
+   * @param { Function } transformBody(body, request) 用于改变提交数据
+   * @param { Function } stringifyBody(body, request) 自定义转换提交数据的函数
+   * @param { Function } validateStatus(response) 自定义校验请求是否成功
+   * 只有在支持 fetch 的环境下才有效
+   * @param { String } cache 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached(默认default)
+   * @param { String } credentials 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include(默认same-origin)
+   * @param { String } referrer 可以设置: no-referrer,client或URL(默认client)
+   * @param { String } referrerPolicy 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
+   * @param { String } integrity 包括请求的subresource integrity值
+   * 高级参数(不建议使用))
+   * @param { Function } $XMLHttpRequest 自定义 XMLHttpRequest 请求函数
+   * @param { Function } $http 自定义 http 请求函数
+   * @param { Function } $fetch 自定义 fetch 请求函数
+   * @param { Function } $jsonp 自定义 jsonp 处理函数
+   * @param { Function } $Promise 自定义 Promise 函数
+   * @param { Function } $context 自定义上下文
+   * @param { Function } $options 自定义参数
+   */
   XEAjax.setup = function (options) {
     utils.assign(setupDefaults, options)
   }
@@ -1200,10 +1200,10 @@
   }
 
   /**
- * 混合函数
- *
- * @param {Object} methods
- */
+   * 混合函数
+   *
+   * @param {Object} methods
+   */
   XEAjax.mixin = function (methods) {
     utils.objectEach(methods, function (fn, name) {
       XEAjax[name] = utils.isFn(fn) ? function () {
