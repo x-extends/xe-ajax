@@ -3,7 +3,7 @@
   "version": "3.5.1",
   "description": "Using the Fetch API,Support the Node.js and browser environment.",
   "main": "index.js",
-  "typing": "types/index.d.ts",
+  "typings": "types/index.d.ts",
   "scripts": {
     "lint": "eslint dist/xe-ajax.js test/**/*.js src/**/*.js",
     "unit": "jest",
