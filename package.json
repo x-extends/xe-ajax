@@ -1,9 +1,9 @@
 {
   "name": "xe-ajax",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "Using the Fetch API,Support the Node.js and browser environment.",
   "main": "index.js",
-  "typing": "index.d.ts",
+  "typing": "types/index.d.ts",
   "scripts": {
     "lint": "eslint dist/xe-ajax.js test/**/*.js src/**/*.js",
     "unit": "jest",
@@ -11,7 +11,8 @@
   },
   "files": [
     "src",
-    "dist/*.js"
+    "types",
+    "dist"
   ],
   "devDependencies": {
     "eslint": "^5.9.0",
@@ -39,7 +40,7 @@
     "name": "Xu Liangzhan",
     "email": "xu_liangzhan@163.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/xuliangzhan/xe-ajax/issues"
   },
