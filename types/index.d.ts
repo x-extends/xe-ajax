@@ -634,16 +634,7 @@ export interface XEAjaxMethods {
 }
 
 /**
- * 基于 Promise API 的异步请求函数，支持 nodejs、browser 环境
- * @example 
- ```javascript
- XEAjax.ajax({url: '/api/test/message/list'})
-  .then(response => {
-    // Success
-  }).catch(e => {
-    // Failure
-  })
- ```
+ * Using the Fetch API,Support the Node.js and browser environment.
  */
 declare var XEAjax: XEAjaxMethods;
 
