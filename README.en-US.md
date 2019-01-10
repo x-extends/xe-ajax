@@ -585,7 +585,7 @@ XEAjax.interceptors.request.use((request, next) => {
 
 ### Response interceptor
 
-XEAjax.interceptors.response.use(Function(response, next[, request]), Function(response, next))
+XEAjax.interceptors.response.use(Function(response, next[, request]), Function(response, next[, request]))
 
 next( [, newResponse] )
 
