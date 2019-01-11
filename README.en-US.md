@@ -101,6 +101,7 @@ define(['xe-ajax'], function (XEAjax) {
 |------|------|-----|----|
 | url | String | Request interface contains the URL of the request. |  |
 | baseURL | String | Request base URL | Context path |
+| origin | String | Change the origin. | location.origin |
 | method | String | The method read-only property of the Request interface contains the request's method | 'GET' |
 | params | Object | Request the params contents. |  |
 | body | Object | Request the body contents. |  |
@@ -163,7 +164,7 @@ define(['xe-ajax'], function (XEAjax) {
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  baseURL: 'https://xuliangzhan.com',
+  baseURL: 'https://test.com',
   bodyType: 'json-data',
   credentials: 'include',
   headers: {
@@ -366,7 +367,7 @@ XEAjax.postJSON('/api/test/message/save', formBody)
 import XEAjax from 'xe-ajax'
 
 // Case 1:
-// http://xuliangzhan.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
+// http://test.com/api/jsonp/public/message?callback=jsonp_xeajax_1521272815608_1
 // jsonp_xeajax_1521272815608_1({message: 'success'})
 XEAjax.fetchJsonp('/api/jsonp/public/message')
   .then(response => {
@@ -378,7 +379,7 @@ XEAjax.fetchJsonp('/api/jsonp/public/message')
   })
 
 // Case 2:
-// http://xuliangzhan.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
+// http://test.com/api/jsonp/public/message?cb=jsonp_xeajax_1521272815608_2
 // jsonp_xeajax_1521272815608_2({message: 'success'})
 XEAjax.doJsonp('/api/jsonp/public/message', null, {jsonp: 'cb'})
   .then(response => {
@@ -386,7 +387,7 @@ XEAjax.doJsonp('/api/jsonp/public/message', null, {jsonp: 'cb'})
   })
 
 // Case 3:
-// http://xuliangzhan.com/api/jsonp/public/message?id=222&cb=func
+// http://test.com/api/jsonp/public/message?id=222&cb=func
 // func({message: 'success'})
 XEAjax.jsonp('/api/jsonp/public/message', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
   .then(data => {

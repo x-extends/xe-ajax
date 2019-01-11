@@ -102,6 +102,7 @@ define(['xe-ajax'], function (XEAjax) {
 |------|------|-----|----|
 | url | String | 请求地址 |  |
 | baseURL | String | 基础路径 | 默认上下文路径 |
+| origin | String | 改变目标源 | location.origin |
 | method | String | 请求方法 | 'GET' |
 | params | Object | 表单查询参数 |  |
 | body | Object | 提交主体内容 |  |
@@ -164,7 +165,8 @@ define(['xe-ajax'], function (XEAjax) {
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  baseURL: 'https://xuliangzhan.com',
+  // 除非 url 是绝对路径（'/api/list' 或 '//test.com/api/list' 或 'https://test.com/api/list'），否则 baseURL 会拼接在 url 之前
+  baseURL: 'https://test.com',
   bodyType: 'json-data',
   credentials: 'include',
   headers: {
@@ -370,7 +372,7 @@ XEAjax.deleteJSON('/api/test/message/delete/1')
 import XEAjax from 'xe-ajax'
 
 // 例子1
-// 请求路径: https://xuliangzhan.com/jsonp/test/message/list?callback=jsonp_xeajax_1521272815608_1
+// 请求路径: https://test.com/jsonp/test/message/list?callback=jsonp_xeajax_1521272815608_1
 // 服务端返回结果: jsonp_xeajax_1521272815608_1([...])
 XEAjax.fetchJsonp('/jsonp/test/message/list')
   .then(response => {
@@ -382,7 +384,7 @@ XEAjax.fetchJsonp('/jsonp/test/message/list')
   })
 
 // 例子2
-// 请求路径: https://xuliangzhan.com/jsonp/test/message/list?cb=jsonp_xeajax_1521272815608_2
+// 请求路径: https://test.com/jsonp/test/message/list?cb=jsonp_xeajax_1521272815608_2
 // 服务端返回结果: jsonp_xeajax_1521272815608_2([...])
 XEAjax.doJsonp('/jsonp/test/message/list', null, {jsonp: 'cb'})
   .then(response => {
@@ -390,7 +392,7 @@ XEAjax.doJsonp('/jsonp/test/message/list', null, {jsonp: 'cb'})
   })
 
 // 例子3
-// 请求路径: https://xuliangzhan.com/jsonp/test/message/list/page/10/1?id=222&cb=func
+// 请求路径: https://test.com/jsonp/test/message/list/page/10/1?id=222&cb=func
 // 服务端返回结果: func({page: {...}, result: [...])
 XEAjax.jsonp('/jsonp/test/message/list/page/10/1', {id: 222}, {jsonp: 'cb',jsonpCallback: 'func'})
   .then(data => {

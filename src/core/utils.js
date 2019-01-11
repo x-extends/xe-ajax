@@ -50,8 +50,8 @@ function stringifyParams (resultVal, resultKey, isArr) {
   return result
 }
 
-function getLocatOrigin () {
-  return isNodeJS ? '' : ($locat.origin || ($locat.protocol + '//' + $locat.host))
+function getLocatOrigin (request) {
+  return request.origin || (isNodeJS ? '' : ($locat.origin || ($locat.protocol + '//' + $locat.host)))
 }
 
 var utils = {
@@ -94,22 +94,22 @@ var utils = {
     return typeof obj === 'function'
   },
 
-  err: function (e) {
-    var outError = $console.error ? $console.error : ''
-    if (outError) {
-      outError(e)
-    }
-  },
+  err: $console.error ? function (e) {
+    $console.error(e)
+  } : function () {},
 
   getOrigin: getLocatOrigin,
 
-  getBaseURL: function () {
+  getBaseURL: function (request) {
+    if (request.baseURL) {
+      return request.baseURL
+    }
     if (isNodeJS) {
       return ''
     }
     var pathname = $locat.pathname
     var lastIndex = lastIndexOf(pathname, '/') + 1
-    return getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
+    return getLocatOrigin(request) + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
   },
 
   objectEach: objectEach,

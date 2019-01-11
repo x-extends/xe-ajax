@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.5.1
+ * xe-ajax.js v3.5.2
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -61,8 +61,8 @@
     return result
   }
 
-  function getLocatOrigin () {
-    return isNodeJS ? '' : ($locat.origin || ($locat.protocol + '//' + $locat.host))
+  function getLocatOrigin (request) {
+    return request.origin || (isNodeJS ? '' : ($locat.origin || ($locat.protocol + '//' + $locat.host)))
   }
 
   var utils = {
@@ -105,22 +105,22 @@
       return typeof obj === 'function'
     },
 
-    err: function (e) {
-      var outError = $console.error ? $console.error : ''
-      if (outError) {
-        outError(e)
-      }
-    },
+    err: $console.error ? function (e) {
+      $console.error(e)
+    } : function () { },
 
     getOrigin: getLocatOrigin,
 
-    getBaseURL: function () {
+    getBaseURL: function (request) {
+      if (request.baseURL) {
+        return request.baseURL
+      }
       if (isNodeJS) {
         return ''
       }
       var pathname = $locat.pathname
       var lastIndex = lastIndexOf(pathname, '/') + 1
-      return getLocatOrigin() + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
+      return getLocatOrigin(request) + (lastIndex === pathname.length ? pathname : pathname.substring(0, lastIndex))
     },
 
     objectEach: objectEach,
@@ -182,7 +182,6 @@
 
   var setupDefaults = {
     method: 'GET',
-    baseURL: utils.getBaseURL(),
     mode: 'cors',
     cache: 'default',
     credentials: 'same-origin',
@@ -487,6 +486,7 @@
   }
 
   var requestPro = XERequest.prototype
+  var reFullURL = /(\w+:)\/{2}.+/
 
   requestPro.abort = function () {
     if (this.xhr) {
@@ -495,8 +495,10 @@
     this.$abort = true
   }
   requestPro.getUrl = function () {
+    var matchs
     var url = this.url
     var params = this.params
+    var origin = utils.getOrigin(this)
     var transformParams = this.transformParams
     var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: new Date().getTime() } : {}
     if (url) {
@@ -511,16 +513,17 @@
       if (params) {
         url += (url.indexOf('?') === -1 ? '?' : '&') + params
       }
-      if (/\w+:\/{2}.*/.test(url)) {
+      if (reFullURL.test(url)) {
         return url
       }
       if (url.indexOf('//') === 0) {
-        return (utils.IS_N ? '' : location.protocol) + url
+        matchs = origin.match(reFullURL)
+        return (matchs ? matchs[1] : (utils.IS_N ? '' : location.protocol)) + url
       }
       if (url.indexOf('/') === 0) {
-        return utils.getOrigin() + url
+        return origin + url
       }
-      return this.baseURL.replace(/\/$/, '') + '/' + url
+      return utils.getBaseURL(this).replace(/\/$/, '') + '/' + url
     }
     return url
   }

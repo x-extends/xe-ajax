@@ -15,6 +15,7 @@ function XERequest (options) {
 }
 
 var requestPro = XERequest.prototype
+var reFullURL = /(\w+:)\/{2}.+/
 
 requestPro.abort = function () {
   if (this.xhr) {
@@ -23,8 +24,10 @@ requestPro.abort = function () {
   this.$abort = true
 }
 requestPro.getUrl = function () {
+  var matchs
   var url = this.url
   var params = this.params
+  var origin = utils.getOrigin(this)
   var transformParams = this.transformParams
   var _param = utils.includes(['no-store', 'no-cache', 'reload'], this.cache) ? { _t: new Date().getTime() } : {}
   if (url) {
@@ -39,16 +42,17 @@ requestPro.getUrl = function () {
     if (params) {
       url += (url.indexOf('?') === -1 ? '?' : '&') + params
     }
-    if (/\w+:\/{2}.*/.test(url)) {
+    if (reFullURL.test(url)) {
       return url
     }
     if (url.indexOf('//') === 0) {
-      return (utils.IS_N ? '' : location.protocol) + url
+      matchs = origin.match(reFullURL)
+      return (matchs ? matchs[1] : (utils.IS_N ? '' : location.protocol)) + url
     }
     if (url.indexOf('/') === 0) {
-      return utils.getOrigin() + url
+      return origin + url
     }
-    return this.baseURL.replace(/\/$/, '') + '/' + url
+    return utils.getBaseURL(this).replace(/\/$/, '') + '/' + url
   }
   return url
 }
