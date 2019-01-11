@@ -652,7 +652,9 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## Extends its own utility functions to XEAjax
+## mixin
+
+Extends its own utility functions to XEAjax.
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
