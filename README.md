@@ -665,7 +665,7 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## mixin
+## mixin ( fns ) 扩展函数
 
 扩展自己的实用函数到 XEAjax
 

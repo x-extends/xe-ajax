@@ -652,7 +652,7 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## mixin
+## mixin ( fns )
 
 Extends its own utility functions to XEAjax.
 
