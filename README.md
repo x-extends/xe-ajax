@@ -665,7 +665,7 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## 您可以将自己的实用函数扩展到 XEAjax
+## 扩展自己的实用函数到 XEAjax
 
 ```JavaScript
 import XEAjax from 'xe-ajax'

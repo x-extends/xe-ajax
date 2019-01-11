@@ -652,7 +652,7 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## You can extend your utility functions to XEAjax
+## Extends its own utility functions to XEAjax
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
