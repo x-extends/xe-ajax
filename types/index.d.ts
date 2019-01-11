@@ -1,6 +1,7 @@
 export interface XEAjaxRequest<T> {
   url?: string;
   baseURL?: string;
+  origin?: string;
   method?: string;
   params?: any;
   body?: any;
@@ -100,7 +101,8 @@ export interface XEResponseInterceptors {
     ) => void,
     onRejectd: (
       error: TypeError,
-      next: (resp?: object) => void
+      next: (resp?: object) => void,
+      request?: XEAjaxRequest<any>
     ) => void
   );
 }
