@@ -1,4 +1,4 @@
-# xe-ajax 封装 fetch 的异步请求库
+# xe-ajax
 
 简体中文 | [English](https://github.com/xuliangzhan/xe-ajax/blob/master/README.en-US.md)
 
@@ -7,7 +7,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/xe-ajax/blob/master/LICENSE)
 
-基于 [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) 的异步请求函数，支持 nodejs、browser 环境。
+基于 [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) 的异步请求函数，用于浏览器和 nodejs 的 http 客户端。
 
 ## Browser Support
 
