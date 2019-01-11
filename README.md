@@ -101,8 +101,7 @@ define(['xe-ajax'], function (XEAjax) {
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
 | url | String | 请求地址 |  |
-| baseURL | String | 基础路径 | 默认上下文路径 |
-| origin | String | 改变目标源 | location.origin |
+| baseURL | String | 基础路径 | |
 | method | String | 请求方法 | 'GET' |
 | params | Object | 表单查询参数 |  |
 | body | Object | 提交主体内容 |  |
@@ -119,6 +118,7 @@ define(['xe-ajax'], function (XEAjax) {
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置请求超时 |  |
 | headers | Object | 请求头包含信息 |  |
+| origin | String | 改变目标源 | location.origin |
 | transformParams | Function (params,request) | 用于改变URL参数 |  |
 | paramsSerializer | Function (params,request) | 自定义URL序列化函数 |  |
 | transformBody | Function (body,request) | 用于改变提交数据 |  |

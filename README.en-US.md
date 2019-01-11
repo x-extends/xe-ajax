@@ -100,8 +100,7 @@ define(['xe-ajax'], function (XEAjax) {
 | Name | Type | Description | default value |
 |------|------|-----|----|
 | url | String | Request interface contains the URL of the request. |  |
-| baseURL | String | Request base URL | Context path |
-| origin | String | Change the origin. | location.origin |
+| baseURL | String | Request base URL |  |
 | method | String | The method read-only property of the Request interface contains the request's method | 'GET' |
 | params | Object | Request the params contents. |  |
 | body | Object | Request the body contents. |  |
@@ -118,6 +117,7 @@ define(['xe-ajax'], function (XEAjax) {
 | jsonpCallback | String | Set jsonp callback function name. | Default is a random number with json_xeajax_ prefix |
 | timeout | Number | Setting the request timeout. |  |
 | headers | Object | Optional header fields. | {'Accept': 'application/json, text/plain, */*'} |
+| origin | String | Change the origin. | location.origin |
 | transformParams | Function (params,request) | Change the URL parameter before sending the request. |  |
 | paramsSerializer | Function (params,request) | The custom URL serialization function is finally spliced in the URL. | XEAjax.serialize |
 | transformBody | Function (body,request) | Change the commit body before sending the request. |  |
