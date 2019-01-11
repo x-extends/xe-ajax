@@ -652,34 +652,25 @@ XEAjax.interceptors.response.use((response, next) => {
 })
 ```
 
-## mixing
-
-### common/ajax/index.js
+## You can extend your utility functions to XEAjax
 
 ```JavaScript
 import XEAjax from 'xe-ajax'
 
-export function get (url, options) {
-  return XEAjax.doGet(url, null, options)
-}
-export function delete (url, options) {
-  return XEAjax.doDelete(url, options)
-}
-export function post (url, data, options) {
-  return XEAjax.doPost(url, data, options)
-}
-export function put (url, data, options) {
-  return XEAjax.doPut(url, data, options)
-}
-```
-
-### ./main.js
-
-```JavaScript
-import XEAjax from 'xe-ajax'
-import ajaxFns from '@/common/ajax'
-
-XEAjax.mixin(ajaxFns)
+XEAjax.mixin({
+  get (url, options) {
+    return XEAjax.doGet(url, null, options)
+  },
+  delete (url, options) {
+    return XEAjax.doDelete(url, options)
+  },
+  post (url, data, options) {
+    return XEAjax.doPost(url, data, options)
+  },
+  put (url, data, options) {
+    return XEAjax.doPut(url, data, options)
+  }
+})
 
 XEAjax.get('/api/test/message/list', {params: {id: 123}})
 XEAjax.delete('/api/test/message/delete/123')
