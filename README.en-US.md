@@ -511,8 +511,15 @@ XEAjax.postJSON('/api/upload', formBody)
 // Create a Progress.
 let progress = new XEAjax.Progress()
 progress.onUploadProgress = evnt => {
-  console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}`)
-  console.log(`Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
+  let value = progress.value
+  let loadedSize = progress.loaded.size
+  let loadedUnit = progress.loaded.unit
+  let totalSize = progress.total.size
+  let totalUnit = progress.total.unit
+  let speedSize = progress.speed.size
+  let speedUnit = progress.speed.unit
+  let remaining = progress.remaining
+  console.log(`Progress:${value}% ${loadedSize}${loadedUnit}${totalSize}/${totalUnit}; Speed:${speedSize}/${speedUnit}s; Remaining:${remaining}s`)
 }
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
@@ -530,8 +537,15 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 // Create Progress object.
 let progress = new XEAjax.Progress()
 progress.onDownloadProgress = evnt => {
-  console.log(`Progress:${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}`)
-  console.log(`Speed:${progress.speed.size}/${progress.speed.unit}s; Remaining:${progress.remaining}s`)
+  let value = progress.value
+  let loadedSize = progress.loaded.size
+  let loadedUnit = progress.loaded.unit
+  let totalSize = progress.total.size
+  let totalUnit = progress.total.unit
+  let speedSize = progress.speed.size
+  let speedUnit = progress.speed.unit
+  let remaining = progress.remaining
+  console.log(`Progress:${value}% ${loadedSize}${loadedUnit}${totalSize}/${totalUnit}; Speed:${speedSize}/${speedUnit}s; Remaining:${remaining}s`)
 }
 XEAjax.fetchGet('/api/download/file/1', {progress, method: 'GET'})
 ```

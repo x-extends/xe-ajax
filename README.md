@@ -521,8 +521,15 @@ XEAjax.postJSON('/api/upload', formBody)
 let progress = new XEAjax.Progress()
 // 监听上传进度
 progress.onUploadProgress = evnt => {
-  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}`)
-  console.log(`速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
+  let value = progress.value
+  let loadedSize = progress.loaded.size
+  let loadedUnit = progress.loaded.unit
+  let totalSize = progress.total.size
+  let totalUnit = progress.total.unit
+  let speedSize = progress.speed.size
+  let speedUnit = progress.speed.unit
+  let remaining = progress.remaining
+  console.log(`进度：${value}% ${loadedSize}${loadedUnit}${totalSize}/${totalUnit}; 速度：${speedSize}/${speedUnit}秒; 剩余：${remaining}秒`)
 }
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
@@ -541,8 +548,15 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 let progress = new XEAjax.Progress()
 // 监听下载进度
 progress.onDownloadProgress = evnt => {
-  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}`)
-  console.log(`速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
+  let value = progress.value
+  let loadedSize = progress.loaded.size
+  let loadedUnit = progress.loaded.unit
+  let totalSize = progress.total.size
+  let totalUnit = progress.total.unit
+  let speedSize = progress.speed.size
+  let speedUnit = progress.speed.unit
+  let remaining = progress.remaining
+  console.log(`进度：${value}% ${loadedSize}${loadedUnit}${totalSize}/${totalUnit}; 速度：${speedSize}/${speedUnit}秒; 剩余：${remaining}秒`)
 }
 XEAjax.fetchGet('/api/download/file/1', {progress, method: 'GET'})
 ```
