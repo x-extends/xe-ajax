@@ -165,7 +165,8 @@ define(['xe-ajax'], function (XEAjax) {
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  // 除非 url 是绝对路径（'/api/list' 或 '//test.com/api/list' 或 'https://test.com/api/list'），否则 baseURL 会拼接在 url 之前
+  // 除非 url 是绝对路径（'/api/list' 或 '//test.com/api/list' 或 'https://test.com/api/list'），
+  // 否则 baseURL 会拼接在 url 之前
   baseURL: 'https://test.com',
   bodyType: 'json-data',
   credentials: 'include',
@@ -520,7 +521,8 @@ XEAjax.postJSON('/api/upload', formBody)
 let progress = new XEAjax.Progress()
 // 监听上传进度
 progress.onUploadProgress = evnt => {
-  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; 速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
+  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}`)
+  console.log(`速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
 }
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
@@ -539,7 +541,8 @@ XEAjax.fetchPost('/api/upload', formBody, {progress})
 let progress = new XEAjax.Progress()
 // 监听下载进度
 progress.onDownloadProgress = evnt => {
-  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}; 速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
+  console.log(`进度：${progress.value}% ${progress.loaded.size}${progress.loaded.unit}${progress.total.size}/${progress.total.unit}`)
+  console.log(`速度：${progress.speed.size}/${progress.speed.unit}秒; 剩余：${progress.remaining}秒`)
 }
 XEAjax.fetchGet('/api/download/file/1', {progress, method: 'GET'})
 ```
