@@ -19,37 +19,37 @@ xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-poly
 
 ## Installing
 
-```JavaScript
+```javascript
 npm install xe-ajax --save
 ```
 
 Using nodejs
 
-```JavaScript
+```javascript
 const XEAjax = require('xe-ajax')
 ```
 
 Using ES6
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 ```
 
 [Using cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 
-```JavaScript
+```javascript
 <script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 [Using unpkg](https://unpkg.com/xe-ajax/)
 
-```JavaScript
+```javascript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.js"></script>
 ```
 
 Using requirejs
 
-```JavaScript
+```javascript
 // require 配置
 require.config({
   paths: {
@@ -161,7 +161,7 @@ define(['xe-ajax'], function (XEAjax) {
 
 ## 全局参数设置
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
@@ -209,7 +209,7 @@ XEAjax.setup({
 
 ### 基本使用
 
-```JavaScript
+```javascript
 const XEAjax = require('xe-ajax')
 
 XEAjax.ajax({
@@ -234,7 +234,7 @@ XEAjax.ajax({
 
 ### fetch 调用，返回一个结果为 Response 的 Promise 对象
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 XEAjax.fetch('/api/test/message/save', {
@@ -330,7 +330,7 @@ XEAjax.fetchDelete('/api/test/message/delete/1')
 
 ### 根据请求状态码（成功或失败），返回一个包含响应信息的 Peomise 对象 (v3.4.0+)
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 对请求的响应包含以下信息
@@ -351,7 +351,7 @@ XEAjax.doDelete('/api/test/message/delete/1')
 
 ### 根据请求状态码（成功或失败），返回响应结果为 JSON 的 Peomise 对象
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败,直接可以获取响应结果
@@ -369,7 +369,7 @@ XEAjax.deleteJSON('/api/test/message/delete/1')
 
 ### jsonp 调用
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 例子1
@@ -403,7 +403,7 @@ XEAjax.jsonp('/jsonp/test/message/list/page/10/1', {id: 222}, {jsonp: 'cb',jsonp
 
 ### 并发多个请求
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 并发多个
@@ -440,7 +440,7 @@ XEAjax.doAll(iterable2).then(datas => {
 
 ### 嵌套请求
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 相互依赖的嵌套请求
@@ -468,7 +468,7 @@ XEAjax.getJSON('/api/test/message/info', {id: 3})
 
 ## 使用 async/await 处理异步
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 async function init() {
@@ -504,7 +504,7 @@ init()
 | remaining | Number | 剩余时间/秒 |
 | time | Number | 时间戳 |
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 上传、下载
@@ -567,7 +567,7 @@ XEAjax.fetchGet('/api/download/file/1', {progress, method: 'GET'})
 
 允许控制一个或多个取消指令请求
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 创建一个控制器对象
@@ -597,7 +597,7 @@ setTimeout(() => {
 
 XEAjax.interceptors.request.use(Function(request, next))
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 请求之前拦截器
@@ -627,7 +627,7 @@ next( [, newResponse] )
 | body | Object | 设置响应主体内容 |
 | headers | Headers、Object | 设置响应的头信息 |
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 // 请求完成之后拦截
@@ -669,7 +669,7 @@ XEAjax.interceptors.response.use((response, next) => {
 
 扩展自己的实用函数到 XEAjax
 
-```JavaScript
+```javascript
 import XEAjax from 'xe-ajax'
 
 XEAjax.mixin({
