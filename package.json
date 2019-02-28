@@ -31,10 +31,8 @@
   },
   "keywords": [
     "ajax",
-    "vxe-ajax",
-    "xe-ajax",
-    "xhr",
-    "fetch"
+    "xe-fetch",
+    "xe-ajax"
   ],
   "author": {
     "name": "Xu Liangzhan",
