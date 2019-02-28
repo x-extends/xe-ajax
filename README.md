@@ -83,11 +83,11 @@ const XEAjax = require('xe-ajax')
 | mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 'cors' |
 | cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 'same-origin' |
-| * **redirect** | String | 重定向模式, 可以设置follow,error,manual | 'follow' |
-| * **referrer** | String | 可以设置no-referrer,client或URL | 'client' |
-| * **referrerPolicy** | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
-| * **keepalive** | String | 选项可用于允许请求超过页面的生存时间 |  |
-| * **integrity** | String | 包括请求的subresource integrity值 |  |
+| ***redirect** | String | 重定向模式, 可以设置follow,error,manual | 'follow' |
+| ***referrer** | String | 可以设置no-referrer,client或URL | 'client' |
+| ***referrerPolicy** | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| ***keepalive** | String | 选项可用于允许请求超过页面的生存时间 |  |
+| ***integrity** | String | 包括请求的subresource integrity值 |  |
 | jsonp | String | jsonp入参属性名 | 'callback' |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置请求超时 |  |

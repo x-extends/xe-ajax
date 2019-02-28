@@ -83,11 +83,11 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 | mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | 'cors' |
 | cache | String | Handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
 | credentials | String | Set the cookie to be sent along with the request, You can set: omit,same-origin,include | 'same-origin' |
-| redirect | String | The redirect mode to use, You can set: follow,error,manual | 'follow' |
-| * **referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
-| * **referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
-| * **keepalive** | String | The keepalive option can be used to allow the request to outlive the page. |  |
-| * **integrity** | String | Contains the subresource integrity value of the request. |  |
+| ***redirect** | String | The redirect mode to use, You can set: follow,error,manual | 'follow' |
+| ***referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
+| ***referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| ***keepalive** | String | The keepalive option can be used to allow the request to outlive the page. |  |
+| ***integrity** | String | Contains the subresource integrity value of the request. |  |
 | jsonp | String | set jsonp Callback parameter name. | 'callback' |
 | jsonpCallback | String | Set jsonp callback function name. | Default is a random number with json_xeajax_ prefix |
 | timeout | Number | Setting the request timeout. |  |
