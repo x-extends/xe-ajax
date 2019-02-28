@@ -20,46 +20,20 @@ xe-ajax Depends on a native Promise implementation to be supported. If your envi
 
 ## Installing
 
-```JavaScript
+```shell
 npm install xe-ajax --save
 ```
 
 Using nodejs
 
-```JavaScript
+```javascript
 const XEAjax = require('xe-ajax')
 ```
 
-Using ES6
+Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 
-```JavaScript
-import XEAjax from 'xe-ajax'
-```
-
-[Using cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
-
-```JavaScript
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.min.js"></script>
-```
-
-[Using unpkg](https://unpkg.com/xe-ajax/)
-
-```JavaScript
+```javascript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.min.js"></script>
-```
-
-Using requirejs
-
-```JavaScript
-require.config({
-  paths: {
-    // ...,
-    'xe-ajax': './dist/xe-ajax.min'
-  }
-})
-define(['xe-ajax'], function (XEAjax) {
-  XEAjax.fetch('/api/test/message/list')
-})
 ```
 
 ## API

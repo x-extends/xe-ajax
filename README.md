@@ -20,7 +20,7 @@ xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-poly
 
 ## Installing
 
-```javascript
+```shell
 npm install xe-ajax --save
 ```
 
@@ -30,37 +30,10 @@ Using nodejs
 const XEAjax = require('xe-ajax')
 ```
 
-Using ES6
-
-```javascript
-import XEAjax from 'xe-ajax'
-```
-
-[Using cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
-
-```javascript
-<script src="https://cdn.jsdelivr.net/npm/xe-ajax/dist/xe-ajax.min.js"></script>
-```
-
-[Using unpkg](https://unpkg.com/xe-ajax/)
+在 [unpkg](https://unpkg.com/xe-ajax/) 和 [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/) 上获取
 
 ```javascript
 <script src="https://unpkg.com/xe-ajax/dist/xe-ajax.min.js"></script>
-```
-
-Using requirejs
-
-```javascript
-// require 配置
-require.config({
-  paths: {
-    // ...,
-    'xe-ajax': './dist/xe-ajax.min'
-  }
-})
-define(['xe-ajax'], function (XEAjax) {
-  XEAjax.fetch('/api/test/message/list')
-})
 ```
 
 ## API
