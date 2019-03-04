@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.5.2
+ * xe-ajax.js v3.5.3
  * (c) 2017-2018 Xu Liangzhan
  * ISC License.
  * @preserve
@@ -103,6 +103,10 @@
 
     isFn: function (obj) {
       return typeof obj === 'function'
+    },
+
+    createErr: function (message) {
+      return new Error(message)
     },
 
     err: $console.error ? function (e) {
@@ -302,7 +306,7 @@
       }
       return new XEPromise(function (resolve, reject) {
         if (stream.locked) {
-          reject(new TypeError('body stream already read'))
+          reject(utils.createErr('body stream already read'))
         } else {
           stream.locked = true
           resolve(body)
@@ -594,7 +598,7 @@
 
   responsePro.clone = function () {
     if (this.bodyUsed) {
-      throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
+      throw utils.createErr("Failed to execute 'clone' on 'Response': Response body is already used")
     }
     return new XEResponse(this._body, this, this._request)
   }
@@ -722,7 +726,7 @@
     if (request.mode === 'same-origin') {
       if (utils.isCrossOrigin(url)) {
         failed()
-        throw new TypeError('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin() + '.')
+        throw utils.createErr('Fetch API cannot load ' + url + '. Request mode is "same-origin" but the URL\'s origin is not same as the request origin ' + utils.getOrigin(request) + '.')
       }
     }
     xhr._request = request
@@ -883,7 +887,6 @@
     var timer
     var isTimeout = false
     var $fetch = request.$fetch || self.fetch
-    var reqTimeout = request.timeout
     var options = {
       _request: request,
       body: request.getBody()
@@ -895,12 +898,6 @@
         options[pro] = request[pro]
       }
     })
-    if (reqTimeout) {
-      timer = setTimeout(function () {
-        isTimeout = true
-        failed('ERR_T')
-      }, reqTimeout)
-    }
     if (reqSignal && reqSignal.aborted) {
       failed('ERR_A')
     } else {
@@ -919,7 +916,7 @@
   }
 
   function getRequest (request, reqSignal) {
-    if (!request.progress) {
+    if (!request.progress && !request.timeout) {
       if (request.$fetch) {
         return reqSignal ? sendXHR : sendFetch
       } else if (utils.IS_F) {
@@ -1015,7 +1012,7 @@
     }
   }
 
-  var errorType = {
+  var errorMessage = {
     ERR_A: 'The user aborted a request.',
     ERR_T: 'Request timeout.',
     ERR_F: 'Network request failed.'
@@ -1036,7 +1033,7 @@
         (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
           interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
         }, function (type) {
-          interceptorExports.toRejects(request, new TypeError(errorType[type || 'ERR_F']), resolve, reject)
+          interceptorExports.toRejects(request, utils.createErr(errorMessage[type || 'ERR_F']), resolve, reject)
         })
       })
     }, request.$context)

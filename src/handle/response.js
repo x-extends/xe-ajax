@@ -46,7 +46,7 @@ if (utils.IS_DP) {
 
 responsePro.clone = function () {
   if (this.bodyUsed) {
-    throw new TypeError("Failed to execute 'clone' on 'Response': Response body is already used")
+    throw utils.createErr("Failed to execute 'clone' on 'Response': Response body is already used")
   }
   return new XEResponse(this._body, this, this._request)
 }

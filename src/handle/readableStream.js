@@ -14,7 +14,7 @@ function XEReadableStream (body, request, response) {
     }
     return new XEPromise(function (resolve, reject) {
       if (stream.locked) {
-        reject(new TypeError('body stream already read'))
+        reject(utils.createErr('body stream already read'))
       } else {
         stream.locked = true
         resolve(body)

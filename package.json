@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "description": "Using the Fetch API,Support the Node.js and browser environment.",
   "main": "index.js",
   "typings": "types/index.d.ts",

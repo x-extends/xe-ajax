@@ -94,6 +94,10 @@ var utils = {
     return typeof obj === 'function'
   },
 
+  createErr: function (message) {
+    return new Error(message)
+  },
+
   err: $console.error ? function (e) {
     $console.error(e)
   } : function () {},

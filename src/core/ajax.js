@@ -10,7 +10,7 @@ var setupDefaults = require('./setup')
 var handleExports = require('../handle')
 var interceptorExports = require('../handle/interceptor')
 
-var errorType = {
+var errorMessage = {
   ERR_A: 'The user aborted a request.',
   ERR_T: 'Request timeout.',
   ERR_F: 'Network request failed.'
@@ -31,7 +31,7 @@ function XEAjax (options) {
       (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
         interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
       }, function (type) {
-        interceptorExports.toRejects(request, new TypeError(errorType[type || 'ERR_F']), resolve, reject)
+        interceptorExports.toRejects(request, utils.createErr(errorMessage[type || 'ERR_F']), resolve, reject)
       })
     })
   }, request.$context)

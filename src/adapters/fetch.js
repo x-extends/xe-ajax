@@ -15,7 +15,6 @@ function sendFetch (request, finish, failed) {
   var timer
   var isTimeout = false
   var $fetch = request.$fetch || self.fetch
-  var reqTimeout = request.timeout
   var options = {
     _request: request,
     body: request.getBody()
@@ -27,12 +26,6 @@ function sendFetch (request, finish, failed) {
       options[pro] = request[pro]
     }
   })
-  if (reqTimeout) {
-    timer = setTimeout(function () {
-      isTimeout = true
-      failed('ERR_T')
-    }, reqTimeout)
-  }
   if (reqSignal && reqSignal.aborted) {
     failed('ERR_A')
   } else {
@@ -51,7 +44,7 @@ function sendFetch (request, finish, failed) {
 }
 
 function getRequest (request, reqSignal) {
-  if (!request.progress) {
+  if (!request.progress && !request.timeout) {
     if (request.$fetch) {
       return reqSignal ? sendXHR : sendFetch
     } else if (utils.IS_F) {
