@@ -49,6 +49,9 @@ function sendXHR (request, finish, failed) {
   } else {
     xhr.onload = loadFinish
   }
+  if (reqTimeout) {
+    xhr.timeout = reqTimeout
+  }
   xhr.ontimeout = loadFinish
   xhr.onerror = function () {
     failed()
@@ -91,9 +94,6 @@ function sendXHR (request, finish, failed) {
     xhr.withCredentials = true
   } else if (reqCredentials === 'omit') {
     xhr.withCredentials = false
-  }
-  if (reqTimeout) {
-    xhr.timeout = reqTimeout
   }
   xhr.send(request.getBody())
   if (request.$abort) {

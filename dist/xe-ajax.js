@@ -751,6 +751,9 @@
     } else {
       xhr.onload = loadFinish
     }
+    if (reqTimeout) {
+      xhr.timeout = reqTimeout
+    }
     xhr.ontimeout = loadFinish
     xhr.onerror = function () {
       failed()
@@ -793,9 +796,6 @@
       xhr.withCredentials = true
     } else if (reqCredentials === 'omit') {
       xhr.withCredentials = false
-    }
-    if (reqTimeout) {
-      xhr.timeout = reqTimeout
     }
     xhr.send(request.getBody())
     if (request.$abort) {
