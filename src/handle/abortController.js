@@ -1,7 +1,7 @@
 'use strict'
 
 var utils = require('../core/utils')
-var XEAbortSignalPolyfill = require('./abortSignal')
+var XEAbortSignal = require('./abortSignal')
 var requestList = []
 
 function getSignalIndex (item) {
@@ -18,7 +18,7 @@ function getSignalIndex (item) {
  *
  * @param {XERequest} request XERequest 对象
  */
-XEAbortSignalPolyfill.prototype.install = function (request) {
+XEAbortSignal.prototype.install = function (request) {
   var reqSignal = request.signal
   if (reqSignal) {
     var index = getSignalIndex(reqSignal)
@@ -30,11 +30,11 @@ XEAbortSignalPolyfill.prototype.install = function (request) {
   }
 }
 
-function XEAbortControllerPolyfill () {
-  this.signal = new XEAbortSignalPolyfill()
+function XEAbortController () {
+  this.signal = new XEAbortSignal()
 }
 
-XEAbortControllerPolyfill.prototype.abort = function () {
+XEAbortController.prototype.abort = function () {
   var index = getSignalIndex(this.signal)
   if (index > -1) {
     var requestItem = requestList[index]
@@ -50,7 +50,5 @@ XEAbortControllerPolyfill.prototype.abort = function () {
     requestList.splice(index, 1)
   }
 }
-
-var XEAbortController = XEAbortControllerPolyfill
 
 module.exports = XEAbortController

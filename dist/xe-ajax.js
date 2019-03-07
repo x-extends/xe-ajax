@@ -315,7 +315,7 @@
     }
   }
 
-  function XEAbortSignalPolyfill () {
+  function XEAbortSignal () {
     this.onaborted = null
     if (utils.IS_DP) {
       this._store = { aborted: false }
@@ -325,7 +325,7 @@
   }
 
   if (utils.IS_DP) {
-    Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
+    Object.defineProperty(XEAbortSignal.prototype, 'aborted', {
       get: function () {
         return this._store.aborted
       }
@@ -348,7 +348,7 @@
    *
    * @param {XERequest} request XERequest 对象
    */
-  XEAbortSignalPolyfill.prototype.install = function (request) {
+  XEAbortSignal.prototype.install = function (request) {
     var reqSignal = request.signal
     if (reqSignal) {
       var index = getSignalIndex(reqSignal)
@@ -360,11 +360,11 @@
     }
   }
 
-  function XEAbortControllerPolyfill () {
-    this.signal = new XEAbortSignalPolyfill()
+  function XEAbortController () {
+    this.signal = new XEAbortSignal()
   }
 
-  XEAbortControllerPolyfill.prototype.abort = function () {
+  XEAbortController.prototype.abort = function () {
     var index = getSignalIndex(this.signal)
     if (index > -1) {
       var requestItem = requestList[index]
@@ -380,8 +380,6 @@
       requestList.splice(index, 1)
     }
   }
-
-  var XEAbortController = XEAbortControllerPolyfill
 
   var reqQueue = { resolves: [], rejects: [] }
   var respQueue = { resolves: [], rejects: [] }
