@@ -50,7 +50,8 @@ function getRequest (request, reqSignal) {
 
 function createRequestFactory () {
   if (utils.IS_N) {
-    return sendHttp
+    /* eslint-disable no-undef */
+    return typeof sendHttp
   } else if (utils.IS_F) {
     return function (request) {
       return getRequest(request, request.signal).apply(this, arguments)
