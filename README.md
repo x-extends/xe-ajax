@@ -33,7 +33,7 @@ const XEAjax = require('xe-ajax')
 在 [unpkg](https://unpkg.com/xe-ajax/) 和 [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/) 上获取
 
 ```javascript
-<script src="https://unpkg.com/xe-ajax/dist/xe-ajax.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax"></script>
 ```
 
 ## API

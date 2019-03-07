@@ -33,7 +33,7 @@ const XEAjax = require('xe-ajax')
 Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/npm/xe-ajax/)
 
 ```javascript
-<script src="https://unpkg.com/xe-ajax/dist/xe-ajax.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-ajax"></script>
 ```
 
 ## API

@@ -3,6 +3,8 @@
   "version": "3.5.3",
   "description": "Using the Fetch API,Support the Node.js and browser environment.",
   "main": "index.js",
+  "unpkg": "dist/xe-ajax.js",
+  "jsdelivr": "dist/xe-ajax.js",
   "typings": "types/index.d.ts",
   "scripts": {
     "lint": "eslint dist/xe-ajax.js test/**/*.js src/**/*.js",
