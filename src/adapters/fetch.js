@@ -12,15 +12,12 @@ var handleExports = require('../handle')
  * @param { Function } failed
  */
 function sendFetch (request, finish, failed) {
-  var timer
-  var isTimeout = false
   var $fetch = request.$fetch || self.fetch
   var options = {
     _request: request,
     body: request.getBody()
   }
   var reqSignal = request.signal
-  var clearTimeoutFn = clearTimeout
   utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), function (pro) {
     if (request[pro]) {
       options[pro] = request[pro]
@@ -30,15 +27,9 @@ function sendFetch (request, finish, failed) {
     failed('ERR_A')
   } else {
     $fetch(request.getUrl(), options).then(function (resp) {
-      if (!isTimeout) {
-        clearTimeoutFn(timer)
-        handleExports.toResponse(resp, request).then(finish)
-      }
+      handleExports.toResponse(resp, request).then(finish)
     })['catch'](function (e) {
-      if (!isTimeout) {
-        clearTimeoutFn(timer)
-        failed()
-      }
+      failed()
     })
   }
 }

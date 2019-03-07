@@ -42,7 +42,7 @@ XEAbortControllerPolyfill.prototype.abort = function () {
       var item = requestItem[0]
       request.abort()
       if (utils.IS_DP) {
-        item.D_AS.aborted = true
+        item._store.aborted = true
       } else {
         item.aborted = true
       }
@@ -51,7 +51,6 @@ XEAbortControllerPolyfill.prototype.abort = function () {
   }
 }
 
-/* eslint-disable no-undef */
-var XEAbortController = utils.IS_FAC ? AbortController : XEAbortControllerPolyfill
+var XEAbortController = XEAbortControllerPolyfill
 
 module.exports = XEAbortController

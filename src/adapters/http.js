@@ -89,7 +89,7 @@ function httpRequest (request, finish, failed) {
     timer = setTimeout(function () {
       isTimeout = true
       req.abort()
-      failed('ERR_T')
+      finish({ status: 0, body: null })
     }, reqTimeout)
   }
 
@@ -101,23 +101,12 @@ function getHttp (urlLocat) {
 }
 
 function sendHttp (request, finish, failed) {
-  var timer
-  var clearTimeoutFn = clearTimeout
-  var reqTimeout = request.timeout
   if (utils.isFn(request.$http)) {
-    if (reqTimeout) {
-      timer = setTimeout(function () {
-        failed('ERR_T')
-      }, reqTimeout)
-    }
     return request.$http(request, function () {
-      clearTimeoutFn(timer)
       return httpRequest(request, finish, failed)
     }, function (resp) {
-      clearTimeoutFn(timer)
       handleExports.toResponse(resp, request).then(finish)
     }, function (e) {
-      clearTimeoutFn(timer)
       failed()
     })
   }

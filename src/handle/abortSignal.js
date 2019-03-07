@@ -5,7 +5,7 @@ var utils = require('../core/utils')
 function XEAbortSignalPolyfill () {
   this.onaborted = null
   if (utils.IS_DP) {
-    this.D_AS = { aborted: false }
+    this._store = { aborted: false }
   } else {
     this.aborted = false
   }
@@ -14,7 +14,7 @@ function XEAbortSignalPolyfill () {
 if (utils.IS_DP) {
   Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
     get: function () {
-      return this.D_AS.aborted
+      return this._store.aborted
     }
   })
 }

@@ -11,9 +11,8 @@ var handleExports = require('../handle')
 var interceptorExports = require('../handle/interceptor')
 
 var errorMessage = {
-  ERR_A: 'The user aborted a request.',
-  ERR_T: 'Request timeout.',
-  ERR_F: 'Network request failed.'
+  ERR_A: 'The user aborted a request',
+  ERR_F: 'Network request failed'
 }
 
 /**

@@ -14,6 +14,7 @@ function sendXHR (request, finish, failed) {
   var downloadProgress
   var autoCompute
   var upload
+  var xhrLoadEnd = false
   var url = request.getUrl()
   var reqTimeout = request.timeout
   var reqCredentials = request.credentials
@@ -21,11 +22,16 @@ function sendXHR (request, finish, failed) {
   var xhr = request.xhr = new $XMLHttpRequest()
   var progress = request.progress
   var loadFinish = function () {
-    finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
-      status: xhr.status,
-      statusText: xhr.statusText,
-      headers: parseXHRHeaders(xhr)
-    }, request))
+    try {
+      finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
+        status: xhr.status,
+        statusText: xhr.statusText,
+        headers: parseXHRHeaders(xhr)
+      }, request))
+    } catch (e) {
+      finish({ status: 0, body: null })
+    }
+    xhrLoadEnd = true
   }
   if (request.mode === 'same-origin') {
     if (utils.isCrossOrigin(url)) {
@@ -43,14 +49,16 @@ function sendXHR (request, finish, failed) {
   } else {
     xhr.onload = loadFinish
   }
+  xhr.ontimeout = loadFinish
   xhr.onerror = function () {
     failed()
   }
-  xhr.ontimeout = function () {
-    failed('ERR_T')
-  }
+  request._noA = xhr.onabort === undefined
   xhr.onabort = function () {
-    failed('ERR_A')
+    if (!xhrLoadEnd) {
+      xhrLoadEnd = true
+      failed('ERR_A')
+    }
   }
   if (progress) {
     uploadProgress = progress.onUploadProgress
@@ -85,9 +93,7 @@ function sendXHR (request, finish, failed) {
     xhr.withCredentials = false
   }
   if (reqTimeout) {
-    setTimeout(function () {
-      xhr.abort()
-    }, reqTimeout)
+    xhr.timeout = reqTimeout
   }
   xhr.send(request.getBody())
   if (request.$abort) {
@@ -174,10 +180,13 @@ function formatUnit (bSize, progress) {
 function parseXHRHeaders (xhr) {
   var rowIndex
   var headers = {}
-  utils.arrayEach(utils.trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
-    rowIndex = row.indexOf(':')
-    headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
-  })
+  var responseHeaders = utils.trim(xhr.getAllResponseHeaders())
+  if (responseHeaders) {
+    utils.arrayEach(responseHeaders.split('\n'), function (row) {
+      rowIndex = row.indexOf(':')
+      headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
+    })
+  }
   return headers
 }
 

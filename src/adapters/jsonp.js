@@ -45,14 +45,14 @@ function sendJSONP (request, finish, failed) {
       if (!isTimeout) {
         clearTimeoutFn(timer)
         jsonpClear(request, jsonpCallback)
-        finish()
+        failed()
       }
     }
     if (reqTimeout) {
       timer = setTimeout(function () {
         isTimeout = true
         jsonpClear(request, jsonpCallback)
-        finish('ERR_T')
+        finish({ status: 0, body: null })
       }, reqTimeout)
     }
     $dom.body.appendChild(script)

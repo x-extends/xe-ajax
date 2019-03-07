@@ -318,7 +318,7 @@
   function XEAbortSignalPolyfill () {
     this.onaborted = null
     if (utils.IS_DP) {
-      this.D_AS = { aborted: false }
+      this._store = { aborted: false }
     } else {
       this.aborted = false
     }
@@ -327,7 +327,7 @@
   if (utils.IS_DP) {
     Object.defineProperty(XEAbortSignalPolyfill.prototype, 'aborted', {
       get: function () {
-        return this.D_AS.aborted
+        return this._store.aborted
       }
     })
   }
@@ -372,7 +372,7 @@
         var item = requestItem[0]
         request.abort()
         if (utils.IS_DP) {
-          item.D_AS.aborted = true
+          item._store.aborted = true
         } else {
           item.aborted = true
         }
@@ -381,8 +381,7 @@
     }
   }
 
-  /* eslint-disable no-undef */
-  var XEAbortController = utils.IS_FAC ? AbortController : XEAbortControllerPolyfill
+  var XEAbortController = XEAbortControllerPolyfill
 
   var reqQueue = { resolves: [], rejects: [] }
   var respQueue = { resolves: [], rejects: [] }
@@ -495,6 +494,9 @@
   requestPro.abort = function () {
     if (this.xhr) {
       this.xhr.abort()
+      if (this._noA) {
+        this.xhr.onabort()
+      }
     }
     this.$abort = true
   }
@@ -537,19 +539,23 @@
     var reqMethod = this.method
     var transformBody = this.transformBody
     var stringifyBody = this.stringifyBody
-    if (body && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
-      if (transformBody) {
-        body = this.body = transformBody(body, this) || body
-      }
-      if (stringifyBody) {
-        result = stringifyBody(body, this)
+    if (body) {
+      if (reqMethod === 'GET' || reqMethod === 'HEAD') {
+        throw utils.createErr('Request with GET/HEAD method cannot have body')
       } else {
-        if (utils.isURLSParams(body)) {
-          result = body.toString()
-        } else if (utils.isFData(body) || utils.isStr(body)) {
-          result = body
+        if (transformBody) {
+          body = this.body = transformBody(body, this) || body
+        }
+        if (stringifyBody) {
+          result = stringifyBody(body, this)
         } else {
-          result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
+          if (utils.isURLSParams(body)) {
+            result = body.toString()
+          } else if (utils.isFData(body) || utils.isStr(body)) {
+            result = body
+          } else {
+            result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
+          }
         }
       }
     }
@@ -710,6 +716,7 @@
     var downloadProgress
     var autoCompute
     var upload
+    var xhrLoadEnd = false
     var url = request.getUrl()
     var reqTimeout = request.timeout
     var reqCredentials = request.credentials
@@ -717,11 +724,16 @@
     var xhr = request.xhr = new $XMLHttpRequest()
     var progress = request.progress
     var loadFinish = function () {
-      finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
-        status: xhr.status,
-        statusText: xhr.statusText,
-        headers: parseXHRHeaders(xhr)
-      }, request))
+      try {
+        finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: parseXHRHeaders(xhr)
+        }, request))
+      } catch (e) {
+        finish({ status: 0, body: null })
+      }
+      xhrLoadEnd = true
     }
     if (request.mode === 'same-origin') {
       if (utils.isCrossOrigin(url)) {
@@ -739,14 +751,16 @@
     } else {
       xhr.onload = loadFinish
     }
+    xhr.ontimeout = loadFinish
     xhr.onerror = function () {
       failed()
     }
-    xhr.ontimeout = function () {
-      failed('ERR_T')
-    }
+    request._noA = xhr.onabort === undefined
     xhr.onabort = function () {
-      failed('ERR_A')
+      if (!xhrLoadEnd) {
+        xhrLoadEnd = true
+        failed('ERR_A')
+      }
     }
     if (progress) {
       uploadProgress = progress.onUploadProgress
@@ -781,9 +795,7 @@
       xhr.withCredentials = false
     }
     if (reqTimeout) {
-      setTimeout(function () {
-        xhr.abort()
-      }, reqTimeout)
+      xhr.timeout = reqTimeout
     }
     xhr.send(request.getBody())
     if (request.$abort) {
@@ -870,10 +882,13 @@
   function parseXHRHeaders (xhr) {
     var rowIndex
     var headers = {}
-    utils.arrayEach(utils.trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
-      rowIndex = row.indexOf(':')
-      headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
-    })
+    var responseHeaders = utils.trim(xhr.getAllResponseHeaders())
+    if (responseHeaders) {
+      utils.arrayEach(responseHeaders.split('\n'), function (row) {
+        rowIndex = row.indexOf(':')
+        headers[utils.trim(row.slice(0, rowIndex))] = utils.trim(row.slice(rowIndex + 1))
+      })
+    }
     return headers
   }
 
@@ -884,15 +899,12 @@
    * @param { Function } failed
    */
   function sendFetch (request, finish, failed) {
-    var timer
-    var isTimeout = false
     var $fetch = request.$fetch || self.fetch
     var options = {
       _request: request,
       body: request.getBody()
     }
     var reqSignal = request.signal
-    var clearTimeoutFn = clearTimeout
     utils.arrayEach('method,headers,signal,mode,cache,credentials,redirect,referrer,referrerPolicy,keepalive,integrity'.split(','), function (pro) {
       if (request[pro]) {
         options[pro] = request[pro]
@@ -902,15 +914,9 @@
       failed('ERR_A')
     } else {
       $fetch(request.getUrl(), options).then(function (resp) {
-        if (!isTimeout) {
-          clearTimeoutFn(timer)
-          handleExports.toResponse(resp, request).then(finish)
-        }
+        handleExports.toResponse(resp, request).then(finish)
       })['catch'](function (e) {
-        if (!isTimeout) {
-          clearTimeoutFn(timer)
-          failed()
-        }
+        failed()
       })
     }
   }
@@ -984,14 +990,14 @@
         if (!isTimeout) {
           clearTimeoutFn(timer)
           jsonpClear(request, jsonpCallback)
-          finish()
+          failed()
         }
       }
       if (reqTimeout) {
         timer = setTimeout(function () {
           isTimeout = true
           jsonpClear(request, jsonpCallback)
-          finish('ERR_T')
+          finish({ status: 0, body: null })
         }, reqTimeout)
       }
       $dom.body.appendChild(script)
@@ -1013,9 +1019,8 @@
   }
 
   var errorMessage = {
-    ERR_A: 'The user aborted a request.',
-    ERR_T: 'Request timeout.',
-    ERR_F: 'Network request failed.'
+    ERR_A: 'The user aborted a request',
+    ERR_F: 'Network request failed'
   }
 
   /**

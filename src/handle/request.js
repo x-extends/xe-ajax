@@ -20,6 +20,9 @@ var reFullURL = /(\w+:)\/{2}.+/
 requestPro.abort = function () {
   if (this.xhr) {
     this.xhr.abort()
+    if (this._noA) {
+      this.xhr.onabort()
+    }
   }
   this.$abort = true
 }
@@ -62,19 +65,23 @@ requestPro.getBody = function () {
   var reqMethod = this.method
   var transformBody = this.transformBody
   var stringifyBody = this.stringifyBody
-  if (body && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
-    if (transformBody) {
-      body = this.body = transformBody(body, this) || body
-    }
-    if (stringifyBody) {
-      result = stringifyBody(body, this)
+  if (body) {
+    if (reqMethod === 'GET' || reqMethod === 'HEAD') {
+      throw utils.createErr('Request with GET/HEAD method cannot have body')
     } else {
-      if (utils.isURLSParams(body)) {
-        result = body.toString()
-      } else if (utils.isFData(body) || utils.isStr(body)) {
-        result = body
+      if (transformBody) {
+        body = this.body = transformBody(body, this) || body
+      }
+      if (stringifyBody) {
+        result = stringifyBody(body, this)
       } else {
-        result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
+        if (utils.isURLSParams(body)) {
+          result = body.toString()
+        } else if (utils.isFData(body) || utils.isStr(body)) {
+          result = body
+        } else {
+          result = this.bodyType === 'form-data' ? utils.serialize(body) : JSON.stringify(body)
+        }
       }
     }
   }
