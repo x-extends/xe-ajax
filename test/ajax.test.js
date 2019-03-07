@@ -1,7 +1,7 @@
 const XEAjax = require('../index')
 
-describe('Ajax functions', function () {
-  test('serialize()', function () {
+describe('Ajax functions', () => {
+  test('serialize()', () => {
     expect(
       XEAjax.serialize({ name: 'test1' })
     ).toEqual('name=test1')
