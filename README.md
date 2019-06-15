@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm build](https://travis-ci.org/xuliangzhan/xe-ajax.svg?branch=master)](https://travis-ci.org/xuliangzhan/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
-[![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](http://img.badgesize.io/https://unpkg.com/xe-ajax/lib/index.umd.min.js?compression=gzip&label=gzip%20size:%20JS)
+[![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](https://unpkg.com/xe-ajax/dist/xe-ajax.min.js)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/xe-ajax/blob/master/LICENSE)
 
 基于 [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) 的异步请求函数，用于浏览器和 nodejs 的 http 客户端。
@@ -21,7 +21,7 @@ xe-ajax 依赖 Promise。如果您的环境不支持 Promise，使用 babel-poly
 ## Installing
 
 ```shell
-npm install xe-ajax --save
+npm install xe-ajax
 ```
 
 Using nodejs
