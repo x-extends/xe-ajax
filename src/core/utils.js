@@ -24,7 +24,7 @@ function lastIndexOf (str, val) {
   for (var len = str.length - 1; len >= 0; len--) {
     if (val === str[len]) {
       return len
-    };
+    }
   }
   return -1
 }
