@@ -49,9 +49,6 @@ function sendXHR (request, finish, failed) {
   } else {
     xhr.onload = loadFinish
   }
-  if (reqTimeout) {
-    xhr.timeout = reqTimeout
-  }
   xhr.ontimeout = loadFinish
   xhr.onerror = function () {
     failed()
@@ -87,6 +84,9 @@ function sendXHR (request, finish, failed) {
   utils.headersEach(request.headers, function (value, name) {
     xhr.setRequestHeader(name, value)
   })
+  if (reqTimeout) {
+    xhr.timeout = reqTimeout
+  }
   if (utils.IS_A) {
     xhr.responseType = 'blob'
   }

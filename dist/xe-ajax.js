@@ -749,9 +749,6 @@
     } else {
       xhr.onload = loadFinish
     }
-    if (reqTimeout) {
-      xhr.timeout = reqTimeout
-    }
     xhr.ontimeout = loadFinish
     xhr.onerror = function () {
       failed()
@@ -787,6 +784,9 @@
     utils.headersEach(request.headers, function (value, name) {
       xhr.setRequestHeader(name, value)
     })
+    if (reqTimeout) {
+      xhr.timeout = reqTimeout
+    }
     if (utils.IS_A) {
       xhr.responseType = 'blob'
     }
