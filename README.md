@@ -667,4 +667,4 @@ XEAjax.put('/api/test/message/update', {id: 123, name: 'test1'})
 
 ## License
 
-Copyright (c) 2017-present, Xu Liangzhan
+MIT License, 2017-present, Xu Liangzhan
