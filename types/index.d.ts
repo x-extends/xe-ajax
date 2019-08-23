@@ -53,7 +53,7 @@ export interface XERequestInterceptors {
       request: XEAjaxRequest<any>,
       next: () => void
     ) => void
-  );
+  ): void;
 }
 
 export interface XEResponseInterceptors {
@@ -68,12 +68,12 @@ export interface XEResponseInterceptors {
       next: (resp?: object) => void,
       request?: XEAjaxRequest<any>
     ) => void,
-    onRejectd: (
+    onRejectd?: (
       error: TypeError,
       next: (resp?: object) => void,
       request?: XEAjaxRequest<any>
     ) => void
-  );
+  ): void;
 }
 
 export interface XEAjaxMethods {

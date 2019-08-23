@@ -1,6 +1,6 @@
 /**
- * xe-ajax.js v3.5.4
- * (c) 2017-2018 Xu Liangzhan
+ * xe-ajax.js v3.7.0
+ * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
  */
@@ -35,7 +35,7 @@
     for (var len = str.length - 1; len >= 0; len--) {
       if (val === str[len]) {
         return len
-      };
+      }
     }
     return -1
   }

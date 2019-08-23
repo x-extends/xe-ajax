@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "Using the Fetch API,Support the Node.js and browser environment.",
   "main": "index.js",
   "unpkg": "dist/xe-ajax.js",
