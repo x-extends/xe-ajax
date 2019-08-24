@@ -76,9 +76,13 @@ export interface XEResponseInterceptors {
   ): void;
 }
 
+export interface PluginObject<T> {
+  install(xAjax: typeof XEAjax): any;
+}
+
 export interface XEAjaxMethods {
   version: string;
-  use(plugin: (XEAjax: any) => void): void;
+  use(plugin: PluginObject<any>, ...options: any[]): void;
 
   /**
    * 设置全局参数

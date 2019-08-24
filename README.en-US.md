@@ -24,6 +24,13 @@ xe-ajax Depends on a native Promise implementation to be supported. If your envi
 npm install xe-ajax --save
 ```
 
+```javascript
+import XEAjax from 'xe-ajax'
+import XEAjaxMock from 'xe-ajax-mock'
+
+XEAjax.use(XEAjaxMock)
+```
+
 Using nodejs
 
 ```javascript
@@ -655,4 +662,4 @@ XEAjax.put('/api/test/message/update', {id: 123, name: 'test1'})
 
 ## License
 
-Copyright (c) 2017-present, Xu Liangzhan
+MIT License, 2017-present, Xu Liangzhan
