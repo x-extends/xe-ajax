@@ -1,34 +1,118 @@
 export interface XEAjaxRequest<T> {
+  /**
+   * 请求地址
+   */
   url?: string;
+  /**
+   * 基础路径
+   */
   baseURL?: string;
+  /**
+   * 改变目标源
+   */
   origin?: string;
+  /**
+   * 请求方法
+   */
   method?: string;
+  /**
+   * 表单查询参数
+   */
   params?: any;
+  /**
+   * 提交主体内容
+   */
   body?: any;
+  /**
+   * 提交主体内容方式，可以设置json-data,form-data
+   */
   bodyType?: string | 'json-data' | 'form-data';
+  /**
+   * 请求的模式, 可以设置cors,no-cors,same-origin
+   */
   mode?: string;
+  /**
+   * 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached
+   */
   cache?: string;
+  /**
+   * 设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include
+   */
   credentials?: string;
+  /**
+   * 重定向模式, 可以设置follow,error,manual
+   */
   redirect?: string;
+  /**
+   * 可以设置no-referrer,client或URL
+   */
   referrer?: string;
+  /**
+   * 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url
+   */
   referrerPolicy?: string;
+  /**
+   * 选项可用于允许请求超过页面的生存时间
+   */
   keepalive?: string;
+  /**
+   * integrity
+   */
   integrity?: string;
+  /**
+   * jsonp入参属性名
+   */
   jsonp?: string;
+  /**
+   * jsonp响应结果的回调函数名
+   */
   jsonpCallback?: string;
+  /**
+   * 设置请求超时
+   */
   timeout?: number;
+  /**
+   * 请求头包含信息
+   */
   headers?: Headers | object;
+  /**
+   * 用于改变URL参数
+   */
   transformParams?: (params: any) => any;
+  /**
+   * 自定义URL序列化函数
+   */
   paramsSerializer?: (params: any) => string;
+  /**
+   * 用于改变提交数据
+   */
   transformBody?: (body: any) => any;
+  /**
+   * 自定义转换提交数据的函数
+   */
   stringifyBody?: (body: any) => any;
+  /**
+   * 自定义校验请求是否成功
+   */
   validateStatus?: (response: Response) => boolean;
 }
 
 export interface XEAjaxResponseSchema<T> {
+  /**
+   * 响应的数据
+   */
   data: any;
+  /**
+   * 响应的状态码
+   */
   status: number;
+  /**
+   * 响应的状态信息
+   */
   statusText: string;
+  /**
+   * 响应头信息
+   */
   headers: any;
 }
 
@@ -50,7 +134,13 @@ export interface XERequestInterceptors {
    */
   use(
     resolve: (
+      /**
+       * Request 对象
+       */
       request: XEAjaxRequest<any>,
+      /**
+       * 继续执行下一个拦截器
+       */
       next: () => void
     ) => void
   ): void;
@@ -64,13 +154,28 @@ export interface XEResponseInterceptors {
    */
   use(
     onRejected: (
+      /**
+       * Response 对象
+       */
       response: Response,
+      /**
+       * 继续执行下一个拦截器
+       */
       next: (resp?: object) => void,
       request?: XEAjaxRequest<any>
     ) => void,
     onRejectd?: (
+      /**
+       * Error 对象
+       */
       error: TypeError,
+      /**
+       * 继续执行下一个拦截器
+       */
       next: (resp?: object) => void,
+      /**
+       * Request 对象
+       */
       request?: XEAjaxRequest<any>
     ) => void
   ): void;
@@ -82,6 +187,11 @@ export interface PluginObject<T> {
 
 export interface XEAjaxMethods {
   version: string;
+  /**
+   * 安装插件
+   * @param plugin 插件
+   * @param options 参数
+   */
   use(plugin: PluginObject<any>, ...options: any[]): void;
 
   /**
@@ -315,7 +425,7 @@ export interface XEAjaxMethods {
 }
 
 /**
- * Using the Fetch API,Support the Node.js and browser environment.
+ * 异步请求库，用于浏览器和 node.js 的 HTTP 客户端
  */
 declare var XEAjax: XEAjaxMethods;
 

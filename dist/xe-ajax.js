@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.8.0
+ * xe-ajax.js v3.8.1
  * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
