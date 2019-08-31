@@ -8,7 +8,7 @@
 [![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](https://unpkg.com/xe-ajax/dist/xe-ajax.min.js)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/xe-ajax/blob/master/LICENSE)
 
-基于 [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) 的异步请求函数，用于浏览器和 nodejs 的 http 客户端。
+基于 [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) 的异步请求函数，用于浏览器和 nodejs 的 http 客户端。
 
 ## Browser Support
 
