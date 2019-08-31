@@ -38,35 +38,16 @@ const XEAjax = require('xe-ajax')
 
 ## API
 
-* *基本函数*
+* *fetch 核心*
   * [ajax ( options )](#基本使用)
   * [fetch ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-  * [doAll ( iterable )](#并发多个请求)
-  * [设置默认全局参数](#全局参数设置)
-  * [拦截器](#拦截器-v30)
-  * [如何取消请求](#取消请求-v320)
-  * [上传/下载进度监听](#上传下载-v349)
 * *便捷函数*
-  * [fetchHead ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-  * [fetchDelete ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-  * [fetchJsonp ( url[, params, options] )](#jsonp-调用)
-  * [fetchGet ( url[, params, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-  * [fetchPost ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-  * [fetchPut ( url[, body, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-  * [doHead ( url[, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * [doDelete ( url[, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
   * [doJsonp ( url[, params, options] )](#jsonp-调用)
   * [doGet ( url[, params, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
   * [doPost ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * [doPut ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * [doPatch ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * [headJSON ( url[, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
-  * [deleteJSON ( url[, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
   * [jsonp ( url[, params, options] )](#jsonp-调用)
   * [getJSON ( url[, params, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
   * [postJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
-  * [putJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
-  * [patchJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
 
 ### options 完整参数
 

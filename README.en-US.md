@@ -45,35 +45,16 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 
 ## API
 
-* *Base functions*
+* *fetch core*
   * [ajax ( options )](#ajax)
   * [fetch ( url[, options] )](#fetch-to-response)
-  * [doAll ( iterable )](#multiple-requests)
-  * [Global settings](#default-global-settings)
-  * [Interceptor](#interceptor-v30)
-  * [Cancel request](#cancel-request-v320)
-  * [Upload/Download](#uploaddownload-v349)
 * *Convenience function*
-  * [fetchHead ( url[, options] )](#fetch-to-response)
-  * [fetchDelete ( url[, options] )](#fetch-to-response)
-  * [fetchJsonp ( url[, params, options] )](#jsonp)
-  * [fetchGet ( url[, params, options] )](#fetch-to-response)
-  * [fetchPost ( url[, body, options] )](#fetch-to-response)
-  * [fetchPut ( url[, body, options] )](#fetch-to-response)
-  * [doHead ( url[, options] )](#fetch-to-response-schema-v340)
-  * [doDelete ( url[, options] )](#fetch-to-response-schema-v340)
   * [doJsonp ( url[, params, options] )](#jsonp)
   * [doGet ( url[, params, options] )](#fetch-to-response-schema-v340)
   * [doPost ( url[, body, options] )](#fetch-to-response-schema-v340)
-  * [doPut ( url[, body, options] )](#fetch-to-response-schema-v340)
-  * [doPatch ( url[, body, options] )](#fetch-to-response-schema-v340)
-  * [headJSON ( url[, options] )](#fetch-to-json)
-  * [deleteJSON ( url[, options] )](#fetch-to-json)
   * [jsonp ( url[, params, options] )](#jsonp)
   * [getJSON ( url[, params, options] )](#fetch-to-json)
   * [postJSON ( url[, body, options] )](#fetch-to-json)
-  * [putJSON ( url[, body, options] )](#fetch-to-json)
-  * [patchJSON ( url[, body, options] )](#fetch-to-json)
 
 ### Options
 
