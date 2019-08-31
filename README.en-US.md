@@ -45,20 +45,22 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 
 ## API
 
-* *fetch core*
-  * [ajax ( options )](#ajax)
-  * [fetch ( url[, options] )](#fetch-to-response)
-* *Convenience function*
-  * [doJsonp ( url[, params, options] )](#jsonp)
-  * [doGet ( url[, params, options] )](#fetch-to-response-schema-v340)
-  * [doPost ( url[, body, options] )](#fetch-to-response-schema-v340)
-  * [jsonp ( url[, params, options] )](#jsonp)
-  * [getJSON ( url[, params, options] )](#fetch-to-json)
-  * [postJSON ( url[, body, options] )](#fetch-to-json)
+* Core
+  * [ajax ( request )](#ajax)
+  * [fetch ( url[, request] )](#fetch-to-response)
+* Convenience function
+  * Response mode 1
+    * [doJsonp ( url[, params, request] )](#jsonp)
+    * [doGet ( url[, params, request] )](#fetch-to-response-schema-v340)
+    * [doPost ( url[, body, request] )](#fetch-to-response-schema-v340)
+  * Response mode 2
+    * [jsonp ( url[, params, request] )](#jsonp)
+    * [getJSON ( url[, params, request] )](#fetch-to-json)
+    * [postJSON ( url[, body, request] )](#fetch-to-json)
 
-### Options
+### Request
 
-*: Only the latest version of the browser is supported.
+*: Only modern browsers are supported.
 
 | Name | Type | Description | default value |
 |------|------|-----|----|
@@ -621,17 +623,17 @@ Extends its own utility functions to XEAjax.
 import XEAjax from 'xe-ajax'
 
 XEAjax.mixin({
-  get (url, options) {
-    return XEAjax.doGet(url, null, options)
+  get (url, request) {
+    return XEAjax.doGet(url, null, request)
   },
-  delete (url, options) {
-    return XEAjax.doDelete(url, options)
+  delete (url, request) {
+    return XEAjax.doDelete(url, request)
   },
-  post (url, data, options) {
-    return XEAjax.doPost(url, data, options)
+  post (url, data, request) {
+    return XEAjax.doPost(url, data, request)
   },
-  put (url, data, options) {
-    return XEAjax.doPut(url, data, options)
+  put (url, data, request) {
+    return XEAjax.doPut(url, data, request)
   }
 })
 

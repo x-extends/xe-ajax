@@ -38,20 +38,22 @@ const XEAjax = require('xe-ajax')
 
 ## API
 
-* *fetch 核心*
-  * [ajax ( options )](#基本使用)
-  * [fetch ( url[, options] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* *便捷函数*
-  * [doJsonp ( url[, params, options] )](#jsonp-调用)
-  * [doGet ( url[, params, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * [doPost ( url[, body, options] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * [jsonp ( url[, params, options] )](#jsonp-调用)
-  * [getJSON ( url[, params, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
-  * [postJSON ( url[, body, options] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* 核心
+  * [ajax ( request )](#基本使用)
+  * [fetch ( url[, request] )](#fetch-调用返回一个结果为-response-的-promise-对象)
+* 便捷函数
+  * 响应方式 1
+    * [doJsonp ( url[, params, request] )](#jsonp-调用)
+    * [doGet ( url[, params, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+    * [doPost ( url[, body, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+  * 响应方式 2
+    * [jsonp ( url[, params, request] )](#jsonp-调用)
+    * [getJSON ( url[, params, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+    * [postJSON ( url[, body, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
 
-### options 完整参数
+### Request
 
-*: 只支持最新版本的浏览器。
+*: 只支持现代的浏览器。
 
 | 参数 | 类型 | 描述 | 默认值 |
 |------|------|-----|----|
@@ -626,17 +628,17 @@ XEAjax.interceptors.response.use((response, next) => {
 import XEAjax from 'xe-ajax'
 
 XEAjax.mixin({
-  get (url, options) {
-    return XEAjax.doGet(url, null, options)
+  get (url, request) {
+    return XEAjax.doGet(url, null, request)
   },
-  delete (url, options) {
-    return XEAjax.doDelete(url, options)
+  delete (url, request) {
+    return XEAjax.doDelete(url, request)
   },
-  post (url, data, options) {
-    return XEAjax.doPost(url, data, options)
+  post (url, data, request) {
+    return XEAjax.doPost(url, data, request)
   },
-  put (url, data, options) {
-    return XEAjax.doPut(url, data, options)
+  put (url, data, request) {
+    return XEAjax.doPut(url, data, request)
   }
 })
 
