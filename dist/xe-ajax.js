@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.8.1
+ * xe-ajax.js v3.8.2
  * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
@@ -1047,6 +1047,9 @@
   XEAjax.serialize = utils.serialize
   XEAjax.Progress = XEProgress
   XEAjax.AbortController = XEAbortController
+  XEAjax.headers = XEHeaders
+  XEAjax.request = XERequest
+  XEAjax.response = XEResponse
 
   /**
    * Installation

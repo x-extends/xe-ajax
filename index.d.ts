@@ -74,7 +74,7 @@ export interface XEAjaxRequest<T> {
   /**
    * 请求头包含信息
    */
-  headers?: Headers | object;
+  headers?: any;
   /**
    * 用于改变URL参数
    */
@@ -161,7 +161,7 @@ export interface XEResponseInterceptors {
       /**
        * 继续执行下一个拦截器
        */
-      next: (resp?: object) => void,
+      next: (resp?: any) => void,
       request?: XEAjaxRequest<any>
     ) => void,
     onRejectd?: (
@@ -172,7 +172,7 @@ export interface XEResponseInterceptors {
       /**
        * 继续执行下一个拦截器
        */
-      next: (resp?: object) => void,
+      next: (resp?: any) => void,
       /**
        * Request 对象
        */
@@ -204,13 +204,13 @@ export interface XEAjaxMethods {
    * 允许用您自己的实用函数扩展到 XEAjax
    * @param methods 扩展函数集
    */
-  mixin(methods: object): void;
+  mixin(methods: any): void;
 
   /**
    * 将表单序列化为可以在 Ajax 请求中发送到服务器的查询字符串。
    * @param params 表单参数
    */
-  serialize(params: object): string;
+  serialize(params: any): string;
 
   /**
    * 请求之前、响应之后拦截器
@@ -237,7 +237,7 @@ export interface XEAjaxMethods {
    * 取消控制器
    * @since 3.2.0
    */
-  AbortController: AbortController;
+  AbortController: typeof AbortController;
 
   /**
    * @param options 请求参数
@@ -248,7 +248,7 @@ export interface XEAjaxMethods {
    * doAll 使用对象参数, 用法和 Promise.all 一致
    * @param iterable 对象数组 或 Promise 数组
    */
-  doAll(iterable: (object | Promise<any>)[]): Promise<any[]>;
+  doAll(iterable: any[]): Promise<any[]>;
 
   /**
    * 发送 Jsonp 请求，返回一个结果为 Response 的 Promise 对象

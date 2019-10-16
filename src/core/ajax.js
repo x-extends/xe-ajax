@@ -2,8 +2,10 @@
 
 var utils = require('./utils')
 var XEProgress = require('../handle/progress')
+var XEHeaders = require('../handle/headers')
 var XEAbortController = require('../handle/abortController')
 var XERequest = require('../handle/request')
+var XEResponse = require('../handle/response')
 var fetchRequest = require('../adapters/fetch')
 var sendJSONP = require('../adapters/jsonp')
 var setupDefaults = require('./setup')
@@ -40,6 +42,9 @@ XEAjax.interceptors = interceptorExports.interceptors
 XEAjax.serialize = utils.serialize
 XEAjax.Progress = XEProgress
 XEAjax.AbortController = XEAbortController
+XEAjax.headers = XEHeaders
+XEAjax.request = XERequest
+XEAjax.response = XEResponse
 
 /**
  * Installation
