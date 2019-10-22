@@ -38,6 +38,7 @@ function toResponse (resp, request) {
 }
 
 var handleExports = {
+  getResponse: getResponse,
   isResponse: isResponse,
   toResponse: toResponse
 }

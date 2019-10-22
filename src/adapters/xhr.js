@@ -1,7 +1,7 @@
 'use strict'
 
 var utils = require('../core/utils')
-var XEResponse = require('../handle/response')
+var handleExports = require('../handle')
 
 /**
  * xhr
@@ -23,11 +23,13 @@ function sendXHR (request, finish, failed) {
   var progress = request.progress
   var loadFinish = function () {
     try {
-      finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
-        status: xhr.status,
-        statusText: xhr.statusText,
-        headers: parseXHRHeaders(xhr)
-      }, request))
+      finish(
+        handleExports.getResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: parseXHRHeaders(xhr)
+        }, request)
+      )
     } catch (e) {
       finish({ status: 0, body: null })
     }

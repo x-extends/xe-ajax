@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.8.2
+ * xe-ajax.js v3.8.3
  * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
@@ -699,6 +699,7 @@
   }
 
   var handleExports = {
+    getResponse: getResponse,
     isResponse: isResponse,
     toResponse: toResponse
   }
@@ -723,11 +724,13 @@
     var progress = request.progress
     var loadFinish = function () {
       try {
-        finish(new XEResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          headers: parseXHRHeaders(xhr)
-        }, request))
+        finish(
+          handleExports.getResponse(xhr[utils.IS_A ? 'response' : 'responseText'], {
+            status: xhr.status,
+            statusText: xhr.statusText,
+            headers: parseXHRHeaders(xhr)
+          }, request)
+        )
       } catch (e) {
         finish({ status: 0, body: null })
       }
