@@ -14,8 +14,12 @@ function addCheckQueue (calls, callback) {
 
 function useInterceptors (queue) {
   return function (finish, failed) {
-    addCheckQueue(queue.resolves, finish)
-    addCheckQueue(queue.rejects, failed)
+    if (finish) {
+      addCheckQueue(queue.resolves, finish)
+    }
+    if (failed) {
+      addCheckQueue(queue.rejects, failed)
+    }
   }
 }
 

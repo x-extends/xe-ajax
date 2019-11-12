@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.8.3
+ * xe-ajax.js v3.8.4
  * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
@@ -392,8 +392,12 @@
 
   function useInterceptors (queue) {
     return function (finish, failed) {
-      addCheckQueue(queue.resolves, finish)
-      addCheckQueue(queue.rejects, failed)
+      if (finish) {
+        addCheckQueue(queue.resolves, finish)
+      }
+      if (failed) {
+        addCheckQueue(queue.rejects, failed)
+      }
     }
   }
 

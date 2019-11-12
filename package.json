@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "description": "fetch 异步请求库，用于浏览器和 node.js 的 HTTP 客户端",
   "main": "index.js",
   "unpkg": "dist/xe-ajax.js",
