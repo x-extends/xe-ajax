@@ -166,10 +166,6 @@ var utils = {
     if (headers && headers.forEach) {
       headers.forEach(callabck)
     }
-  },
-
-  clearContext: function (XEAjax) {
-    XEAjax.$context = XEAjax.$Promise = null
   }
 }
 

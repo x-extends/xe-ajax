@@ -422,6 +422,51 @@ export interface XEAjaxMethods {
    * @param options 可选参数
    */
   headJSON(url: string, options?: XEAjaxRequest<any>): Promise<any>;
+  
+  /**
+   * 发送 GET 请求，返回响应结果为 JSON 的 Peomise 对象
+   * @param url 请求地址
+   * @param params 表单查询参数
+   * @param options 可选参数
+   */
+  get(url: string, params?: any, options?: XEAjaxRequest<any>): Promise<any>;
+
+  /**
+   * 发送 POST 请求，返回响应结果为 JSON 的 Peomise 对象
+   * @param url 请求地址
+   * @param body 表单提交参数
+   * @param options 可选参数
+   */
+  post(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<any>;
+
+  /**
+   * 发送 PUT 请求，返回响应结果为 JSON 的 Peomise 对象
+   * @param url 请求地址
+   * @param body 表单提交参数
+   * @param options 可选参数
+   */
+  put(url: string, body?: any, options?: XEAjaxRequest<any>): Promise<any>;
+
+  /**
+   * 发送 DELETE 请求，返回响应结果为 JSON 的 Peomise 对象
+   * @param url 请求地址
+   * @param options 可选参数
+   */
+  delete(url: string, options?: XEAjaxRequest<any>): Promise<any>;
+
+  /**
+   * 发送 PATCH 请求，返回响应结果为 JSON 的 Peomise 对象
+   * @param url 请求地址
+   * @param options 可选参数
+   */
+  patch(url: string, options?: XEAjaxRequest<any>): Promise<any>;
+
+  /**
+   * 发送 HEAD 请求，返回响应结果为 JSON 的 Peomise 对象
+   * @param url 请求地址
+   * @param options 可选参数
+   */
+  head(url: string, options?: XEAjaxRequest<any>): Promise<any>;
 }
 
 /**

@@ -27,15 +27,14 @@ function useInterceptors (queue) {
  * Request 拦截器
  */
 function requests (request) {
-  var XEPromise = request.$Promise || Promise
-  var thenInterceptor = XEPromise.resolve(request, request.$context)
+  var thenInterceptor = Promise.resolve(request)
   utils.arrayEach(reqQueue.resolves, function (callback) {
     thenInterceptor = thenInterceptor.then(function (req) {
-      return new XEPromise(function (resolve) {
+      return new Promise(function (resolve) {
         callback(req, function () {
           resolve(req)
         })
-      }, request.$context)
+      })
     })['catch'](utils.err)
   })
   return thenInterceptor
@@ -45,15 +44,14 @@ function requests (request) {
  * Response 拦截器
  */
 function responseInterceptor (calls, request, response) {
-  var XEPromise = request.$Promise || Promise
-  var thenInterceptor = XEPromise.resolve(response, request.$context)
+  var thenInterceptor = Promise.resolve(response)
   utils.arrayEach(calls, function (callback) {
     thenInterceptor = thenInterceptor.then(function (response) {
-      return new XEPromise(function (resolve) {
+      return new Promise(function (resolve) {
         callback(response, function (resp) {
           resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
         }, request)
-      }, request.$context)
+      })
     })['catch'](utils.err)
   })
   return thenInterceptor

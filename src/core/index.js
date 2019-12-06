@@ -3,11 +3,8 @@
 var XEAjax = require('./ajax')
 var utils = require('./utils')
 
-var clearContext = utils.clearContext
-
 function getOptions (method, def, options) {
-  var opts = utils.assign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
-  clearContext(XEAjax)
+  var opts = utils.assign({ method: method }, def, options)
   return opts
 }
 
@@ -38,11 +35,10 @@ function getResponseSchema (isRespSchema, data, status, statusText, headers) {
 function createResponseSchema (method, isRespSchema) {
   return function () {
     var opts = method.apply(this, arguments)
-    var XEPromise = opts.$Promise || Promise
     return XEAjax(opts)['catch'](function (e) {
-      return XEPromise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
+      return Promise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
     }).then(function (response) {
-      return new XEPromise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         var finish = response.ok ? resolve : reject
         response.text().then(function (data) {
           try {
@@ -72,15 +68,12 @@ function requestToJSON (method) {
 
 // 和 Promise.all 类似，支持传对象参数
 function doAll (iterable) {
-  var XEPromise = XEAjax.$Promise || Promise
-  var context = XEAjax.$context
-  clearContext(XEAjax)
-  return XEPromise.all(iterable.map(function (item) {
-    if (item instanceof XEPromise || item instanceof Promise) {
+  return Promise.all(iterable.map(function (item) {
+    if (item instanceof Promise) {
       return item
     }
-    return utils.isObj(item) ? XEAjax(utils.assign({ $context: context, $Promise: XEPromise }, item)) : item
-  }), context)
+    return utils.isObj(item) ? XEAjax(item) : item
+  }))
 }
 
 function createFetch (method) {
@@ -136,6 +129,13 @@ var ajaxExports = {
   deleteJSON: requestToJSON(requestDelete),
   patchJSON: requestToJSON(requestPatch),
   headJSON: requestToJSON(requestHead),
+
+  get: requestToJSON(requestGet),
+  post: requestToJSON(requestPost),
+  put: requestToJSON(requestPut),
+  delete: requestToJSON(requestDelete),
+  patch: requestToJSON(requestPatch),
+  head: requestToJSON(requestHead),
   jsonp: requestToJSON(requestJsonp)
 }
 
@@ -148,7 +148,7 @@ XEAjax.mixin = function (methods) {
   utils.objectEach(methods, function (fn, name) {
     XEAjax[name] = utils.isFn(fn) ? function () {
       var result = fn.apply(XEAjax.$context, arguments)
-      clearContext(XEAjax)
+      XEAjax.$context = null
       return result
     } : fn
   })

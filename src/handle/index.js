@@ -28,13 +28,12 @@ function getResponse (reqBody, resp, request) {
 
 // 将请求结果转为 Respone 对象
 function toResponse (resp, request) {
-  var XEPromise = request.$Promise || Promise
   if (isNativeResponse(resp)) {
     return request.validateStatus ? resp.text().then(function (text) {
       return getResponse(text, resp, request)
-    }) : XEPromise.resolve(resp)
+    }) : Promise.resolve(resp)
   }
-  return XEPromise.resolve(isResponse(resp) ? resp : getResponse(resp.body, resp, request))
+  return Promise.resolve(isResponse(resp) ? resp : getResponse(resp.body, resp, request))
 }
 
 var handleExports = {

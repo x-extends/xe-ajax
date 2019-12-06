@@ -49,8 +49,8 @@ const XEAjax = require('xe-ajax')
     * [doPost ( url[, body, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
   * 响应方式 2
     * [jsonp ( url[, params, request] )](#jsonp-调用)
-    * [getJSON ( url[, params, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
-    * [postJSON ( url[, body, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+    * [get ( url[, params, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+    * [post ( url[, body, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
 
 ### Request
 
@@ -313,16 +313,16 @@ XEAjax.doDelete('/api/test/message/delete/1')
 import XEAjax from 'xe-ajax'
 
 // 根据 validateStatus 状态校验判断完成还是失败,直接可以获取响应结果
-XEAjax.getJSON('/api/test/message/list').then(data => {
+XEAjax.get('/api/test/message/list').then(data => {
   // 请求成功 data
 }).catch(data => {
   // 请求失败
 })
 
-XEAjax.getJSON('/api/test/message/list/page/15/1')
-XEAjax.postJSON('/api/test/message/save', {name: 'u111'})
-XEAjax.putJSON('/api/test/message/update', {name: 'u222'})
-XEAjax.deleteJSON('/api/test/message/delete/1')
+XEAjax.get('/api/test/message/list/page/15/1')
+XEAjax.post('/api/test/message/save', {name: 'u111'})
+XEAjax.put('/api/test/message/update', {name: 'u222'})
+XEAjax.delete('/api/test/message/delete/1')
 ```
 
 ### jsonp 调用
@@ -368,7 +368,7 @@ import XEAjax from 'xe-ajax'
 Promise.all([
   XEAjax.fetchGet('/api/test/message/list'),
   XEAjax.doGet('/api/test/message/list'),
-  XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
+  XEAjax.post('/api/test/message/save'), {name: 'n1'})
 ]).then(datas => {
   // 所有异步完成之后执行
 }).catch(e => {
@@ -377,8 +377,8 @@ Promise.all([
 
 // 竞速，哪个先请求完成执行哪个
 Promise.race([
-  XEAjax.getJSON('/api/test/message/list'),
-  XEAjax.getJSON('/api/test/message/list')
+  XEAjax.get('/api/test/message/list'),
+  XEAjax.get('/api/test/message/list')
 ]).then(datas => {
   // 任意一个请求完成后执行
 }).catch(e => {
@@ -417,8 +417,8 @@ XEAjax.doGet('/api/test/message/info', {id: 3})
   .then(result => {
     // result.data
   })
-XEAjax.getJSON('/api/test/message/info', {id: 3})
-  .then(data => XEAjax.getJSON(`/api/test/message/delete/${data.id}`))
+XEAjax.get('/api/test/message/info', {id: 3})
+  .then(data => XEAjax.get(`/api/test/message/delete/${data.id}`))
   .then(data => {
     // data
   })
@@ -430,8 +430,8 @@ XEAjax.getJSON('/api/test/message/info', {id: 3})
 import XEAjax from 'xe-ajax'
 
 async function init() {
-  let list = await XEAjax.getJSON('/api/test/message/list')
-  let data = await XEAjax.getJSON('/api/test/message/info', {id: list[0].id})
+  let list = await XEAjax.get('/api/test/message/list')
+  let data = await XEAjax.get('/api/test/message/info', {id: list[0].id})
   console.log(list)
   console.log(data)
 }
@@ -471,7 +471,7 @@ let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody)
 XEAjax.doPost('/api/upload', formBody)
-XEAjax.postJSON('/api/upload', formBody)
+XEAjax.post('/api/upload', formBody)
 
 
 // 上传进度

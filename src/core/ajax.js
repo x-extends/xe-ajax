@@ -26,8 +26,7 @@ var errorMessage = {
 function XEAjax (options) {
   var opts = utils.assign({}, setupDefaults, { headers: utils.assign({}, setupDefaults.headers) }, options)
   var request = new XERequest(opts)
-  var XEPromise = request.$Promise || Promise
-  return new XEPromise(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     return interceptorExports.requests(request).then(function () {
       (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
         interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
@@ -35,7 +34,7 @@ function XEAjax (options) {
         interceptorExports.toRejects(request, utils.createErr(errorMessage[type || 'ERR_F']), resolve, reject)
       })
     })
-  }, request.$context)
+  })
 }
 
 XEAjax.interceptors = interceptorExports.interceptors
@@ -82,8 +81,6 @@ XEAjax.use = function (plugin) {
  * @param { Function } $http 自定义 http 请求函数
  * @param { Function } $fetch 自定义 fetch 请求函数
  * @param { Function } $jsonp 自定义 jsonp 处理函数
- * @param { Function } $Promise 自定义 Promise 函数
- * @param { Function } $context 自定义上下文
  * @param { Function } $options 自定义参数
  */
 XEAjax.setup = function (options) {

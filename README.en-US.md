@@ -55,8 +55,8 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
     * [doPost ( url[, body, request] )](#fetch-to-response-schema-v340)
   * Response mode 2
     * [jsonp ( url[, params, request] )](#jsonp)
-    * [getJSON ( url[, params, request] )](#fetch-to-json)
-    * [postJSON ( url[, body, request] )](#fetch-to-json)
+    * [get ( url[, params, request] )](#fetch-to-json)
+    * [post ( url[, body, request] )](#fetch-to-json)
 
 ### Request
 
@@ -306,24 +306,24 @@ XEAjax.doDelete('/api/test/message/delete/1')
 import XEAjax from 'xe-ajax'
 
 // The completion or failure is based on state check.
-XEAjax.getJSON('/api/test/message/list').then(data => {
+XEAjax.get('/api/test/message/list').then(data => {
   // success
 }).catch(data => {
   // failed
 })
 
-XEAjax.getJSON('/api/test/message/list/page/15/1').then(({page, result}) => {
+XEAjax.get('/api/test/message/list/page/15/1').then(({page, result}) => {
   // success
 })
 
-XEAjax.postJSON('/api/test/message/save', {name: 'test'})
-XEAjax.postJSON('/api/test/message/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
-XEAjax.postJSON('/api/test/message/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
+XEAjax.post('/api/test/message/save', {name: 'test'})
+XEAjax.post('/api/test/message/save', {name: 'test', password: '123456'}, {bodyType: 'json-data'})
+XEAjax.post('/api/test/message/save', {name: 'test', password: '123456'}, {bodyType: 'form-data'})
 
 let file = document.querySelector('#myFile').files[0]
 let formBody = new FormData()
 formBody.append('file', file)
-XEAjax.postJSON('/api/test/message/save', formBody)
+XEAjax.post('/api/test/message/save', formBody)
 ```
 
 ### jsonp
@@ -368,7 +368,7 @@ import XEAjax from 'xe-ajax'
 Promise.all([
   XEAjax.fetchGet('/api/test/message/list'),
   XEAjax.doGet('/api/test/message/list'),
-  XEAjax.postJSON('/api/test/message/save'), {name: 'n1'})
+  XEAjax.post('/api/test/message/save'), {name: 'n1'})
 ]).then(datas => {
   // all finish
 }).catch(e => {
@@ -376,8 +376,8 @@ Promise.all([
 })
 
 Promise.race([
-  XEAjax.getJSON('/api/test/message/list'),
-  XEAjax.getJSON('/api/test/message/list')
+  XEAjax.get('/api/test/message/list'),
+  XEAjax.get('/api/test/message/list')
 ]).then(datas => {
   // finish
 }).catch(e => {
@@ -416,8 +416,8 @@ XEAjax.doGet('/api/test/message/info', {id: 3})
   .then(result => {
     // result.data
   })
-XEAjax.getJSON('/api/test/message/info', {id: 3})
-  .then(data => XEAjax.getJSON(`/api/test/message/delete/${data.id}`))
+XEAjax.get('/api/test/message/info', {id: 3})
+  .then(data => XEAjax.get(`/api/test/message/delete/${data.id}`))
   .then(data => {
     // data
   })
@@ -429,8 +429,8 @@ XEAjax.getJSON('/api/test/message/info', {id: 3})
 import XEAjax from 'xe-ajax'
 
 async function init() {
-  let list = await XEAjax.getJSON('/api/test/message/list')
-  let data = await XEAjax.getJSON('/api/test/message/info', {id: list[0].id})
+  let list = await XEAjax.get('/api/test/message/list')
+  let data = await XEAjax.get('/api/test/message/info', {id: list[0].id})
   console.log(list)
   console.log(data)
 }
@@ -469,7 +469,7 @@ let formBody = new FormData()
 formBody.append('file', file)
 XEAjax.fetchPost('/api/upload', formBody)
 XEAjax.doPost('/api/upload', formBody)
-XEAjax.postJSON('/api/upload', formBody)
+XEAjax.post('/api/upload', formBody)
 
 
 // Upload

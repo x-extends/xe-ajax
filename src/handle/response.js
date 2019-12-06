@@ -98,15 +98,14 @@ if (utils.IS_A) {
 }
 
 function fileReaderReady (request, reader) {
-  var XEPromise = request.$Promise || Promise
-  return new XEPromise(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     reader.onload = function () {
       resolve(reader.result)
     }
     reader.onerror = function () {
       reject(reader.error)
     }
-  }, request.$context)
+  })
 }
 
 module.exports = XEResponse

@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v3.8.4
+ * xe-ajax.js v4.0.0
  * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
@@ -177,10 +177,6 @@
       if (headers && headers.forEach) {
         headers.forEach(callabck)
       }
-    },
-
-    clearContext: function (XEAjax) {
-      XEAjax.$context = XEAjax.$Promise = null
     }
   }
 
@@ -298,20 +294,19 @@
     this.locked = false
     this._getBody = function () {
       var stream = this
-      var XEPromise = request.$Promise || Promise
       if (utils.IS_DP) {
         response._response.bodyUsed = true
       } else {
         response.bodyUsed = true
       }
-      return new XEPromise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         if (stream.locked) {
           reject(utils.createErr('body stream already read'))
         } else {
           stream.locked = true
           resolve(body)
         }
-      }, request.$context)
+      })
     }
   }
 
@@ -405,15 +400,14 @@
    * Request 拦截器
    */
   function requests (request) {
-    var XEPromise = request.$Promise || Promise
-    var thenInterceptor = XEPromise.resolve(request, request.$context)
+    var thenInterceptor = Promise.resolve(request)
     utils.arrayEach(reqQueue.resolves, function (callback) {
       thenInterceptor = thenInterceptor.then(function (req) {
-        return new XEPromise(function (resolve) {
+        return new Promise(function (resolve) {
           callback(req, function () {
             resolve(req)
           })
-        }, request.$context)
+        })
       })['catch'](utils.err)
     })
     return thenInterceptor
@@ -423,15 +417,14 @@
    * Response 拦截器
    */
   function responseInterceptor (calls, request, response) {
-    var XEPromise = request.$Promise || Promise
-    var thenInterceptor = XEPromise.resolve(response, request.$context)
+    var thenInterceptor = Promise.resolve(response)
     utils.arrayEach(calls, function (callback) {
       thenInterceptor = thenInterceptor.then(function (response) {
-        return new XEPromise(function (resolve) {
+        return new Promise(function (resolve) {
           callback(response, function (resp) {
             resolve(resp && resp.body && resp.status ? handleExports.toResponse(resp, request) : response)
           }, request)
-        }, request.$context)
+        })
       })['catch'](utils.err)
     })
     return thenInterceptor
@@ -658,15 +651,14 @@
   }
 
   function fileReaderReady (request, reader) {
-    var XEPromise = request.$Promise || Promise
-    return new XEPromise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
       reader.onload = function () {
         resolve(reader.result)
       }
       reader.onerror = function () {
         reject(reader.error)
       }
-    }, request.$context)
+    })
   }
 
   function isNativeResponse (obj) {
@@ -693,13 +685,12 @@
 
   // 将请求结果转为 Respone 对象
   function toResponse (resp, request) {
-    var XEPromise = request.$Promise || Promise
     if (isNativeResponse(resp)) {
       return request.validateStatus ? resp.text().then(function (text) {
         return getResponse(text, resp, request)
-      }) : XEPromise.resolve(resp)
+      }) : Promise.resolve(resp)
     }
-    return XEPromise.resolve(isResponse(resp) ? resp : getResponse(resp.body, resp, request))
+    return Promise.resolve(isResponse(resp) ? resp : getResponse(resp.body, resp, request))
   }
 
   var handleExports = {
@@ -1038,8 +1029,7 @@
   function XEAjax (options) {
     var opts = utils.assign({}, setupDefaults, { headers: utils.assign({}, setupDefaults.headers) }, options)
     var request = new XERequest(opts)
-    var XEPromise = request.$Promise || Promise
-    return new XEPromise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
       return interceptorExports.requests(request).then(function () {
         (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
           interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
@@ -1047,7 +1037,7 @@
           interceptorExports.toRejects(request, utils.createErr(errorMessage[type || 'ERR_F']), resolve, reject)
         })
       })
-    }, request.$context)
+    })
   }
 
   XEAjax.interceptors = interceptorExports.interceptors
@@ -1094,19 +1084,14 @@
    * @param { Function } $http 自定义 http 请求函数
    * @param { Function } $fetch 自定义 fetch 请求函数
    * @param { Function } $jsonp 自定义 jsonp 处理函数
-   * @param { Function } $Promise 自定义 Promise 函数
-   * @param { Function } $context 自定义上下文
    * @param { Function } $options 自定义参数
    */
   XEAjax.setup = function (options) {
     utils.assign(setupDefaults, options)
   }
 
-  var clearContext = utils.clearContext
-
   function getOptions (method, def, options) {
-    var opts = utils.assign({ method: method, $context: XEAjax.$context, $Promise: XEAjax.$Promise }, def, options)
-    clearContext(XEAjax)
+    var opts = utils.assign({ method: method }, def, options)
     return opts
   }
 
@@ -1137,11 +1122,10 @@
   function createResponseSchema (method, isRespSchema) {
     return function () {
       var opts = method.apply(this, arguments)
-      var XEPromise = opts.$Promise || Promise
       return XEAjax(opts)['catch'](function (e) {
-        return XEPromise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
+        return Promise.reject(getResponseSchema(isRespSchema, '', 'failed', e.message || e, {}), this)
       }).then(function (response) {
-        return new XEPromise(function (resolve, reject) {
+        return new Promise(function (resolve, reject) {
           var finish = response.ok ? resolve : reject
           response.text().then(function (data) {
             try {
@@ -1171,15 +1155,12 @@
 
   // 和 Promise.all 类似，支持传对象参数
   function doAll (iterable) {
-    var XEPromise = XEAjax.$Promise || Promise
-    var context = XEAjax.$context
-    clearContext(XEAjax)
-    return XEPromise.all(iterable.map(function (item) {
-      if (item instanceof XEPromise || item instanceof Promise) {
+    return Promise.all(iterable.map(function (item) {
+      if (item instanceof Promise) {
         return item
       }
-      return utils.isObj(item) ? XEAjax(utils.assign({ $context: context, $Promise: XEPromise }, item)) : item
-    }), context)
+      return utils.isObj(item) ? XEAjax(item) : item
+    }))
   }
 
   function createFetch (method) {
@@ -1235,6 +1216,13 @@
     deleteJSON: requestToJSON(requestDelete),
     patchJSON: requestToJSON(requestPatch),
     headJSON: requestToJSON(requestHead),
+
+    get: requestToJSON(requestGet),
+    post: requestToJSON(requestPost),
+    put: requestToJSON(requestPut),
+    delete: requestToJSON(requestDelete),
+    patch: requestToJSON(requestPatch),
+    head: requestToJSON(requestHead),
     jsonp: requestToJSON(requestJsonp)
   }
 
@@ -1247,7 +1235,7 @@
     utils.objectEach(methods, function (fn, name) {
       XEAjax[name] = utils.isFn(fn) ? function () {
         var result = fn.apply(XEAjax.$context, arguments)
-        clearContext(XEAjax)
+        XEAjax.$context = null
         return result
       } : fn
     })
