@@ -1,6 +1,6 @@
 {
   "name": "xe-ajax",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "fetch 异步请求库，用于浏览器和 node.js 的 HTTP 客户端",
   "main": "index.js",
   "unpkg": "dist/xe-ajax.js",
@@ -18,16 +18,16 @@
     "*.d.ts"
   ],
   "devDependencies": {
-    "eslint": "^5.15.1",
+    "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "jest": "^24.1.0",
-    "markdown-doctest": "^0.9.1",
-    "regenerator-runtime": "^0.13.1"
+    "jest": "^24.9.0",
+    "markdown-doctest": "^1.0.0",
+    "regenerator-runtime": "^0.13.3"
   },
   "repository": {
     "type": "git",

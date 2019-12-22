@@ -154,7 +154,7 @@ XEAjax.mixin = function (methods) {
   })
 }
 
-XEAjax.mixin(ajaxExports)
+utils.assign(XEAjax, ajaxExports)
 
 module.exports = XEAjax
 module.exports.default = XEAjax

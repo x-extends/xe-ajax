@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v4.0.0
+ * xe-ajax.js v4.0.1
  * (c) 2017-present Xu Liangzhan
  * ISC License.
  * @preserve
@@ -1241,7 +1241,7 @@
     })
   }
 
-  XEAjax.mixin(ajaxExports)
+  utils.assign(XEAjax, ajaxExports)
 
   return XEAjax
 }))
