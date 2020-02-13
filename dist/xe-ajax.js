@@ -1,5 +1,5 @@
 /**
- * xe-ajax.js v4.0.1
+ * xe-ajax.js v4.0.2
  * ISC License.
  * @preserve
  */
@@ -933,7 +933,7 @@
   function createRequestFactory () {
     if (utils.IS_N) {
       /* eslint-disable no-undef */
-      return typeof sendHttp
+      return sendHttp
     } else if (utils.IS_F) {
       return function (request) {
         return getRequest(request, request.signal).apply(this, arguments)
