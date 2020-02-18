@@ -66,22 +66,6 @@ var interceptors = {
   }
 }
 
-// 默认拦截器
-interceptors.request.use(function (request, next) {
-  var reqHeaders = request.headers
-  var reqBody = request.body
-  var reqMethod = request.method
-  if (reqBody && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
-    if (!utils.isFData(reqBody)) {
-      reqHeaders.set('Content-Type', utils.isURLSParams(reqBody) || request.bodyType === 'form-data' ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8')
-    }
-  }
-  if (utils.isCrossOrigin(request.getUrl())) {
-    reqHeaders.set('X-Requested-With', 'XMLHttpRequest')
-  }
-  next()
-})
-
 function responseToResolves (request, response, resolve, reject) {
   responseInterceptor(respQueue.resolves, request, response).then(resolve)
 }

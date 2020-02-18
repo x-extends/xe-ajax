@@ -17,6 +17,20 @@ var errorMessage = {
   ERR_F: 'Network request failed'
 }
 
+function handleDefaultHeader (request) {
+  var reqHeaders = request.headers
+  var reqBody = request.body
+  var reqMethod = request.method
+  if (reqBody && reqMethod !== 'GET' && reqMethod !== 'HEAD') {
+    if (!utils.isFData(reqBody)) {
+      reqHeaders.set('Content-Type', utils.isURLSParams(reqBody) || request.bodyType === 'form-data' ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8')
+    }
+  }
+  if (utils.isCrossOrigin(request.getUrl())) {
+    reqHeaders.set('X-Requested-With', 'XMLHttpRequest')
+  }
+}
+
 /**
   * 支持: nodejs、browser
   *
@@ -27,6 +41,7 @@ function XEAjax (options) {
   var opts = utils.assign({}, setupDefaults, { headers: utils.assign({}, setupDefaults.headers) }, options)
   var request = new XERequest(opts)
   return new Promise(function (resolve, reject) {
+    handleDefaultHeader(request)
     return interceptorExports.requests(request).then(function () {
       (request.jsonp ? sendJSONP : fetchRequest)(request, function (response) {
         interceptorExports.toResolves(request, handleExports.toResponse(response, request), resolve, reject)
