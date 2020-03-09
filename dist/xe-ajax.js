@@ -1,6 +1,6 @@
 /**
  * xe-ajax.js v4.0.3
- * ISC License.
+ * MIT License.
  * @preserve
  */
 (function (global, factory) {
