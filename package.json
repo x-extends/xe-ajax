@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xuliangzhan/xe-ajax.git"
+    "url": "git+https://github.com/x-extends/xe-ajax.git"
   },
   "keywords": [
     "ajax",
@@ -44,7 +44,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xuliangzhan/xe-ajax/issues"
+    "url": "https://github.com/x-extends/xe-ajax/issues"
   },
-  "homepage": "https://github.com/xuliangzhan/xe-ajax#readme"
+  "homepage": "https://github.com/x-extends/xe-ajax#readme"
 }

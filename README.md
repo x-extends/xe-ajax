@@ -1,13 +1,13 @@
 # xe-ajax
 
-简体中文 | [English](https://github.com/xuliangzhan/xe-ajax/blob/master/README.en-US.md)
+简体中文 | [English](README.en-US.md)  
 
 [![gitee star](https://gitee.com/xuliangzhan_admin/xe-ajax/badge/star.svg?theme=dark)](https://gitee.com/xuliangzhan_admin/xe-ajax/stargazers)
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.org/package/xe-ajax)
 [![npm build](https://travis-ci.org/xuliangzhan/xe-ajax.svg?branch=master)](https://travis-ci.org/xuliangzhan/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 [![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](https://unpkg.com/xe-ajax/dist/xe-ajax.min.js)
-[![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/xe-ajax/blob/master/LICENSE)
+[![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 基于 [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) 的异步请求函数，用于浏览器和 nodejs 的 http 客户端。
 
@@ -651,4 +651,4 @@ XEAjax.put('/api/test/message/update', {id: 123, name: 'test1'})
 
 ## License
 
-MIT License, 2017-present, Xu Liangzhan
+[MIT](LICENSE) © 2017-present, Xu Liangzhan
