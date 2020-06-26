@@ -7,7 +7,7 @@
   "jsdelivr": "dist/xe-ajax.js",
   "typings": "index.d.ts",
   "scripts": {
-    "lint": "eslint dist/xe-ajax.js test/**/*.js src/**/*.js",
+    "lint": "eslint test/**/*.js src/**/*.js",
     "unit": "jest",
     "test": "npm run lint && npm run unit"
   },
