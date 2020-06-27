@@ -6,16 +6,16 @@
   "unpkg": "dist/xe-ajax.js",
   "jsdelivr": "dist/xe-ajax.js",
   "typings": "index.d.ts",
+  "scripts": {
+    "format": "eslint --fix dist/*.ts",
+    "test": "jest"
+  },
   "files": [
     "src",
     "dist",
     "*.ts",
     "*.d.ts"
   ],
-  "scripts": {
-    "format": "eslint --fix dist/*.ts",
-    "test": "jest"
-  },
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
