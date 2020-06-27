@@ -4,7 +4,7 @@
 
 [![gitee star](https://gitee.com/xuliangzhan_admin/xe-ajax/badge/star.svg?theme=dark)](https://gitee.com/xuliangzhan_admin/xe-ajax/stargazers)
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.com/package/xe-ajax)
-[![npm build](https://travis-ci.org/x-extends/xe-ajax.svg?branch=master)](https://travis-ci.org/x-extends/xe-ajax)
+[![npm build](https://travis-ci.com/x-extends/xe-ajax.svg?branch=master)](https://travis-ci.com/x-extends/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
 [![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](http://img.badgesize.io/https://unpkg.com/xe-ajax/lib/index.umd.min.js?compression=gzip&label=gzip%20size:%20JS)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
