@@ -2,7 +2,7 @@
 
 简体中文 | [English](README.en-US.md)  
 
-[![gitee star](https://gitee.com/xuliangzhan_admin/xe-ajax/badge/star.svg?theme=dark)](https://gitee.com/xuliangzhan_admin/xe-ajax/stargazers)
+[![gitee star](https://gitee.com/x-extends/xe-ajax/badge/star.svg?theme=dark)](https://gitee.com/x-extends/xe-ajax/stargazers)
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.com/package/xe-ajax)
 [![npm build](https://travis-ci.com/x-extends/xe-ajax.svg?branch=master)](https://travis-ci.com/x-extends/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
