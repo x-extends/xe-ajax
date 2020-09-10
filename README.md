@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.com/package/xe-ajax)
 [![npm build](https://travis-ci.com/x-extends/xe-ajax.svg?branch=master)](https://travis-ci.com/x-extends/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
-[![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](https://unpkg.com/xe-ajax/dist/xe-ajax.min.js)
+[![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.umd.min.js?compression=gzip&label=gzip%20size:%20JS)](https://unpkg.com/xe-ajax/dist/xe-ajax.umd.min.js)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 基于 [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) 的异步请求函数，用于浏览器和 nodejs 的 http 客户端
@@ -42,15 +42,14 @@ const XEAjax = require('xe-ajax')
 * 核心
   * [ajax ( request )](#基本使用)
   * [fetch ( url[, request] )](#fetch-调用返回一个结果为-response-的-promise-对象)
-* 便捷函数
-  * 响应方式 1
-    * [doJsonp ( url[, params, request] )](#jsonp-调用)
-    * [doGet ( url[, params, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-    * [doPost ( url[, body, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
-  * 响应方式 2
-    * [jsonp ( url[, params, request] )](#jsonp-调用)
-    * [get ( url[, params, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
-    * [post ( url[, body, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* 便捷函数 1
+  * [jsonp ( url[, params, request] )](#jsonp-调用)
+  * [get ( url[, params, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+  * [post ( url[, body, request] )](#根据请求状态码成功或失败返回响应结果为-json-的-peomise-对象)
+* 便捷函数 2
+  * [doJsonp ( url[, params, request] )](#jsonp-调用)
+  * [doGet ( url[, params, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
+  * [doPost ( url[, body, request] )](#根据请求状态码成功或失败返回一个包含响应信息的-peomise-对象-v340)
 
 ### Request
 
@@ -67,21 +66,21 @@ const XEAjax = require('xe-ajax')
 | mode | String | 请求的模式, 可以设置cors,no-cors,same-origin | 'cors' |
 | cache | String | 处理缓存方式,可以设置default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
 | credentials | String |  设置 cookie 是否随请求一起发送,可以设置: omit,same-origin,include | 'same-origin' |
-| ***redirect** | String | 重定向模式, 可以设置follow,error,manual | 'follow' |
-| ***referrer** | String | 可以设置no-referrer,client或URL | 'client' |
-| ***referrerPolicy** | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
-| ***keepalive** | String | 选项可用于允许请求超过页面的生存时间 |  |
-| ***integrity** | String | 包括请求的subresource integrity值 |  |
 | jsonp | String | jsonp入参属性名 | 'callback' |
 | jsonpCallback | String | jsonp响应结果的回调函数名 | 默认自动生成函数名 |
 | timeout | Number | 设置请求超时 |  |
 | headers | Object | 请求头包含信息 |  |
-| origin | String | 改变目标源 | location.origin |
+| origin | String | 请求目标源 | location.origin |
 | transformParams | Function (params,request) | 用于改变URL参数 |  |
 | paramsSerializer | Function (params,request) | 自定义URL序列化函数 |  |
 | transformBody | Function (body,request) | 用于改变提交数据 |  |
 | stringifyBody | Function (body,request) | 自定义转换提交数据的函数 |  |
 | validateStatus | Function (response) | 自定义校验请求是否成功 | 默认200-299 |
+| ***redirect** | String | 重定向模式, 可以设置follow,error,manual | 'follow' |
+| ***referrer** | String | 可以设置no-referrer,client或URL | 'client' |
+| ***referrerPolicy** | String | 可以设置: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| ***keepalive** | String | 选项可用于允许请求超过页面的生存时间 |  |
+| ***integrity** | String | 包括请求的subresource integrity值 |  |
 
 ### Headers
 
@@ -123,9 +122,11 @@ const XEAjax = require('xe-ajax')
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
+  // 默认请求域名
+  // origin: 'https://test.com',
   // 除非 url 是绝对路径（'/api/list' 或 '//test.com/api/list' 或 'https://test.com/api/list'），
   // 否则 baseURL 会拼接在 url 之前
-  baseURL: 'https://test.com',
+  // baseURL: 'https://test.com',
   bodyType: 'json-data',
   credentials: 'include',
   headers: {

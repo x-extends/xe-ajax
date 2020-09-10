@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/xe-ajax.svg?style=flat-square)](https://www.npmjs.com/package/xe-ajax)
 [![npm build](https://travis-ci.com/x-extends/xe-ajax.svg?branch=master)](https://travis-ci.com/x-extends/xe-ajax)
 [![npm downloads](https://img.shields.io/npm/dm/xe-ajax.svg?style=flat-square)](http://npm-stat.com/charts.html?package=xe-ajax)
-[![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.min.js?compression=gzip&label=gzip%20size:%20JS)](http://img.badgesize.io/https://unpkg.com/xe-ajax/lib/index.umd.min.js?compression=gzip&label=gzip%20size:%20JS)
+[![gzip size: JS](http://img.badgesize.io/https://unpkg.com/xe-ajax/dist/xe-ajax.umd.min.js?compression=gzip&label=gzip%20size:%20JS)](http://img.badgesize.io/https://unpkg.com/xe-ajax/lib/index.umd.min.js?compression=gzip&label=gzip%20size:%20JS)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) based asynchronous request function for the browser and node.js HTTP client.
@@ -49,15 +49,14 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 * Core
   * [ajax ( request )](#ajax)
   * [fetch ( url[, request] )](#fetch-to-response)
-* Convenience function
-  * Response mode 1
-    * [doJsonp ( url[, params, request] )](#jsonp)
-    * [doGet ( url[, params, request] )](#fetch-to-response-schema-v340)
-    * [doPost ( url[, body, request] )](#fetch-to-response-schema-v340)
-  * Response mode 2
-    * [jsonp ( url[, params, request] )](#jsonp)
-    * [get ( url[, params, request] )](#fetch-to-json)
-    * [post ( url[, body, request] )](#fetch-to-json)
+* Function 1
+  * [doJsonp ( url[, params, request] )](#jsonp)
+  * [doGet ( url[, params, request] )](#fetch-to-response-schema-v340)
+  * [doPost ( url[, body, request] )](#fetch-to-response-schema-v340)
+* Function 2
+  * [jsonp ( url[, params, request] )](#jsonp)
+  * [get ( url[, params, request] )](#fetch-to-json)
+  * [post ( url[, body, request] )](#fetch-to-json)
 
 ### Request
 
@@ -74,11 +73,6 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 | mode | String | The mode you want to use for the request, You can set: cors,no-cors,same-origin | 'cors' |
 | cache | String | Handling cache mode, You can set: default,no-store,no-cache,reload,force-cache,only-if-cached | 'default' |
 | credentials | String | Set the cookie to be sent along with the request, You can set: omit,same-origin,include | 'same-origin' |
-| ***redirect** | String | The redirect mode to use, You can set: follow,error,manual | 'follow' |
-| ***referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
-| ***referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
-| ***keepalive** | String | The keepalive option can be used to allow the request to outlive the page. |  |
-| ***integrity** | String | Contains the subresource integrity value of the request. |  |
 | jsonp | String | set jsonp Callback parameter name. | 'callback' |
 | jsonpCallback | String | Set jsonp callback function name. | Default is a random number with json_xeajax_ prefix |
 | timeout | Number | Setting the request timeout. |  |
@@ -89,6 +83,11 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 | transformBody | Function (body,request) | Change the commit body before sending the request. |  |
 | stringifyBody | Function (body,request) | Customize the body stringify function. | JSON.stringify |
 | validateStatus | Function (response) | Verify that the request is successful. | 200-299 |
+| ***redirect** | String | The redirect mode to use, You can set: follow,error,manual | 'follow' |
+| ***referrer** | String | Specifies the value of the referer HTTP header. You can set: no-referrer,client,URL | 'client' |
+| ***referrerPolicy** | String | You can set: no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,unsafe-url |  |
+| ***keepalive** | String | The keepalive option can be used to allow the request to outlive the page. |  |
+| ***integrity** | String | Contains the subresource integrity value of the request. |  |
 
 ### Headers
 
@@ -130,7 +129,8 @@ Get on [unpkg](https://unpkg.com/xe-ajax/) and [cdnjs](https://cdn.jsdelivr.net/
 import XEAjax from 'xe-ajax'
 
 XEAjax.setup({
-  baseURL: 'https://test.com',
+  // origin: 'https://test.com',
+  // baseURL: 'https://test.com',
   bodyType: 'json-data',
   credentials: 'include',
   headers: {
